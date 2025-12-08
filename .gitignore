@@ -1,0 +1,20 @@
+# Python bytecode (generated files - should not be in version control)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments (should be recreated, not committed)
+venv/
+env/
+ENV/
+.venv
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE swap files
+*.swp
+*.swo
+*~
