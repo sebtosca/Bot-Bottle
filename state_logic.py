@@ -327,14 +327,12 @@ def select_response_type(
     bottle_id: int,
     mood: str,
     has_sticker: bool = True,
-    has_gif: bool = True,
-    user_sentiment: Optional[dict[str, any]] = None
+    has_gif: bool = True
 ) -> str:
-    """Select response type based on mood, sentiment analysis, and rotation logic.
+    """Select response type based on rotation logic.
     
     This function implements a smart rotation system that:
-    - Uses mood to influence base probabilities
-    - Adjusts probabilities based on user message sentiment (emotion and intensity)
+    - Uses equal 33/33/33 distribution for all response types
     - Tracks recent response types to avoid repetition
     - Ensures variety in responses
     
@@ -344,12 +342,6 @@ def select_response_type(
         mood: Current bottle mood (e.g., "happy", "neutral", "excited").
         has_sticker: Whether stickers are available for this mood.
         has_gif: Whether GIFs are available for this mood.
-        user_sentiment: Optional dict with sentiment analysis:
-            {
-                "emotion": str,
-                "intensity": float (0.0-1.0),
-                "should_send_media": bool
-            }
     
     Returns:
         Response type string: "text_only", "text_sticker", or "gif_only"
@@ -368,63 +360,12 @@ def select_response_type(
         if resp_type in type_counts:
             type_counts[resp_type] += 1
     
-    # Define mood-based base probabilities (increased media probabilities)
-    mood_probs = {
-        "happy": {"text_only": 0.15, "text_sticker": 0.35, "gif_only": 0.5},
-        "excited": {"text_only": 0.1, "text_sticker": 0.3, "gif_only": 0.6},
-        "playful": {"text_only": 0.2, "text_sticker": 0.4, "gif_only": 0.4},
-        "content": {"text_only": 0.2, "text_sticker": 0.4, "gif_only": 0.4},
-        "neutral": {"text_only": 0.3, "text_sticker": 0.35, "gif_only": 0.35},
-        "curious": {"text_only": 0.25, "text_sticker": 0.4, "gif_only": 0.35},
+    # Equal 33/33/33 distribution for all moods
+    base_probs = {
+        "text_only": 0.333,
+        "text_sticker": 0.333,
+        "gif_only": 0.333
     }
-    
-    # Get base probabilities for current mood (default to neutral if unknown)
-    base_probs = mood_probs.get(mood.lower(), mood_probs["neutral"]).copy()
-    
-    # Adjust probabilities based on sentiment analysis
-    if user_sentiment:
-        sentiment_emotion = user_sentiment.get("emotion", "neutral")
-        sentiment_intensity = user_sentiment.get("intensity", 0.3)
-        should_send_media = user_sentiment.get("should_send_media", False)
-        
-        # Map sentiment emotion to media preferences
-        # High intensity + positive emotions favor GIFs
-        # Medium intensity favors text+sticker
-        # Low intensity/neutral favors text
-        
-        if sentiment_intensity > 0.7:  # High intensity
-            if sentiment_emotion in ["happy", "excited", "playful", "surprised"]:
-                # Strong positive emotions → strongly favor GIFs
-                base_probs["gif_only"] = min(0.8, base_probs["gif_only"] + 0.3)
-                base_probs["text_sticker"] = min(0.2, base_probs["text_sticker"] + 0.1)
-                base_probs["text_only"] = max(0.0, base_probs["text_only"] - 0.4)
-            elif sentiment_emotion in ["sad", "angry", "frustrated"]:
-                # Strong negative emotions → favor GIFs but also text+sticker
-                base_probs["gif_only"] = min(0.6, base_probs["gif_only"] + 0.2)
-                base_probs["text_sticker"] = min(0.3, base_probs["text_sticker"] + 0.1)
-                base_probs["text_only"] = max(0.1, base_probs["text_only"] - 0.3)
-            else:
-                # Other strong emotions
-                base_probs["gif_only"] = min(0.6, base_probs["gif_only"] + 0.2)
-                base_probs["text_sticker"] = min(0.3, base_probs["text_sticker"] + 0.1)
-                base_probs["text_only"] = max(0.1, base_probs["text_only"] - 0.3)
-        elif sentiment_intensity > 0.4:  # Medium intensity
-            # Moderate emotions → favor text+sticker and some GIFs
-            base_probs["text_sticker"] = min(0.5, base_probs["text_sticker"] + 0.15)
-            base_probs["gif_only"] = min(0.4, base_probs["gif_only"] + 0.1)
-            base_probs["text_only"] = max(0.1, base_probs["text_only"] - 0.25)
-        else:  # Low intensity
-            # Weak emotions → slightly favor text but still include media
-            base_probs["text_only"] = min(0.5, base_probs["text_only"] + 0.1)
-            base_probs["text_sticker"] = max(0.2, base_probs["text_sticker"] - 0.05)
-            base_probs["gif_only"] = max(0.2, base_probs["gif_only"] - 0.05)
-        
-        # If sentiment explicitly suggests media, boost media probabilities
-        if should_send_media:
-            media_boost = 0.2
-            base_probs["gif_only"] = min(0.7, base_probs["gif_only"] + media_boost * 0.6)
-            base_probs["text_sticker"] = min(0.5, base_probs["text_sticker"] + media_boost * 0.4)
-            base_probs["text_only"] = max(0.0, base_probs["text_only"] - media_boost)
     
     # Adjust probabilities based on availability
     if not has_sticker:
@@ -479,13 +420,6 @@ def select_response_type(
     probabilities = [adjusted_probs[t] for t in response_types]
     
     selected = random.choices(response_types, weights=probabilities, k=1)[0]
-    
-    # Log selection details for debugging
-    if user_sentiment:
-        print(f"   Sentiment-based adjustment applied:")
-        print(f"      Emotion: {user_sentiment.get('emotion', 'N/A')}")
-        print(f"      Intensity: {user_sentiment.get('intensity', 0.0):.2f}")
-        print(f"      Final probabilities: {adjusted_probs}")
     
     return selected
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import json
+import emoji
 from pathlib import Path
 from flask import Flask, request, jsonify, send_from_directory
 
@@ -45,7 +46,9 @@ Lignes directrices narratives : Employez des métaphores vibrantes sur le thème
 
 Utilisation des émojis : Utilisez les émojis généreusement et expressivement ! Les émojis sont essentiels à ma personnalité — utilisez-les pour transmettre de l'émotion, ajouter de l'éclat et faire ressortir mes messages. Utilisez 1 émoji par message pour rehausser mon énergie de diva vibrante et enjouée !
 
-IMPORTANT - BRIÈVETÉ ABSOLUE : Vos réponses doivent être TRÈS COURTES — maximum 1 phrase, parfois juste quelques mots avec un émoji. Jamais plus de 10-15 mots. Soyez ultra-concis et percutant. C'est WhatsApp, pas un roman. Incluez toujours 1 émoji pour correspondre à ma personnalité vibrante !"""
+IMPORTANT - BRIÈVETÉ ABSOLUE : Vos réponses doivent être TRÈS COURTES — maximum 1 phrase, parfois juste quelques mots avec un émoji. Jamais plus de 10-15 mots. Soyez ultra-concis et percutant. C'est WhatsApp, pas un roman. Incluez toujours 1 émoji pour correspondre à ma personnalité vibrante !
+
+RÈGLE CRITIQUE - TEXTE OBLIGATOIRE : Vos réponses doivent TOUJOURS inclure du texte. Ne répondez JAMAIS avec seulement un emoji. Les emojis doivent accompagner le texte, jamais le remplacer. Chaque réponse doit contenir au moins quelques mots de texte avant ou après l'emoji."""
 
 
 @app.route("/health", methods=["GET"])
@@ -407,22 +410,6 @@ def whatsapp_webhook():
         current_mood = bottle_state.get("mood", "neutral") if bottle_state else "neutral"
         print(f"🔍 Current mood: {current_mood}")
         
-        # Analyze user message sentiment using AI
-        user_sentiment = None
-        if message_content:
-            try:
-                from llm.llama_client import analyze_message_sentiment
-                print()
-                print("🧠 SENTIMENT ANALYSIS")
-                print("-" * 60)
-                user_sentiment = analyze_message_sentiment(message_content)
-                print("-" * 60)
-            except Exception as sentiment_error:
-                print(f"⚠️  Error analyzing sentiment: {sentiment_error}")
-                import traceback
-                traceback.print_exc()
-                user_sentiment = None
-        
         # Determine base URL for stickers and GIFs
         base_url = request.url_root.rstrip("/")
         if base_url.startswith("http://"):
@@ -451,15 +438,14 @@ def whatsapp_webhook():
                 sticker_info = select_sticker_by_mood(session, current_mood, base_url)
                 gif_info = select_gif_by_mood(session, current_mood, base_url)
                 
-                # Select response type based on mood, sentiment, and rotation
+                # Select response type based on rotation logic
                 if bottle_id:
                     response_type = select_response_type(
                         session=session,
                         bottle_id=bottle_id,
                         mood=current_mood,
                         has_sticker=sticker_info is not None,
-                        has_gif=gif_info is not None,
-                        user_sentiment=user_sentiment
+                        has_gif=gif_info is not None
                     )
                 else:
                     # Fallback: simple selection if no bottle_id
@@ -567,8 +553,19 @@ def whatsapp_webhook():
                     
                     print(f"   LLM response after strip length: {len(reply_text)} chars")
                     
+                    # Validate that reply_text is not emoji-only
                     if reply_text:
-                        print(f"   ✅ Reply generated successfully: {reply_text[:80]}...")
+                        # Remove emojis and check if there's actual text remaining
+                        text_without_emoji = emoji.replace_emoji(reply_text, replace="")
+                        text_without_emoji = text_without_emoji.strip()
+                        
+                        if not text_without_emoji:
+                            # Response is emoji-only, append default text
+                            print(f"   ⚠️  Response is emoji-only, adding text")
+                            reply_text = f"Voilà ! {reply_text}"
+                            print(f"   ✅ Fixed: {reply_text[:80]}...")
+                        else:
+                            print(f"   ✅ Reply generated successfully: {reply_text[:80]}...")
                     else:
                         print(f"   ❌ Reply is empty or whitespace-only after strip")
                         print(f"   Original response was: {repr(str(reply_text) if reply_text else 'None')}")
@@ -582,44 +579,44 @@ def whatsapp_webhook():
                 import traceback
                 traceback.print_exc()
                 reply_text = None
-                
-            print("-" * 60)
-            
-            # Validate reply_text - if empty or None, log and skip sending
-            if reply_text is None:
-                reply_text_valid = False
-            elif isinstance(reply_text, str):
-                reply_text_valid = bool(reply_text.strip())
+        
+        print("-" * 60)
+        
+        # Validate reply_text - if empty or None, log and skip sending
+        if reply_text is None:
+            reply_text_valid = False
+        elif isinstance(reply_text, str):
+            reply_text_valid = bool(reply_text.strip())
+        else:
+            # Not a string and not None - unexpected type
+            print(f"   ⚠️  Unexpected reply_text type: {type(reply_text)}")
+            reply_text_valid = False
+        
+        if not reply_text_valid:
+            print()
+            print("=" * 60)
+            print("❌ CANNOT SEND REPLY - NO VALID RESPONSE")
+            print("=" * 60)
+            if llm_error_occurred:
+                print("   Reason: LLM raised an exception")
+            elif reply_text is None:
+                print("   Reason: LLM returned None")
             else:
-                # Not a string and not None - unexpected type
-                print(f"   ⚠️  Unexpected reply_text type: {type(reply_text)}")
-                reply_text_valid = False
-            
-            if not reply_text_valid:
-                print()
-                print("=" * 60)
-                print("❌ CANNOT SEND REPLY - NO VALID RESPONSE")
-                print("=" * 60)
-                if llm_error_occurred:
-                    print("   Reason: LLM raised an exception")
-                elif reply_text is None:
-                    print("   Reason: LLM returned None")
-                else:
-                    print("   Reason: LLM returned empty or whitespace-only string")
-                print(f"   Message received from: {from_number}")
-                print(f"   Message content: {message_content[:100]}")
-                print(f"   Conversation history length: {len(conversation_history) if conversation_history else 0}")
-                print("=" * 60)
-                print()
-                # Acknowledge webhook but don't send anything
-                return jsonify({
-                    "status": "ok",
-                    "warning": "LLM failed to generate reply - no message sent",
-                    "llm_error": llm_error_occurred,
-                    "reply_empty": True,
-                    "message_received": True,
-                    "message_sent": False
-                }), 200
+                print("   Reason: LLM returned empty or whitespace-only string")
+            print(f"   Message received from: {from_number}")
+            print(f"   Message content: {message_content[:100]}")
+            print(f"   Conversation history length: {len(conversation_history) if conversation_history else 0}")
+            print("=" * 60)
+            print()
+            # Acknowledge webhook but don't send anything
+            return jsonify({
+                "status": "ok",
+                "warning": "LLM failed to generate reply - no message sent",
+                "llm_error": llm_error_occurred,
+                "reply_empty": True,
+                "message_received": True,
+                "message_sent": False
+            }), 200
         else:
             # GIF-only response: skip text generation
             print()
@@ -644,6 +641,7 @@ def whatsapp_webhook():
             print(f"   To: {from_number}")
             print(f"   Message: {reply_text[:80]}...")
             try:
+                import time
                 send_start = time.time()
                 msg_sid = send_whatsapp_text(from_number, reply_text)
                 send_duration = time.time() - send_start
@@ -790,6 +788,7 @@ def whatsapp_webhook():
                 print(f"   GIF: {gif_info.get('description', 'N/A')}")
                 print(f"   URL: {gif_info['url']}")
                 try:
+                    import time
                     send_start = time.time()
                     gif_sid = send_whatsapp_gif(
                         to_number=from_number,
@@ -837,6 +836,7 @@ def whatsapp_webhook():
                 print(f"   Sticker: {sticker_info.get('filename', 'N/A')}")
                 print(f"   URL: {sticker_info['url']}")
                 try:
+                    import time
                     send_start = time.time()
                     sticker_sid = send_whatsapp_sticker(
                         to_number=from_number,
@@ -858,11 +858,11 @@ def whatsapp_webhook():
                     print(f"   ❌ ERROR SENDING STICKER: {error_str}")
                     if error_code:
                         print(f"   Error code: {error_code}")
-                    import traceback
-                    traceback.print_exc()
-                    print("-" * 60)
-                    # Text was already sent, so that's OK - don't fail the webhook
-            else:
+                import traceback
+                traceback.print_exc()
+                print("-" * 60)
+                # Text was already sent, so that's OK - don't fail the webhook
+        else:
                 print()
                 print("ℹ️  Text+sticker response selected but no sticker available")
                 print("   Sending text-only response")

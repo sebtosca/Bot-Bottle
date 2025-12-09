@@ -121,7 +121,7 @@ def load_gifs():
             
             mood_tags = gif_info.get("mood_tags", "")
             description = gif_info.get("description", f"GIF: {gif_name}")
-
+            
             # Validate that the file exists in the GIF directory
             gif_path = gifs_dir / filename
             if not gif_path.exists():

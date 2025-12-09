@@ -21,7 +21,7 @@ API_BASE_URL = "https://graph.facebook.com/v18.0"  # Version can be updated as n
 
 class WhatsAppCloudError(Exception):
     """Raised when the WhatsApp Cloud API returns an error."""
-    
+
     def __init__(self, message: str, error_code: Optional[str] = None, error_subcode: Optional[str] = None, full_response: Optional[Dict[str, Any]] = None):
         super().__init__(message)
         self.error_code = error_code
@@ -130,7 +130,7 @@ def send_whatsapp_text(to_number: str, body: str) -> str:
         raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
 
     try:
-        data = resp.json()
+    data = resp.json()
     except json.JSONDecodeError:
         raise WhatsAppCloudError(f"Invalid JSON response from WhatsApp API: {resp.text}")
 
@@ -244,7 +244,7 @@ def send_whatsapp_gif(to_number: str, media_url: str, body: Optional[str] = None
         raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
 
     try:
-        data = resp.json()
+    data = resp.json()
     except json.JSONDecodeError:
         raise WhatsAppCloudError(f"Invalid JSON response from WhatsApp API: {resp.text}")
 
@@ -305,7 +305,7 @@ def send_whatsapp_media(to_number: str, media_url: str, body: Optional[str] = No
         raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
 
     try:
-        data = resp.json()
+    data = resp.json()
     except json.JSONDecodeError:
         raise WhatsAppCloudError(f"Invalid JSON response from WhatsApp API: {resp.text}")
 

@@ -41,7 +41,7 @@ def main():
     try:
         init_db()
         session = get_session()
-        
+
         # Get first GIF from database that has a filename (local-file-based)
         gif = session.query(Sticker).filter(
             Sticker.media_type == "gif",
@@ -66,16 +66,16 @@ def main():
         gif_url = f"{public_base_url}/gifs/{gif.filename}"
         gif_description = gif.description or "GIF"
         gif_mood_tags = gif.mood_tags or "N/A"
-        
+
         print(f"   Recipient: {recipient}")
         print(f"   GIF: {gif_description}")
         print(f"   Mood tags: {gif_mood_tags}")
         print(f"   Filename: {gif.filename}")
         print(f"   URL: {gif_url[:60]}...")
         print()
-        
+
         session.close()
-        
+
     except Exception as e:
         print(f"❌ Error loading GIF from database: {e}")
         import traceback
