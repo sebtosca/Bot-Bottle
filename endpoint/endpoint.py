@@ -582,47 +582,49 @@ def whatsapp_webhook():
         
         print("-" * 60)
         
-        # Validate reply_text - if empty or None, log and skip sending
-        if reply_text is None:
-            reply_text_valid = False
-        elif isinstance(reply_text, str):
-            reply_text_valid = bool(reply_text.strip())
-        else:
-            # Not a string and not None - unexpected type
-            print(f"   ⚠️  Unexpected reply_text type: {type(reply_text)}")
-            reply_text_valid = False
-        
-        if not reply_text_valid:
-            print()
-            print("=" * 60)
-            print("❌ CANNOT SEND REPLY - NO VALID RESPONSE")
-            print("=" * 60)
-            if llm_error_occurred:
-                print("   Reason: LLM raised an exception")
-            elif reply_text is None:
-                print("   Reason: LLM returned None")
-            else:
-                print("   Reason: LLM returned empty or whitespace-only string")
-            print(f"   Message received from: {from_number}")
-            print(f"   Message content: {message_content[:100]}")
-            print(f"   Conversation history length: {len(conversation_history) if conversation_history else 0}")
-            print("=" * 60)
-            print()
-            # Acknowledge webhook but don't send anything
-            return jsonify({
-                "status": "ok",
-                "warning": "LLM failed to generate reply - no message sent",
-                "llm_error": llm_error_occurred,
-                "reply_empty": True,
-                "message_received": True,
-                "message_sent": False
-            }), 200
-        else:
-            # GIF-only response: skip text generation
+        # For GIF-only responses, we don't need text, so skip validation
+        if response_type == "gif_only":
             print()
             print("🤖 SKIPPING TEXT GENERATION (GIF-only response)")
             print("-" * 60)
             reply_text = None
+            reply_text_valid = True  # Allow GIF-only to proceed
+        else:
+            # Validate reply_text - if empty or None, log and skip sending
+            if reply_text is None:
+                reply_text_valid = False
+            elif isinstance(reply_text, str):
+                reply_text_valid = bool(reply_text.strip())
+            else:
+                # Not a string and not None - unexpected type
+                print(f"   ⚠️  Unexpected reply_text type: {type(reply_text)}")
+                reply_text_valid = False
+            
+            if not reply_text_valid:
+                print()
+                print("=" * 60)
+                print("❌ CANNOT SEND REPLY - NO VALID RESPONSE")
+                print("=" * 60)
+                if llm_error_occurred:
+                    print("   Reason: LLM raised an exception")
+                elif reply_text is None:
+                    print("   Reason: LLM returned None")
+                else:
+                    print("   Reason: LLM returned empty or whitespace-only string")
+                print(f"   Message received from: {from_number}")
+                print(f"   Message content: {message_content[:100]}")
+                print(f"   Conversation history length: {len(conversation_history) if conversation_history else 0}")
+                print("=" * 60)
+                print()
+                # Acknowledge webhook but don't send anything
+                return jsonify({
+                    "status": "ok",
+                    "warning": "LLM failed to generate reply - no message sent",
+                    "llm_error": llm_error_occurred,
+                    "reply_empty": True,
+                    "message_received": True,
+                    "message_sent": False
+                }), 200
         
         # Ensure phone number is in correct format (E.164 with +)
         if not from_number.startswith("+"):
