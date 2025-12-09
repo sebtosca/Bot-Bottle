@@ -153,6 +153,47 @@ def serve_gif(filename: str):
     )
 
 
+@app.route("/rules/<filename>", methods=["GET"])
+def serve_rules(filename: str):
+    """Serve rule images from the Rule/ directory.
+    
+    Args:
+        filename: Name of the rule image file (e.g., "model card for game updated.png")
+    
+    Returns:
+        Image file with proper MIME type, or 404 if not found.
+    """
+    rules_dir = Path(__file__).parent.parent / "Rule"
+    
+    # Security: Only allow image files and prevent directory traversal
+    valid_extensions = (".png", ".jpg", ".jpeg", ".webp")
+    filename_lower = filename.lower()
+    if not any(filename_lower.endswith(ext) for ext in valid_extensions) or ".." in filename or "/" in filename:
+        return jsonify({"error": "Invalid filename"}), 400
+    
+    rule_path = rules_dir / filename
+    
+    if not rule_path.exists():
+        return jsonify({"error": "Rule image not found"}), 404
+    
+    # Determine MIME type based on extension
+    if filename.lower().endswith(".png"):
+        mimetype = "image/png"
+    elif filename.lower().endswith((".jpg", ".jpeg")):
+        mimetype = "image/jpeg"
+    elif filename.lower().endswith(".webp"):
+        mimetype = "image/webp"
+    else:
+        mimetype = "image/png"  # Default to PNG
+    
+    # Serve file with proper MIME type
+    return send_from_directory(
+        str(rules_dir),
+        filename,
+        mimetype=mimetype
+    )
+
+
 @app.route("/whatsapp-webhook", methods=["GET", "POST"])
 def whatsapp_webhook():
     """Receive an inbound WhatsApp message from Cloud API and respond via LLM.
@@ -334,6 +375,11 @@ def whatsapp_webhook():
             # Empty message (shouldn't happen, but handle gracefully)
             message_content = "[User sent an empty message]"
 
+        # Determine base URL for media (needed for rules image and stickers/GIFs)
+        base_url = request.url_root.rstrip("/")
+        if base_url.startswith("http://"):
+            base_url = base_url.replace("http://", "https://")
+        
         # Database operations (if DATABASE_URL is set)
         bottle_state = None
         conversation_history = [{"role": "user", "content": message_content}]
@@ -364,6 +410,132 @@ def whatsapp_webhook():
                 
                 # Get recent interactions for conversation history
                 recent_interactions = get_recent_interactions(session, bottle.id, limit=8)
+                
+                # Count user interactions to detect first contact
+                # Note: get_recent_interactions returns oldest first, so the last item is the most recent
+                user_interactions = [inter for inter in recent_interactions if inter.from_user == "true"]
+                is_first_contact = len(user_interactions) == 1  # Only the current message
+                
+                # Check if last bot message was name request
+                # Look for the most recent bot message (from the end of the list, before current user message)
+                last_bot_message = None
+                # Reverse to get newest first, then skip the current user message (which is the last one)
+                reversed_interactions = list(reversed(recent_interactions))
+                for inter in reversed_interactions[1:]:  # Skip current user message (most recent)
+                    if inter.from_user == "false":
+                        last_bot_message = inter.content
+                        break
+                
+                name_request_text = "Quel nom voulez-vous donner à votre bouteille ? 🍒"
+                is_name_response = last_bot_message and name_request_text in last_bot_message
+                
+                # Handle first contact: ask for name
+                if is_first_contact and bottle.name is None:
+                    print()
+                    print("=" * 60)
+                    print("👋 FIRST CONTACT - ASKING FOR BOTTLE NAME")
+                    print("=" * 60)
+                    name_request_msg = name_request_text
+                    try:
+                        msg_sid = send_whatsapp_text(from_number, name_request_msg)
+                        print(f"✅ Name request sent: {msg_sid}")
+                        
+                        # Log bot response
+                        create_interaction(
+                            session=session,
+                            user_id=user.id,
+                            bottle_id=bottle.id,
+                            message_type="text",
+                            from_user=False,
+                            content=name_request_msg
+                        )
+                        session.commit()
+                        
+                        return jsonify({
+                            "status": "ok",
+                            "message": "Name request sent",
+                            "sid": msg_sid
+                        }), 200
+                    except Exception as e:
+                        print(f"❌ Error sending name request: {e}")
+                        import traceback
+                        traceback.print_exc()
+                        # Continue with normal flow if name request fails
+                
+                # Handle name response: store name and send rules image
+                elif is_name_response and bottle.name is None:
+                    print()
+                    print("=" * 60)
+                    print("📝 NAME RESPONSE RECEIVED")
+                    print("=" * 60)
+                    
+                    # Extract name from message (remove extra whitespace)
+                    bottle_name = message_content.strip()
+                    if not bottle_name:
+                        bottle_name = "Bouteille"  # Default name if empty
+                    
+                    # Store name in database
+                    bottle.name = bottle_name
+                    session.add(bottle)
+                    session.commit()
+                    session.refresh(bottle)
+                    print(f"✅ Bottle name stored: {bottle_name}")
+                    
+                    # Send rules image
+                    from urllib.parse import quote
+                    rules_filename = "model card for game updated.png"
+                    encoded_filename = quote(rules_filename, safe='')
+                    rules_url = f"{base_url.rstrip('/')}/rules/{encoded_filename}"
+                    
+                    print(f"📸 Sending rules image: {rules_url}")
+                    try:
+                        rules_image_sid = send_whatsapp_media(from_number, rules_url)
+                        print(f"✅ Rules image sent: {rules_image_sid}")
+                        
+                        # Log rules image
+                        create_interaction(
+                            session=session,
+                            user_id=user.id,
+                            bottle_id=bottle.id,
+                            message_type="image",
+                            from_user=False,
+                            content=f"[Rules image: {rules_filename}]"
+                        )
+                    except Exception as e:
+                        print(f"⚠️  Error sending rules image: {e}")
+                        import traceback
+                        traceback.print_exc()
+                    
+                    # Send welcome message
+                    welcome_msg = f"Parfait ! Votre bouteille s'appelle maintenant {bottle_name} ! 🎉"
+                    try:
+                        welcome_sid = send_whatsapp_text(from_number, welcome_msg)
+                        print(f"✅ Welcome message sent: {welcome_sid}")
+                        
+                        # Log welcome message
+                        create_interaction(
+                            session=session,
+                            user_id=user.id,
+                            bottle_id=bottle.id,
+                            message_type="text",
+                            from_user=False,
+                            content=welcome_msg
+                        )
+                        session.commit()
+                        
+                        return jsonify({
+                            "status": "ok",
+                            "message": "Name stored and rules sent",
+                            "bottle_name": bottle_name,
+                            "rules_sid": rules_image_sid if 'rules_image_sid' in locals() else None,
+                            "welcome_sid": welcome_sid
+                        }), 200
+                    except Exception as e:
+                        print(f"❌ Error sending welcome message: {e}")
+                        import traceback
+                        traceback.print_exc()
+                        # Continue with normal flow if welcome fails
+                
                 conversation_history = []
                 for inter in recent_interactions:
                     role = "user" if inter.from_user == "true" else "assistant"
@@ -393,7 +565,9 @@ def whatsapp_webhook():
                 
                 # Prepare bottle state for LLM
                 bottle_state = {
+                    "id": bottle.id,
                     "type": bottle.type,
+                    "name": bottle.name,
                     "mood": bottle.mood,
                     "personality_level": bottle.personality_level,
                 }
@@ -409,12 +583,6 @@ def whatsapp_webhook():
         # Get current mood and determine response type BEFORE generating text
         current_mood = bottle_state.get("mood", "neutral") if bottle_state else "neutral"
         print(f"🔍 Current mood: {current_mood}")
-        
-        # Determine base URL for stickers and GIFs
-        base_url = request.url_root.rstrip("/")
-        if base_url.startswith("http://"):
-            base_url = base_url.replace("http://", "https://")
-            print(f"⚠️  Converted HTTP to HTTPS for media URLs: {base_url}")
         
         # Check media availability and select response type
         sticker_info = None

@@ -33,6 +33,7 @@ class Bottle(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     type = Column(String, default="maraschino_cherry", nullable=False)  # e.g., "maraschino_cherry", "tabasco", "water"
+    name = Column(String, nullable=True)  # User-given name for the bottle
     mood = Column(String, default="neutral", nullable=False)  # e.g., "happy", "sad", "angry", "lonely", "thirsty", "neutral"
     personality_level = Column(Integer, default=0, nullable=False)  # 0-10 scale, evolves with engagement
     
