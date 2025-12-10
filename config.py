@@ -23,3 +23,7 @@ LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "mistral")
 MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY")
 MISTRAL_MODEL_NAME = os.environ.get("MISTRAL_MODEL_NAME", "ministral-3b")
 
+# Public base URL for serving media (stickers, GIFs, rules images)
+# Should be set to Cloudflare Tunnel URL or other public tunnel service URL
+PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL")
+

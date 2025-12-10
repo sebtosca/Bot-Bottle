@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 import os
@@ -6,7 +7,7 @@ import emoji
 from pathlib import Path
 from flask import Flask, request, jsonify, send_from_directory
 
-from config import DATABASE_URL
+from config import DATABASE_URL, PUBLIC_BASE_URL
 from db.db import (
     init_db,
     get_session,
@@ -376,17 +377,21 @@ def whatsapp_webhook():
             message_content = "[User sent an empty message]"
 
         # Determine base URL for media (needed for rules image and stickers/GIFs)
-        base_url = request.url_root.rstrip("/")
-        if base_url.startswith("http://"):
-            base_url = base_url.replace("http://", "https://")
+        # Prefer PUBLIC_BASE_URL if set (e.g., Cloudflare Tunnel URL), otherwise use request.url_root
+        if PUBLIC_BASE_URL:
+            base_url = PUBLIC_BASE_URL.rstrip("/")
+            # Ensure HTTPS if not already specified
+            if base_url.startswith("http://"):
+                base_url = base_url.replace("http://", "https://")
+        else:
+            # Fallback to request.url_root for backward compatibility
+            base_url = request.url_root.rstrip("/")
+            if base_url.startswith("http://"):
+                base_url = base_url.replace("http://", "https://")
         
         # Database operations (if DATABASE_URL is set)
         bottle_state = None
-        conversation_history = [{"role": "user", "content": message_content}]
-        
-        # Ensure conversation_history is always valid
-        if not conversation_history or len(conversation_history) == 0:
-            conversation_history = [{"role": "user", "content": message_content}]
+        conversation_history = []  # Initialize before use
         
         if DATABASE_URL:
             try:
