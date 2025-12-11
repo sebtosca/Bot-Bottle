@@ -15,7 +15,47 @@ TARGET_SIZE = (512, 512)  # width x height
 MAX_SIZE_KB = 100
 QUALITY = 85  # WebP quality (0-100, lower = smaller file)
 
-def fix_sticker(input_path: Path, output_path: Path = None):
+def remove_background(img: Image.Image, threshold: int = 240) -> Image.Image:
+    """Remove white/light background and make it transparent.
+    
+    Args:
+        img: PIL Image in RGB or RGBA mode
+        threshold: Brightness threshold (0-255). Pixels brighter than this become transparent.
+                   Default 240 works well for white/light backgrounds.
+    
+    Returns:
+        Image with transparent background (RGBA mode)
+    """
+    # Ensure we have RGBA mode
+    if img.mode != "RGBA":
+        img = img.convert("RGBA")
+    
+    # Get image data
+    data = img.getdata()
+    new_data = []
+    
+    for item in data:
+        # If pixel is white/light (brightness > threshold), make it transparent
+        # Calculate brightness: (R + G + B) / 3
+        if len(item) == 4:  # RGBA
+            r, g, b, a = item
+        else:  # RGB (shouldn't happen, but handle it)
+            r, g, b = item[:3]
+            a = 255
+        
+        brightness = (r + g + b) / 3
+        
+        if brightness >= threshold:
+            # Make transparent
+            new_data.append((r, g, b, 0))
+        else:
+            # Keep original (preserve existing alpha if any)
+            new_data.append((r, g, b, a))
+    
+    img.putdata(new_data)
+    return img
+
+def fix_sticker(input_path: Path, output_path: Path = None, remove_bg: bool = False):
     """Resize and convert sticker to meet WhatsApp requirements."""
     if output_path is None:
         output_path = input_path.with_suffix('.webp')
@@ -35,6 +75,27 @@ def fix_sticker(input_path: Path, output_path: Path = None):
             else:
                 img = img.convert("RGBA")
             print(f"  Converted to RGBA for transparency")
+        
+        # Remove background if requested (makes white/light backgrounds transparent)
+        if remove_bg:
+            # Check if image already has transparency by sampling alpha channel
+            has_transparency = False
+            if img.mode == "RGBA":
+                # Sample a few pixels to check for transparency
+                sample_pixels = [
+                    img.getpixel((0, 0)),
+                    img.getpixel((img.width-1, 0)),
+                    img.getpixel((0, img.height-1)),
+                    img.getpixel((img.width-1, img.height-1))
+                ]
+                has_transparency = any(len(p) == 4 and p[3] < 255 for p in sample_pixels)
+            
+            if not has_transparency:
+                # No existing transparency, remove white/light background
+                img = remove_background(img, threshold=240)
+                print(f"  Removed white/light background (made transparent)")
+            else:
+                print(f"  Preserving existing transparency")
         
         # Resize to 512x512 (maintain aspect ratio, then crop/pad)
         img_resized = img.resize(TARGET_SIZE, Image.Resampling.LANCZOS)
@@ -90,17 +151,21 @@ def fix_sticker(input_path: Path, output_path: Path = None):
 
 def main():
     """Fix all stickers in the stickers directory."""
-    stickers_dir = Path(__file__).parent / "stickers"
+    stickers_dir = Path(__file__).parent / "sorting_logic_stickers"
     
     if not stickers_dir.exists():
         print(f"❌ Stickers directory not found: {stickers_dir}")
         return 1
     
-    # Find all image files
-    image_files = list(stickers_dir.glob("*.png")) + list(stickers_dir.glob("*.webp"))
+    # Find all image files (PNG, WebP, JPG, JPEG)
+    png_files = list(stickers_dir.glob("*.png"))
+    webp_files = list(stickers_dir.glob("*.webp"))
+    jpg_files = list(stickers_dir.glob("*.jpg")) + list(stickers_dir.glob("*.jpeg"))
+    image_files = png_files + webp_files + jpg_files
     
     if not image_files:
         print(f"❌ No image files found in {stickers_dir}")
+        print("   Supported formats: PNG, WebP, JPG, JPEG")
         return 1
     
     print("=" * 60)
@@ -108,13 +173,19 @@ def main():
     print("=" * 60)
     print(f"\nTarget: 512x512 pixels, WEBP format, ≤{MAX_SIZE_KB} KB")
     print(f"Found {len(image_files)} image file(s)")
+    if png_files:
+        print(f"  PNG: {len(png_files)}")
+    if webp_files:
+        print(f"  WebP: {len(webp_files)}")
+    if jpg_files:
+        print(f"  JPG/JPEG: {len(jpg_files)}")
     
     # Ask for confirmation
     print("\nThis will:")
     print("  1. Resize images to 512x512 pixels")
-    print("  2. Convert to WEBP format")
+    print("  2. Convert PNG/JPG/JPEG to WEBP format")
     print("  3. Compress to ≤100 KB")
-    print("  4. Save as .webp files")
+    print("  4. Save as .webp files (preserving original backgrounds)")
     
     response = input("\nProceed? (y/n): ").strip().lower()
     if response != 'y':
@@ -141,7 +212,7 @@ def main():
             except:
                 pass
         
-        result = fix_sticker(img_file, output_file)
+        result = fix_sticker(img_file, output_file, remove_bg=False)
         results.append((output_file.name, result))
     
     # Summary

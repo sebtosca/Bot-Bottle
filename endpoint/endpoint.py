@@ -388,7 +388,7 @@ def whatsapp_webhook():
             base_url = request.url_root.rstrip("/")
             if base_url.startswith("http://"):
                 base_url = base_url.replace("http://", "https://")
-        
+
         # Database operations (if DATABASE_URL is set)
         bottle_state = None
         conversation_history = []  # Initialize before use
@@ -748,10 +748,10 @@ def whatsapp_webhook():
                 print(f"   ❌ LLM EXCEPTION OCCURRED")
                 print(f"   Error type: {type(llm_error).__name__}")
                 print(f"   Error message: {str(llm_error)}")
-                print(f"   Full traceback:")
-                import traceback
-                traceback.print_exc()
-                reply_text = None
+            print(f"   Full traceback:")
+            import traceback
+            traceback.print_exc()
+            reply_text = None
         
         print("-" * 60)
         
@@ -772,32 +772,32 @@ def whatsapp_webhook():
                 # Not a string and not None - unexpected type
                 print(f"   ⚠️  Unexpected reply_text type: {type(reply_text)}")
                 reply_text_valid = False
-            
-            if not reply_text_valid:
-                print()
-                print("=" * 60)
-                print("❌ CANNOT SEND REPLY - NO VALID RESPONSE")
-                print("=" * 60)
-                if llm_error_occurred:
-                    print("   Reason: LLM raised an exception")
-                elif reply_text is None:
-                    print("   Reason: LLM returned None")
-                else:
-                    print("   Reason: LLM returned empty or whitespace-only string")
-                print(f"   Message received from: {from_number}")
-                print(f"   Message content: {message_content[:100]}")
-                print(f"   Conversation history length: {len(conversation_history) if conversation_history else 0}")
-                print("=" * 60)
-                print()
-                # Acknowledge webhook but don't send anything
-                return jsonify({
-                    "status": "ok",
-                    "warning": "LLM failed to generate reply - no message sent",
-                    "llm_error": llm_error_occurred,
-                    "reply_empty": True,
-                    "message_received": True,
-                    "message_sent": False
-                }), 200
+        
+        if not reply_text_valid:
+            print()
+            print("=" * 60)
+            print("❌ CANNOT SEND REPLY - NO VALID RESPONSE")
+            print("=" * 60)
+            if llm_error_occurred:
+                print("   Reason: LLM raised an exception")
+            elif reply_text is None:
+                print("   Reason: LLM returned None")
+            else:
+                print("   Reason: LLM returned empty or whitespace-only string")
+            print(f"   Message received from: {from_number}")
+            print(f"   Message content: {message_content[:100]}")
+            print(f"   Conversation history length: {len(conversation_history) if conversation_history else 0}")
+            print("=" * 60)
+            print()
+            # Acknowledge webhook but don't send anything
+            return jsonify({
+                "status": "ok",
+                "warning": "LLM failed to generate reply - no message sent",
+                "llm_error": llm_error_occurred,
+                "reply_empty": True,
+                "message_received": True,
+                "message_sent": False
+            }), 200
         
         # Ensure phone number is in correct format (E.164 with +)
         if not from_number.startswith("+"):
@@ -985,9 +985,9 @@ def whatsapp_webhook():
                     print(f"   ❌ ERROR SENDING GIF: {error_str}")
                     if error_code:
                         print(f"   Error code: {error_code}")
-                    import traceback
-                    traceback.print_exc()
-                    print("-" * 60)
+                import traceback
+                traceback.print_exc()
+                print("-" * 60)
             else:
                 print()
                 print("⚠️  GIF-only response selected but no GIF available")
@@ -1006,33 +1006,33 @@ def whatsapp_webhook():
             if sticker_info and sticker_info.get("url"):
                 print()
                 print("🎨 SENDING STICKER (FOLLOWING TEXT)")
+            print("-" * 60)
+            print(f"   To: {from_number}")
+            print(f"   Sticker: {sticker_info.get('filename', 'N/A')}")
+            print(f"   URL: {sticker_info['url']}")
+            try:
+                import time
+                send_start = time.time()
+                sticker_sid = send_whatsapp_sticker(
+                    to_number=from_number,
+                    media_url=sticker_info["url"]
+                )
+                send_duration = time.time() - send_start
+                print(f"   ✅ STICKER SENT SUCCESSFULLY")
+                print(f"   Sticker ID: {sticker_sid}")
+                print(f"   Send duration: {send_duration:.2f}s")
                 print("-" * 60)
-                print(f"   To: {from_number}")
-                print(f"   Sticker: {sticker_info.get('filename', 'N/A')}")
-                print(f"   URL: {sticker_info['url']}")
-                try:
-                    import time
-                    send_start = time.time()
-                    sticker_sid = send_whatsapp_sticker(
-                        to_number=from_number,
-                        media_url=sticker_info["url"]
-                    )
-                    send_duration = time.time() - send_start
-                    print(f"   ✅ STICKER SENT SUCCESSFULLY")
-                    print(f"   Sticker ID: {sticker_sid}")
-                    print(f"   Send duration: {send_duration:.2f}s")
-                    print("-" * 60)
-                except Exception as media_error:
-                    from whatsapp_cloud_client import WhatsAppCloudError
-                    error_str = str(media_error)
-                    error_code = None
-                    error_subcode = None
-                    if isinstance(media_error, WhatsAppCloudError):
-                        error_code = media_error.error_code
-                        error_subcode = media_error.error_subcode
-                    print(f"   ❌ ERROR SENDING STICKER: {error_str}")
-                    if error_code:
-                        print(f"   Error code: {error_code}")
+            except Exception as media_error:
+                from whatsapp_cloud_client import WhatsAppCloudError
+                error_str = str(media_error)
+                error_code = None
+                error_subcode = None
+                if isinstance(media_error, WhatsAppCloudError):
+                    error_code = media_error.error_code
+                    error_subcode = media_error.error_subcode
+                print(f"   ❌ ERROR SENDING STICKER: {error_str}")
+                if error_code:
+                    print(f"   Error code: {error_code}")
                 import traceback
                 traceback.print_exc()
                 print("-" * 60)
@@ -1061,7 +1061,7 @@ def whatsapp_webhook():
                             message_type="text",
                             from_user=False,
                             content=reply_text
-                        )
+                    )
                     
                     # Log sticker if sent (after text for text_sticker)
                     if response_type == "text_sticker" and sticker_sid:
