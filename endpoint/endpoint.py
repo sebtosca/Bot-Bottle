@@ -748,10 +748,10 @@ def whatsapp_webhook():
                 print(f"   ❌ LLM EXCEPTION OCCURRED")
                 print(f"   Error type: {type(llm_error).__name__}")
                 print(f"   Error message: {str(llm_error)}")
-            print(f"   Full traceback:")
-            import traceback
-            traceback.print_exc()
-            reply_text = None
+                print(f"   Full traceback:")
+                import traceback
+                traceback.print_exc()
+                reply_text = None
         
         print("-" * 60)
         
