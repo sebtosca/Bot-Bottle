@@ -526,7 +526,8 @@ def whatsapp_webhook():
                     
                     # Send rules image
                     try:
-                        rules_url = f"{base_url.rstrip('/')}/rules/regles%20du%20jeu.png"
+                        # Add version query param to bypass WhatsApp media cache
+                        rules_url = f"{base_url.rstrip('/')}/rules/regles%20du%20jeu.png?v=2"
                         rules_sid = send_whatsapp_media(from_number, rules_url, "Here are the rules of the game!")
                         print(f"✅ Rules image sent: {rules_sid}")
                         
@@ -656,7 +657,8 @@ def whatsapp_webhook():
                     print("📋 RULES REQUEST DETECTED")
                     print("=" * 60)
                     try:
-                        rules_url = f"{base_url.rstrip('/')}/rules/regles%20du%20jeu.png"
+                        # Add version query param to bypass WhatsApp media cache
+                        rules_url = f"{base_url.rstrip('/')}/rules/regles%20du%20jeu.png?v=2"
                         rules_sid = send_whatsapp_media(from_number, rules_url, "Voici les règles du jeu !")
                         print(f"✅ Rules image sent: {rules_sid}")
                         
