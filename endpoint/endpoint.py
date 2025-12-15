@@ -8,6 +8,7 @@ import random
 from pathlib import Path
 from flask import Flask, request, jsonify, send_from_directory
 from sqlalchemy.exc import OperationalError
+from werkzeug.exceptions import BadRequest
 
 from config import DATABASE_URL, PUBLIC_BASE_URL
 from game_logic import (
@@ -280,7 +281,18 @@ def whatsapp_webhook():
         print("-" * 60)
         
         # Parse incoming message from WhatsApp Cloud API webhook (JSON format)
-        data = request.get_json()
+        try:
+            data = request.get_json()
+        except BadRequest as json_error:
+            # Handle malformed or non-UTF-8 JSON payloads gracefully
+            print("❌ Failed to parse JSON payload from webhook")
+            print(f"   Error: {json_error}")
+            raw_body = request.get_data(cache=False)
+            print(f"   Raw data (first 200 bytes): {raw_body[:200]!r}")
+            return jsonify({
+                "error": "Invalid JSON payload",
+                "details": str(json_error)
+            }), 400
         
         if not data:
             print("❌ No JSON data received")

@@ -16,8 +16,8 @@ def main():
         return 1
     
     try:
-        init_db()
-        session = get_session()
+init_db()
+session = get_session()
         
         # Count stickers before deletion
         total_count = session.query(Sticker).count()
@@ -40,7 +40,7 @@ def main():
         # Delete all stickers
         print(f"\n🗑️  Deleting {total_count} sticker(s)...")
         deleted = session.query(Sticker).delete()
-        session.commit()
+session.commit()
         
         # Verify deletion
         remaining = session.query(Sticker).count()
@@ -56,7 +56,7 @@ def main():
         else:
             print(f"\n⚠️  Warning: {remaining} sticker(s) still remain in database")
         
-        session.close()
+session.close()
         return 0
         
     except Exception as e:
