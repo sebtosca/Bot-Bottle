@@ -1,8 +1,12 @@
-"""Load local GIF/MP4 metadata from gifs.json into the database.
+"""Load local GIF/MP4 files from the GIF directory into the database.
 
-This script reads GIF entries from gifs.json and loads them
-into the database with mood metadata, assuming each GIF is a
-local file served via the /gifs/<filename> Flask route.
+This script scans the GIF directory for all MP4/GIF files and loads them
+into the database. It uses:
+- gifs.json (optional) for mood_tags metadata
+- GIF/GIF_descriptions.json (optional) for descriptions
+
+All files in the GIF directory will be loaded, regardless of whether
+they're listed in gifs.json.
 
 Usage:
     python scripts/load_gifs.py
@@ -33,63 +37,75 @@ def load_gifs():
         print(f"❌ Database initialization failed: {e}")
         return 1
     
-    # Get gifs.json file and GIF directory
+    # Get gifs.json file, GIF_descriptions.json, and GIF directory
     project_root = Path(__file__).parent.parent
     gifs_file = project_root / "gifs.json"
+    gif_descriptions_file = project_root / "GIF" / "GIF_descriptions.json"
     gifs_dir = project_root / "GIF"
     
-    if not gifs_file.exists():
-        print(f"❌ gifs.json file not found: {gifs_file}")
-        print("\nCreate gifs.json in the project root with the following format:")
-        print("""
-{
-  "gif_name_1": {
-    "filename": "my_clip.mp4",
-    "mood_tags": "happy,excited",
-    "description": "Description of the GIF"
-  },
-  "gif_name_2": {
-    "filename": "another_clip.mp4",
-    "mood_tags": "sad,lonely",
-    "description": "Another GIF description"
-  }
-}
-""")
-        return 1
-    
-    # Load GIFs from JSON file
-    try:
-        with open(gifs_file, "r", encoding="utf-8") as f:
-            gifs_data = json.load(f)
-    except Exception as e:
-        print(f"❌ Error reading gifs.json: {e}")
-        return 1
-    
-    if not gifs_data:
-        print("⚠️  gifs.json is empty")
-        return 0
-    
-    print(f"Found {len(gifs_data)} GIF entry/entries in gifs.json\n")
     if not gifs_dir.exists():
         print(f"❌ GIF directory not found: {gifs_dir}")
         print("   Create this directory and place your MP4/GIF files in it.")
         return 1
+    
+    # Load GIFs metadata from JSON file (optional - for mood_tags)
+    gifs_metadata = {}
+    if gifs_file.exists():
+        try:
+            with open(gifs_file, "r", encoding="utf-8") as f:
+                gifs_data = json.load(f)
+            # Build a mapping from filename to metadata
+            for gif_name, gif_info in gifs_data.items():
+                if isinstance(gif_info, dict):
+                    filename = gif_info.get("filename")
+                    if filename:
+                        gifs_metadata[filename] = gif_info
+            if gifs_metadata:
+                print(f"✅ Loaded metadata for {len(gifs_metadata)} GIF(s) from gifs.json")
+        except Exception as e:
+            print(f"⚠️  Warning: Could not read gifs.json: {e}")
+            print("   Continuing without gifs.json metadata...")
+    else:
+        print("ℹ️  gifs.json not found. Will load all GIFs from directory without mood_tags.")
+    
+    print()
+    
+    # Load descriptions from GIF_descriptions.json if it exists
+    descriptions_dict = {}
+    if gif_descriptions_file.exists():
+        try:
+            with open(gif_descriptions_file, "r", encoding="utf-8") as f:
+                descriptions_dict = json.load(f)
+            print(f"✅ Loaded {len(descriptions_dict)} description(s) from GIF_descriptions.json")
+        except Exception as e:
+            print(f"⚠️  Warning: Could not read GIF_descriptions.json: {e}")
+            print("   Continuing without descriptions file...")
+    else:
+        print("ℹ️  GIF_descriptions.json not found. Will use descriptions from gifs.json if available.")
+    
+    print()
+    
+    # Scan GIF directory for all MP4/GIF files
+    gif_files = list(gifs_dir.glob("*.mp4")) + list(gifs_dir.glob("*.gif"))
+    # Exclude JSON files
+    gif_files = [f for f in gif_files if f.suffix.lower() in {".mp4", ".gif"}]
+    
+    if not gif_files:
+        print(f"⚠️  No GIF/MP4 files found in {gifs_dir}")
+        print("   Place your MP4/GIF files in the GIF directory.")
+        return 0
+    
+    print(f"Found {len(gif_files)} GIF/MP4 file(s) in directory\n")
     
     session = get_session()
     loaded_count = 0
     updated_count = 0
     error_count = 0
     
-    # Collect all valid filenames from gifs.json
-    valid_filenames = set()
-    for gif_name, gif_info in gifs_data.items():
-        if isinstance(gif_info, dict):
-            filename = gif_info.get("filename")
-            if filename:
-                valid_filenames.add(filename)
+    # Collect all valid filenames from directory
+    valid_filenames = {f.name for f in gif_files}
     
     # Clean up old GIF records that don't have matching files
-    # (e.g., old .gif files that were converted to .mp4)
     all_gifs = session.query(Sticker).filter(Sticker.media_type == "gif").all()
     deleted_count = 0
     for old_gif in all_gifs:
@@ -104,31 +120,24 @@ def load_gifs():
         print(f"  Cleaned up {deleted_count} orphaned GIF record(s)\n")
     
     try:
-        for gif_name, gif_info in gifs_data.items():
-            print(f"Processing: {gif_name}")
-            
-            # Validate required fields
-            if not isinstance(gif_info, dict):
-                print(f"  ❌ Invalid entry format (must be object)")
-                error_count += 1
-                continue
-            
-            filename = gif_info.get("filename")
-            if not filename:
-                print(f"  ❌ Missing 'filename' field")
-                error_count += 1
-                continue
-            
-            mood_tags = gif_info.get("mood_tags", "")
-            description = gif_info.get("description", f"GIF: {gif_name}")
-            
-            # Validate that the file exists in the GIF directory
-            gif_path = gifs_dir / filename
-            if not gif_path.exists():
-                print(f"  ❌ File not found in GIF directory: {gif_path}")
-                error_count += 1
-                continue
+        for gif_path in sorted(gif_files):
+            filename = gif_path.name
+            print(f"Processing: {filename}")
 
+            # Get metadata from gifs.json if available
+            gif_metadata = gifs_metadata.get(filename, {})
+            mood_tags = gif_metadata.get("mood_tags", "")
+            
+            # Get description: prefer GIF_descriptions.json, fallback to gifs.json, then default
+            description = None
+            if filename in descriptions_dict:
+                description = descriptions_dict[filename]
+                print(f"  📝 Using description from GIF_descriptions.json")
+            elif gif_metadata.get("description"):
+                description = gif_metadata.get("description")
+            else:
+                description = f"GIF: {filename}"
+            
             # Basic WhatsApp-related checks: extension and size.
             # WhatsApp \"GIFs\" should be short MP4 clips (< 6s, no audio),
             # recommended under ~1.5MB. Here we only warn about extension/size.
@@ -153,7 +162,8 @@ def load_gifs():
                 existing.url = None
                 session.add(existing)
                 print(f"  ✅ Updated: {filename}")
-                print(f"     mood_tags={mood_tags}")
+                if mood_tags:
+                    print(f"     mood_tags={mood_tags}")
                 print(f"     Description: {description[:60]}...")
                 updated_count += 1
             else:
@@ -168,7 +178,8 @@ def load_gifs():
                 )
                 session.add(new_gif)
                 print(f"  ✅ Created: {filename}")
-                print(f"     mood_tags={mood_tags}")
+                if mood_tags:
+                    print(f"     mood_tags={mood_tags}")
                 print(f"     Description: {description[:60]}...")
                 loaded_count += 1
         
@@ -180,7 +191,7 @@ def load_gifs():
         print(f"  Loaded: {loaded_count}")
         print(f"  Updated: {updated_count}")
         print(f"  Errors: {error_count}")
-        print(f"  Total entries processed: {len(gifs_data)}")
+        print(f"  Total files processed: {len(gif_files)}")
         
         if loaded_count > 0 or updated_count > 0:
             print("\n✅ GIFs loaded successfully!")

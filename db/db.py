@@ -3,7 +3,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, Float, Text
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, Float, Text, Boolean
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session, relationship
 
@@ -33,8 +34,18 @@ class Bottle(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     type = Column(String, default="maraschino_cherry", nullable=False)  # e.g., "maraschino_cherry", "tabasco", "water"
+    name = Column(String, nullable=True)  # User-given name for the bottle (optional)
     mood = Column(String, default="neutral", nullable=False)  # e.g., "happy", "sad", "angry", "lonely", "thirsty", "neutral"
     personality_level = Column(Integer, default=0, nullable=False)  # 0-10 scale, evolves with engagement
+    
+    # Feeding game fields
+    fullness_level = Column(Float, default=100.0, nullable=False)  # 0.0 to 100.0
+    accessory_color = Column(String, nullable=True)  # "GREEN", "YELLOW", "BLACK", "BLUE"
+    last_fullness_decrease = Column(DateTime, nullable=True)  # Track last 8hr decrease
+    game_started = Column(Boolean, default=False, nullable=False)  # Has game started?
+    current_feed_count = Column(Integer, default=0, nullable=False)  # Correct emojis in current session (0-3)
+    incorrect_feed_count = Column(Integer, default=0, nullable=False)  # Incorrect emojis in current session
+    last_feed_time = Column(DateTime, nullable=True)  # When last fed
     
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -115,6 +126,45 @@ def init_db() -> None:
     Base.metadata.create_all(bind=engine)
     
     print("✅ Database initialized successfully")
+
+
+def is_db_initialized() -> bool:
+    """Check if database is initialized and reachable.
+    
+    This function verifies both that the session factory exists AND that
+    the database is actually reachable by performing a lightweight connection test.
+    
+    Returns:
+        True if database is initialized and reachable, False otherwise.
+    """
+    if SessionLocal is None or engine is None:
+        return False
+    
+    # Test actual connectivity with a lightweight connection test
+    try:
+        # Try to get a connection from the pool
+        # This will fail if database is unreachable
+        conn = engine.connect()
+        conn.close()
+        return True
+    except OperationalError:
+        # Connection failed - database is not reachable
+        return False
+    except Exception:
+        # Other exceptions (shouldn't happen, but be safe)
+        return False
+
+
+def reset_db_initialization() -> None:
+    """Reset database initialization state.
+    
+    This function should be called when connection errors occur to prevent
+    repeated connection attempts. It resets the global engine and SessionLocal
+    to None, allowing the app to gracefully continue without database functionality.
+    """
+    global engine, SessionLocal
+    engine = None
+    SessionLocal = None
 
 
 def get_session() -> Session:

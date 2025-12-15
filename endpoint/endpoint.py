@@ -4,13 +4,22 @@ from __future__ import annotations
 import os
 import json
 import emoji
+import random
 from pathlib import Path
 from flask import Flask, request, jsonify, send_from_directory
+from sqlalchemy.exc import OperationalError
 
 from config import DATABASE_URL, PUBLIC_BASE_URL
+from game_logic import (
+    start_game, process_emoji_feed, extract_emojis_from_message,
+    check_and_decrease_fullness, get_stickers_for_state, get_fullness_state,
+    detect_rules_request, detect_rename_request, extract_name_from_message
+)
 from db.db import (
     init_db,
     get_session,
+    is_db_initialized,
+    reset_db_initialization,
     get_or_create_user,
     get_or_create_bottle,
     create_interaction,
@@ -151,6 +160,34 @@ def serve_gif(filename: str):
         str(gifs_dir),
         filename,
         mimetype=mimetype
+    )
+
+
+@app.route("/feeding-stickers/<filename>", methods=["GET"])
+def serve_feeding_sticker(filename: str):
+    """Serve feeding game logic stickers from the feeding_game_logic_stickers/ directory.
+    
+    Args:
+        filename: Name of the sticker file (e.g., "vert_bouteille_affamee_verre_pleine.webp")
+    
+    Returns:
+        Sticker image file with proper MIME type, or 404 if not found.
+    """
+    # Security: only allow WebP files and prevent traversal
+    filename_lower = filename.lower()
+    if not filename_lower.endswith(".webp") or ".." in filename or "/" in filename:
+        return jsonify({"error": "Invalid filename"}), 400
+    
+    stickers_dir = Path(__file__).parent.parent / "feeding_game_logic_stickers"
+    sticker_path = stickers_dir / filename
+    
+    if not sticker_path.exists():
+        return jsonify({"error": "Sticker not found"}), 404
+    
+    return send_from_directory(
+        str(stickers_dir),
+        filename,
+        mimetype="image/webp"
     )
 
 
@@ -388,12 +425,23 @@ def whatsapp_webhook():
             base_url = request.url_root.rstrip("/")
             if base_url.startswith("http://"):
                 base_url = base_url.replace("http://", "https://")
+            
+            # Warn if using localhost (WhatsApp servers can't access it)
+            if "localhost" in base_url or "127.0.0.1" in base_url:
+                print()
+                print("⚠️  WARNING: Base URL is localhost - WhatsApp servers cannot access it!")
+                print(f"   Current base_url: {base_url}")
+                print("   Set PUBLIC_BASE_URL in .env to your public tunnel URL (e.g., Cloudflare Tunnel)")
+                print("   Example: PUBLIC_BASE_URL=https://your-url.trycloudflare.com")
+                print()
 
         # Database operations (if DATABASE_URL is set)
         bottle_state = None
         conversation_history = []  # Initialize before use
+        feed_result = None  # Initialize for game logic
+        feed_feedback_sent = False  # Track if feed feedback was sent
         
-        if DATABASE_URL:
+        if DATABASE_URL and is_db_initialized():
             try:
                 session = get_session()
                 
@@ -434,41 +482,64 @@ def whatsapp_webhook():
                 name_request_text = "Quel nom voulez-vous donner à votre bouteille ? 🍒"
                 is_name_response = last_bot_message and name_request_text in last_bot_message
                 
-                # Handle first contact: ask for name
-                if is_first_contact and bottle.name is None:
+                # GAME INITIALIZATION: Check if game needs to start
+                if not bottle.game_started:
                     print()
                     print("=" * 60)
-                    print("👋 FIRST CONTACT - ASKING FOR BOTTLE NAME")
+                    print("🎮 STARTING GAME")
                     print("=" * 60)
-                    name_request_msg = name_request_text
+                    
+                    # Start the game
+                    bottle, name_prompt = start_game(session, bottle, message_content)
+                    session.add(bottle)
+                    session.commit()
+                    
+                    # Send name prompt if needed
+                    if name_prompt:
+                        try:
+                            msg_sid = send_whatsapp_text(from_number, name_prompt)
+                            print(f"✅ Name prompt sent: {msg_sid}")
+                            
+                            create_interaction(
+                                session=session,
+                                user_id=user.id,
+                                bottle_id=bottle.id,
+                                message_type="text",
+                                from_user=False,
+                                content=name_prompt
+                            )
+                            session.commit()
+                        except Exception as e:
+                            print(f"❌ Error sending name prompt: {e}")
+                    
+                    # Send rules image
                     try:
-                        msg_sid = send_whatsapp_text(from_number, name_request_msg)
-                        print(f"✅ Name request sent: {msg_sid}")
+                        rules_url = f"{base_url.rstrip('/')}/rules/regles%20du%20jeu.png"
+                        rules_sid = send_whatsapp_media(from_number, rules_url, "Here are the rules of the game!")
+                        print(f"✅ Rules image sent: {rules_sid}")
                         
-                        # Log bot response
                         create_interaction(
                             session=session,
                             user_id=user.id,
                             bottle_id=bottle.id,
-                            message_type="text",
+                            message_type="image",
                             from_user=False,
-                            content=name_request_msg
+                            content="Rules image"
                         )
                         session.commit()
-                        
+                    except Exception as e:
+                        print(f"⚠️  Error sending rules image: {e}")
+                    
+                    # If name was extracted, continue; otherwise return
+                    if name_prompt:
                         return jsonify({
                             "status": "ok",
-                            "message": "Name request sent",
+                            "message": "Game started, name prompt sent",
                             "sid": msg_sid
                         }), 200
-                    except Exception as e:
-                        print(f"❌ Error sending name request: {e}")
-                        import traceback
-                        traceback.print_exc()
-                        # Continue with normal flow if name request fails
                 
-                # Handle name response: store name and send rules image
-                elif is_name_response and bottle.name is None:
+                # Handle name response if game started but name not set, or if user is responding to rename prompt
+                elif bottle.game_started and (bottle.name is None or (last_bot_message and ("Quel nom voulez-vous me donner" in last_bot_message or "Quel nom voulez-vous donner à votre bouteille" in last_bot_message))):
                     print()
                     print("=" * 60)
                     print("📝 NAME RESPONSE RECEIVED")
@@ -486,38 +557,12 @@ def whatsapp_webhook():
                     session.refresh(bottle)
                     print(f"✅ Bottle name stored: {bottle_name}")
                     
-                    # Send rules image
-                    from urllib.parse import quote
-                    rules_filename = "model card for game updated.png"
-                    encoded_filename = quote(rules_filename, safe='')
-                    rules_url = f"{base_url.rstrip('/')}/rules/{encoded_filename}"
-                    
-                    print(f"📸 Sending rules image: {rules_url}")
-                    try:
-                        rules_image_sid = send_whatsapp_media(from_number, rules_url)
-                        print(f"✅ Rules image sent: {rules_image_sid}")
-                        
-                        # Log rules image
-                        create_interaction(
-                            session=session,
-                            user_id=user.id,
-                            bottle_id=bottle.id,
-                            message_type="image",
-                            from_user=False,
-                            content=f"[Rules image: {rules_filename}]"
-                        )
-                    except Exception as e:
-                        print(f"⚠️  Error sending rules image: {e}")
-                        import traceback
-                        traceback.print_exc()
-                    
-                    # Send welcome message
-                    welcome_msg = f"Parfait ! Votre bouteille s'appelle maintenant {bottle_name} ! 🎉"
+                    # Send welcome message with game info
+                    welcome_msg = f"Perfect! Your bottle is now named {bottle_name}! 🎉\n\nFeed me the right emojis to keep me full! My accessory color will change each time you feed me, so pay attention! 🎨"
                     try:
                         welcome_sid = send_whatsapp_text(from_number, welcome_msg)
                         print(f"✅ Welcome message sent: {welcome_sid}")
                         
-                        # Log welcome message
                         create_interaction(
                             session=session,
                             user_id=user.id,
@@ -530,16 +575,147 @@ def whatsapp_webhook():
                         
                         return jsonify({
                             "status": "ok",
-                            "message": "Name stored and rules sent",
+                            "message": "Name stored",
                             "bottle_name": bottle_name,
-                            "rules_sid": rules_image_sid if 'rules_image_sid' in locals() else None,
                             "welcome_sid": welcome_sid
                         }), 200
                     except Exception as e:
                         print(f"❌ Error sending welcome message: {e}")
                         import traceback
                         traceback.print_exc()
-                        # Continue with normal flow if welcome fails
+                
+                # GAME LOGIC: Check and decrease fullness if 8 hours passed
+                if bottle.game_started:
+                    fullness_decreased = check_and_decrease_fullness(bottle)
+                    if fullness_decreased:
+                        print()
+                        print("=" * 60)
+                        print("⏰ FULLNESS DECREASED (8 hours passed)")
+                        print("=" * 60)
+                        print(f"   New fullness level: {bottle.fullness_level:.1f}%")
+                        session.add(bottle)
+                        session.commit()
+                
+                # Initialize flags for skipping LLM response
+                feed_feedback_sent = False
+                rules_request_sent = False
+                rename_request_sent = False
+                
+                # GAME LOGIC: Process emoji feeds if message contains emojis
+                feed_result = None
+                if bottle.game_started and message_type in ["emoji", "mixed"]:
+                    print()
+                    print("=" * 60)
+                    print("🍽️  PROCESSING EMOJI FEED")
+                    print("=" * 60)
+                    
+                    emojis = extract_emojis_from_message(message_content)
+                    if emojis:
+                        print(f"   Found {len(emojis)} emoji(s) in message")
+                        print(f"   Accessory color: {bottle.accessory_color}")
+                        feed_result = process_emoji_feed(session, bottle, emojis)
+                        print(f"   Result: {feed_result['message']}")
+                        print(f"   Fullness: {bottle.fullness_level:.1f}%")
+                        print(f"   Feed count: {bottle.current_feed_count}/3")
+                        print("=" * 60)
+                        
+                        # Send feed feedback immediately
+                        try:
+                            feedback_sid = send_whatsapp_text(from_number, feed_result['message'])
+                            print(f"✅ Feed feedback sent: {feedback_sid}")
+                            
+                            create_interaction(
+                                session=session,
+                                user_id=user.id,
+                                bottle_id=bottle.id,
+                                message_type="text",
+                                from_user=False,
+                                content=feed_result['message']
+                            )
+                            session.commit()
+                            feed_feedback_sent = True  # Set flag to skip LLM response
+                        except Exception as e:
+                            print(f"⚠️  Error sending feed feedback: {e}")
+                
+                # Check for rules request (can be asked at any time)
+                if bottle.game_started and detect_rules_request(message_content):
+                    print()
+                    print("=" * 60)
+                    print("📋 RULES REQUEST DETECTED")
+                    print("=" * 60)
+                    try:
+                        rules_url = f"{base_url.rstrip('/')}/rules/regles%20du%20jeu.png"
+                        rules_sid = send_whatsapp_media(from_number, rules_url, "Voici les règles du jeu !")
+                        print(f"✅ Rules image sent: {rules_sid}")
+                        
+                        create_interaction(
+                            session=session,
+                            user_id=user.id,
+                            bottle_id=bottle.id,
+                            message_type="image",
+                            from_user=False,
+                            content="Rules image"
+                        )
+                        session.commit()
+                        rules_request_sent = True  # Set flag to skip LLM response
+                    except Exception as e:
+                        print(f"⚠️  Error sending rules image: {e}")
+                
+                # Check for renaming request (can be done at any time)
+                if bottle.game_started and detect_rename_request(message_content):
+                    print()
+                    print("=" * 60)
+                    print("✏️  RENAME REQUEST DETECTED")
+                    print("=" * 60)
+                    
+                    # Try to extract name from message
+                    new_name = extract_name_from_message(message_content)
+                    
+                    if new_name:
+                        # Name found in message, update it
+                        old_name = bottle.name or "Bouteille"
+                        bottle.name = new_name
+                        session.add(bottle)
+                        session.commit()
+                        session.refresh(bottle)
+                        print(f"✅ Bottle renamed from '{old_name}' to '{new_name}'")
+                        
+                        try:
+                            rename_msg = f"Parfait ! Je m'appelle maintenant {new_name} ! 🎉"
+                            rename_sid = send_whatsapp_text(from_number, rename_msg)
+                            print(f"✅ Rename confirmation sent: {rename_sid}")
+                            
+                            create_interaction(
+                                session=session,
+                                user_id=user.id,
+                                bottle_id=bottle.id,
+                                message_type="text",
+                                from_user=False,
+                                content=rename_msg
+                            )
+                            session.commit()
+                            rename_request_sent = True  # Set flag to skip LLM response
+                        except Exception as e:
+                            print(f"⚠️  Error sending rename confirmation: {e}")
+                    else:
+                        # No name in message, prompt for it
+                        try:
+                            rename_prompt = "Quel nom voulez-vous me donner ? 🍒"
+                            rename_sid = send_whatsapp_text(from_number, rename_prompt)
+                            print(f"✅ Rename prompt sent: {rename_sid}")
+                            
+                            create_interaction(
+                                session=session,
+                                user_id=user.id,
+                                bottle_id=bottle.id,
+                                message_type="text",
+                                from_user=False,
+                                content=rename_prompt
+                            )
+                            session.commit()
+                            rename_request_sent = True  # Set flag to skip LLM response
+                        except Exception as e:
+                            print(f"⚠️  Error sending rename prompt: {e}")
                 
                 conversation_history = []
                 for inter in recent_interactions:
@@ -575,14 +751,27 @@ def whatsapp_webhook():
                     "name": bottle.name,
                     "mood": bottle.mood,
                     "personality_level": bottle.personality_level,
+                    "fullness_level": bottle.fullness_level if bottle.game_started else None,
+                    "accessory_color": bottle.accessory_color if bottle.game_started else None,
+                    "current_feed_count": bottle.current_feed_count if bottle.game_started else None,
+                    "game_started": bottle.game_started,
                 }
                 
+            except OperationalError as db_error:
+                # Connection error - reset initialization state to prevent future connection attempts
+                reset_db_initialization()
+                print(f"⚠️  Database connection lost (continuing without DB): {db_error}")
             except Exception as db_error:
+                # Other database errors
                 print(f"⚠️  Database error (continuing without DB): {db_error}")
+                
                 # Continue without database - use basic mode
                 if session:
-                    session.rollback()
-                    session.close()
+                    try:
+                        session.rollback()
+                        session.close()
+                    except Exception:
+                        pass  # Ignore errors when closing failed session
                     session = None
 
         # Get current mood and determine response type BEFORE generating text
@@ -592,26 +781,43 @@ def whatsapp_webhook():
         # Check media availability and select response type
         sticker_info = None
         gif_info = None
-        response_type = "text_only"  # Default
+        response_type = "text_sticker"  # Default
         
-        if DATABASE_URL and session:
-            try:
-                # Get bottle_id for response type selection
-                bottle_id = None
-                if bottle_state and "id" in bottle_state:
-                    bottle_id = bottle_state["id"]
-                elif session:
+        if DATABASE_URL and is_db_initialized() and session:
+            # Get bottle_id for response type selection (outside try block to ensure it's available)
+            bottle_id = None
+            if bottle_state and "id" in bottle_state:
+                bottle_id = bottle_state["id"]
+            elif session:
+                try:
                     from db.db import User, Bottle
                     user = session.query(User).filter_by(whatsapp_number=from_number).first()
                     if user:
                         bottle = get_or_create_bottle(session, user.id)
                         bottle_id = bottle.id
-                
-                # Try to select both sticker and GIF
+                except Exception as e:
+                    print(f"   ⚠️  Error getting bottle_id: {e}")
+            
+            # Try to select sticker (with individual error handling)
+            try:
                 sticker_info = select_sticker_by_mood(session, current_mood, base_url)
+            except Exception as sticker_error:
+                print(f"   ⚠️  Error selecting sticker: {sticker_error}")
+                import traceback
+                traceback.print_exc()
+                sticker_info = None
+            
+            # Try to select GIF (with individual error handling)
+            try:
                 gif_info = select_gif_by_mood(session, current_mood, base_url)
-                
-                # Select response type based on rotation logic
+            except Exception as gif_error:
+                print(f"   ⚠️  Error selecting GIF: {gif_error}")
+                import traceback
+                traceback.print_exc()
+                gif_info = None
+            
+            # Select response type based on rotation logic
+            try:
                 if bottle_id:
                     response_type = select_response_type(
                         session=session,
@@ -627,26 +833,45 @@ def whatsapp_webhook():
                     elif sticker_info:
                         response_type = "text_sticker"
                     else:
-                        response_type = "text_only"
-                
-                print()
-                print("🎨 RESPONSE TYPE SELECTION")
-                print("-" * 60)
-                print(f"   Selected response type: {response_type}")
-                print(f"   Sticker available: {'Yes' if sticker_info else 'No'}")
-                print(f"   GIF available: {'Yes' if gif_info else 'No'}")
-                print("-" * 60)
-            except Exception as media_error:
-                print(f"   ⚠️  Error selecting media: {media_error}")
+                        response_type = "text_sticker"  # Default to text_sticker if neither available
+            except Exception as response_error:
+                print(f"   ⚠️  Error selecting response type: {response_error}")
                 import traceback
                 traceback.print_exc()
+                # Fallback to simple selection
+                if gif_info:
+                    response_type = "gif_only"
+                elif sticker_info:
+                    response_type = "text_sticker"
+                else:
+                    response_type = "text_sticker"
+            
+            print()
+            print("🎨 RESPONSE TYPE SELECTION")
+            print("-" * 60)
+            print(f"   Selected response type: {response_type}")
+            print(f"   Sticker available: {'Yes' if sticker_info else 'No'}")
+            if sticker_info:
+                print(f"   Sticker URL: {sticker_info.get('url', 'N/A')[:60]}...")
+            print(f"   GIF available: {'Yes' if gif_info else 'No'}")
+            if gif_info:
+                print(f"   GIF URL: {gif_info.get('url', 'N/A')[:60]}...")
+            print(f"   Base URL used: {base_url}")
+            print("-" * 60)
         
         # Generate reply using LLM (only if needed)
         reply_text = None
         llm_error_occurred = False
+        reply_text_valid = False  # Initialize - will be set based on conditions below
         
-        # Only generate text if response type requires it
-        if response_type in ["text_only", "text_sticker"]:
+        # Only generate text if response type requires it and feed feedback/rules/rename not sent
+        if feed_feedback_sent or rules_request_sent or rename_request_sent:
+            print()
+            print("🤖 SKIPPING TEXT GENERATION (Feed feedback already sent)")
+            print("-" * 60)
+            reply_text = None
+            reply_text_valid = True
+        elif response_type == "text_sticker":
             print()
             print("🤖 GENERATING REPLY")
             print("-" * 60)
@@ -762,6 +987,10 @@ def whatsapp_webhook():
             print("-" * 60)
             reply_text = None
             reply_text_valid = True  # Allow GIF-only to proceed
+        elif feed_feedback_sent:
+            # Feed feedback already sent, no need for LLM text - validation already passed
+            # reply_text_valid was set to True above, so we're good
+            pass
         else:
             # Validate reply_text - if empty or None, log and skip sending
             if reply_text is None:
@@ -809,7 +1038,7 @@ def whatsapp_webhook():
         sticker_sid = None
         
         # Send text message (if response type requires it)
-        if response_type in ["text_only", "text_sticker"] and reply_text:
+        if response_type == "text_sticker" and reply_text:
             print()
             print("📤 SENDING TEXT MESSAGE")
             print("-" * 60)
@@ -846,15 +1075,25 @@ def whatsapp_webhook():
                 if error_subcode:
                     print(f"   Error subcode: {error_subcode}")
                 
-                # Check for common delivery error codes
+                # Check for common error codes
+                # 10 = OAuth/permissions error (invalid token, missing permissions)
                 # 131030 = Recipient phone number not in allowed list
                 # 131026 = Invalid recipient phone number
                 # 131047 = Message failed to send
                 # 131048 = Rate limit exceeded
                 is_delivery_error = False
                 delivery_error_type = None
+                is_auth_error = False
                 
-                if error_code == "131030" or error_subcode == "131030" or "131030" in error_str or "not in allowed list" in error_str.lower():
+                # Check for OAuth/permissions error (code 10)
+                if (error_code == "10" or error_code == 10 or 
+                    error_subcode == "10" or error_subcode == 10 or 
+                    "10" in str(error_code) or 
+                    "OAuthException" in error_str or 
+                    "permission" in error_str.lower() or
+                    "access token" in error_str.lower()):
+                    is_auth_error = True
+                elif error_code == "131030" or error_subcode == "131030" or "131030" in error_str or "not in allowed list" in error_str.lower():
                     is_delivery_error = True
                     delivery_error_type = "not_in_allowed_list"
                 elif error_code == "131026" or error_subcode == "131026" or "131026" in error_str or "invalid recipient" in error_str.lower():
@@ -866,6 +1105,36 @@ def whatsapp_webhook():
                 elif error_code == "131048" or error_subcode == "131048" or "131048" in error_str or "rate limit" in error_str.lower():
                     is_delivery_error = True
                     delivery_error_type = "rate_limit"
+                
+                # Handle OAuth/permissions errors
+                if is_auth_error:
+                    print()
+                    print("=" * 60)
+                    print("⚠️  WHATSAPP API PERMISSIONS ERROR")
+                    print("=" * 60)
+                    print(f"   Error: {error_str}")
+                    print()
+                    print("   This error typically means:")
+                    print("   1. Access token is invalid or expired")
+                    print("   2. App doesn't have required permissions")
+                    print("   3. Phone number ID or Account ID is incorrect")
+                    print()
+                    print("   To fix this:")
+                    print("   1. Go to Meta Developer Console: https://developers.facebook.com/")
+                    print("   2. Navigate to your WhatsApp app")
+                    print("   3. Check 'API Setup' → Verify:")
+                    print("      - Access Token is valid and not expired")
+                    print("      - Phone number ID matches your .env file")
+                    print("      - Account ID is correct")
+                    print("   4. Check 'App Review' → Ensure required permissions are approved:")
+                    print("      - whatsapp_business_messaging")
+                    print("      - whatsapp_business_management")
+                    print("   5. Regenerate access token if needed")
+                    print("   6. Update your .env file with correct values")
+                    print("=" * 60)
+                    print()
+                    # Don't return error response, just log it
+                    return jsonify({"status": "error", "message": "WhatsApp API permissions error - check logs"}), 500
                 
                 if is_delivery_error:
                     print()
@@ -1006,43 +1275,160 @@ def whatsapp_webhook():
             if sticker_info and sticker_info.get("url"):
                 print()
                 print("🎨 SENDING STICKER (FOLLOWING TEXT)")
-            print("-" * 60)
-            print(f"   To: {from_number}")
-            print(f"   Sticker: {sticker_info.get('filename', 'N/A')}")
-            print(f"   URL: {sticker_info['url']}")
-            try:
-                import time
-                send_start = time.time()
-                sticker_sid = send_whatsapp_sticker(
-                    to_number=from_number,
-                    media_url=sticker_info["url"]
-                )
-                send_duration = time.time() - send_start
-                print(f"   ✅ STICKER SENT SUCCESSFULLY")
-                print(f"   Sticker ID: {sticker_sid}")
-                print(f"   Send duration: {send_duration:.2f}s")
                 print("-" * 60)
-            except Exception as media_error:
-                from whatsapp_cloud_client import WhatsAppCloudError
-                error_str = str(media_error)
-                error_code = None
-                error_subcode = None
-                if isinstance(media_error, WhatsAppCloudError):
-                    error_code = media_error.error_code
-                    error_subcode = media_error.error_subcode
-                print(f"   ❌ ERROR SENDING STICKER: {error_str}")
-                if error_code:
-                    print(f"   Error code: {error_code}")
-                import traceback
-                traceback.print_exc()
-                print("-" * 60)
-                # Text was already sent, so that's OK - don't fail the webhook
-        else:
+                print(f"   To: {from_number}")
+                print(f"   Sticker: {sticker_info.get('filename', 'N/A')}")
+                print(f"   URL: {sticker_info['url']}")
+                try:
+                    import time
+                    send_start = time.time()
+                    sticker_sid = send_whatsapp_sticker(
+                        to_number=from_number,
+                        media_url=sticker_info["url"]
+                    )
+                    send_duration = time.time() - send_start
+                    print(f"   ✅ STICKER SENT SUCCESSFULLY")
+                    print(f"   Sticker ID: {sticker_sid}")
+                    print(f"   Send duration: {send_duration:.2f}s")
+                    print("-" * 60)
+                except Exception as media_error:
+                    from whatsapp_cloud_client import WhatsAppCloudError
+                    error_str = str(media_error)
+                    error_code = None
+                    error_subcode = None
+                    if isinstance(media_error, WhatsAppCloudError):
+                        error_code = media_error.error_code
+                        error_subcode = media_error.error_subcode
+                    print(f"   ❌ ERROR SENDING STICKER: {error_str}")
+                    if error_code:
+                        print(f"   Error code: {error_code}")
+                    import traceback
+                    traceback.print_exc()
+                    print("-" * 60)
+                    # Text was already sent, so that's OK - don't fail the webhook
+            else:
                 print()
                 print("ℹ️  Text+sticker response selected but no sticker available")
                 print("   Sending text-only response")
         
         # text_only: No media to send (already handled above)
+        
+        # GAME LOGIC: Send game stickers if game is active
+        if session and DATABASE_URL and bottle and bottle.game_started:
+            try:
+                # Refresh bottle to get latest state
+                session.refresh(bottle)
+                
+                # Get stickers for current state
+                game_stickers = get_stickers_for_state(bottle, base_url)
+                
+                # Send fullness sticker if available
+                if game_stickers.get("fullness"):
+                    fullness_sticker = game_stickers["fullness"]
+                    print()
+                    print("🎮 SENDING FULLNESS STICKER")
+                    print("-" * 60)
+                    print(f"   To: {from_number}")
+                    print(f"   Sticker: {fullness_sticker.get('filename', 'N/A')}")
+                    print(f"   Fullness: {bottle.fullness_level:.1f}% ({get_fullness_state(bottle.fullness_level)})")
+                    print(f"   URL: {fullness_sticker['url']}")
+                    try:
+                        import time
+                        send_start = time.time()
+                        fullness_sid = send_whatsapp_sticker(
+                            to_number=from_number,
+                            media_url=fullness_sticker["url"]
+                        )
+                        send_duration = time.time() - send_start
+                        print(f"   ✅ FULLNESS STICKER SENT")
+                        print(f"   Sticker ID: {fullness_sid}")
+                        print(f"   Send duration: {send_duration:.2f}s")
+                        print("-" * 60)
+                        
+                        # Log sticker interaction
+                        create_interaction(
+                            session=session,
+                            user_id=user.id,
+                            bottle_id=bottle.id,
+                            message_type="sticker",
+                            from_user=False,
+                            content=f"[Fullness sticker: {fullness_sticker['filename']}]"
+                        )
+                    except Exception as e:
+                        print(f"   ❌ Error sending fullness sticker: {e}")
+                        import traceback
+                        traceback.print_exc()
+                
+                # Send emotional sticker if available (and not already sent as part of normal flow)
+                if game_stickers.get("emotional") and not (sticker_info and sticker_info.get("url")):
+                    emotional_sticker = game_stickers["emotional"]
+                    print()
+                    print("😊 SENDING EMOTIONAL STICKER")
+                    print("-" * 60)
+                    print(f"   To: {from_number}")
+                    print(f"   Sticker: {emotional_sticker.get('filename', 'N/A')}")
+                    print(f"   Mood: {bottle.mood}")
+                    print(f"   URL: {emotional_sticker['url']}")
+                    try:
+                        import time
+                        send_start = time.time()
+                        emotional_sid = send_whatsapp_sticker(
+                            to_number=from_number,
+                            media_url=emotional_sticker["url"]
+                        )
+                        send_duration = time.time() - send_start
+                        print(f"   ✅ EMOTIONAL STICKER SENT")
+                        print(f"   Sticker ID: {emotional_sid}")
+                        print(f"   Send duration: {send_duration:.2f}s")
+                        print("-" * 60)
+                        
+                        # Log sticker interaction
+                        create_interaction(
+                            session=session,
+                            user_id=user.id,
+                            bottle_id=bottle.id,
+                            message_type="sticker",
+                            from_user=False,
+                            content=f"[Emotional sticker: {emotional_sticker['filename']}]"
+                        )
+                    except Exception as e:
+                        print(f"   ❌ Error sending emotional sticker: {e}")
+                        import traceback
+                        traceback.print_exc()
+                
+                # Check if bottle is empty and send special message
+                if bottle.fullness_level <= 0.0:
+                    print()
+                    print("=" * 60)
+                    print("🏠 BOTTLE IS EMPTY - WANTS TO RETURN HOME")
+                    print("=" * 60)
+                    # Randomly choose one of the return home messages
+                    return_home_messages = [
+                        "Je suis toute vide ! Ramène-moi chez moi 🏠, au supermarché.",
+                        "Ma famille me manque… ramène-moi à la maison 🏠, au supermarché 💔"
+                    ]
+                    return_home_msg = random.choice(return_home_messages)
+                    try:
+                        return_sid = send_whatsapp_text(from_number, return_home_msg)
+                        print(f"✅ Return home message sent: {return_sid}")
+                        
+                        create_interaction(
+                            session=session,
+                            user_id=user.id,
+                            bottle_id=bottle.id,
+                            message_type="text",
+                            from_user=False,
+                            content=return_home_msg
+                        )
+                        session.commit()
+                    except Exception as e:
+                        print(f"❌ Error sending return home message: {e}")
+                
+                session.commit()
+            except Exception as e:
+                print(f"⚠️  Error sending game stickers: {e}")
+                import traceback
+                traceback.print_exc()
 
         # Log outgoing interactions (if database is available)
         if session and DATABASE_URL:
@@ -1053,7 +1439,7 @@ def whatsapp_webhook():
                     bottle = get_or_create_bottle(session, user.id)
                     
                     # Log text message if sent
-                    if response_type in ["text_only", "text_sticker"] and reply_text:
+                    if response_type == "text_sticker" and reply_text:
                         create_interaction(
                             session=session,
                             user_id=user.id,

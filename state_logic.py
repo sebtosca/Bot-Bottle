@@ -332,7 +332,8 @@ def select_response_type(
     """Select response type based on rotation logic.
     
     This function implements a smart rotation system that:
-    - Uses equal 33/33/33 distribution for all response types
+    - Uses 80% text_sticker and 20% gif_only distribution
+    - Prevents consecutive GIF responses (never sends two GIFs back-to-back)
     - Tracks recent response types to avoid repetition
     - Ensures variety in responses
     
@@ -344,43 +345,46 @@ def select_response_type(
         has_gif: Whether GIFs are available for this mood.
     
     Returns:
-        Response type string: "text_only", "text_sticker", or "gif_only"
+        Response type string: "text_sticker" or "gif_only"
     """
     # Get recent bot response types
     recent_types = get_recent_bot_response_types(session, bottle_id, limit=8)
     
-    # Count recent response types
+    # Count recent response types (still track text_only for historical data)
     type_counts = {
-        "text_only": 0,
         "text_sticker": 0,
         "gif_only": 0
     }
     
     for resp_type in recent_types:
+        # Only count text_sticker and gif_only (ignore text_only for probability calculation)
         if resp_type in type_counts:
             type_counts[resp_type] += 1
     
-    # Equal 33/33/33 distribution for all moods
-    base_probs = {
-        "text_only": 0.333,
-        "text_sticker": 0.333,
-        "gif_only": 0.333
-    }
+    # Check if last response was gif_only to prevent consecutive GIFs
+    if recent_types and recent_types[-1] == "gif_only":
+        # Last response was GIF, force text_sticker this time
+        base_probs = {
+            "text_sticker": 1.0,
+            "gif_only": 0.0
+        }
+    else:
+        # Normal 80/20 distribution between text_sticker and gif_only
+        base_probs = {
+            "text_sticker": 0.8,
+            "gif_only": 0.2
+        }
     
     # Adjust probabilities based on availability
     if not has_sticker:
-        # If no sticker available, redistribute its probability
-        sticker_prob = base_probs["text_sticker"]
+        # If no sticker available, give 100% to gif_only
         base_probs["text_sticker"] = 0
-        base_probs["text_only"] += sticker_prob * 0.6
-        base_probs["gif_only"] += sticker_prob * 0.4
+        base_probs["gif_only"] = 1.0
     
     if not has_gif:
-        # If no GIF available, redistribute its probability
-        gif_prob = base_probs["gif_only"]
+        # If no GIF available, give 100% to text_sticker
         base_probs["gif_only"] = 0
-        base_probs["text_only"] += gif_prob * 0.5
-        base_probs["text_sticker"] += gif_prob * 0.5
+        base_probs["text_sticker"] = 1.0
     
     # Normalize probabilities (in case we adjusted them)
     total = sum(base_probs.values())

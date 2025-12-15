@@ -126,16 +126,18 @@ def send_whatsapp_text(to_number: str, body: str) -> str:
     url = _get_messages_url()
     resp = requests.post(url, headers=_get_headers(), data=json.dumps(payload), timeout=10)
 
-    if resp.status_code >= 400:
-        raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
-
+    # Try to parse JSON response even for error status codes
     try:
         data = resp.json()
     except json.JSONDecodeError:
+        # If we can't parse JSON, raise generic error
+        if resp.status_code >= 400:
+            raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
         raise WhatsAppCloudError(f"Invalid JSON response from WhatsApp API: {resp.text}")
 
-    # Check for errors even when status is 200
-    _check_api_response(data, resp.text)
+    # Check for errors in response (works for both 200 and 400+ status codes)
+    if resp.status_code >= 400 or "error" in data or "errors" in data:
+        _check_api_response(data, resp.text)
 
     messages = data.get("messages", [])
     if not messages:
