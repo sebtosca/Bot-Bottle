@@ -118,7 +118,7 @@ def main() -> int:
         if not gif_dir.is_absolute():
             gif_dir = project_root / gif_dir
     else:
-        gif_dir = project_root / "GIF"
+        gif_dir = project_root / "weather_GIF"
 
     if not gif_dir.exists():
         print(f"❌ GIF directory not found: {gif_dir}")

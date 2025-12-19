@@ -1,0 +1,20 @@
+{
+    "noir_bouteille_affamee_verre_vide.webp": "Le personnage est triste et mélancolique, pleurant et exprimant un manque pour sa <<maison>> (la machine de recyclage).",
+    "noir_bouteille_affamee_non_recyclable_pleine.webp": "Le personnage est souriant et semble complètement satisfait.",
+    "noir_bouteille_affamee_non_recyclable_un_tiers_plein.webp": "Le personnage est très affamé ou a un grand besoin, exprimé par << Ma mé... j'ai la dalle ! >>",
+    "noir_bouteille_affamee_non_recyclable_deux_tiers_plein.webp": "Le personnage est serein mais exprime un léger besoin en disant <<J'ai ben besoin d'un p'tit quelque chose.>>",
+    "bleu_bouteille_affamee_papier_carton_un_tiers_plein.webp": "Le personnage est très affamé ou a un grand besoin, exprimé par <<Ma mé... j'ai la dalle !>>",
+    "bleu_bouteille_affamee_papier_carton_pleine.webp": "Le personnage est souriant et semble complètement satisfait.", 
+    "bleu_bouteille_affamee_papier_carton_deux_tiers_plein.webp": "Le personnage est serein mais exprime un léger besoin en disant << J'ai ben besoin d'un p'tit quelque chose.>>",
+    "bleu_bouteille_affamee_papier_carton_vide.webp": "Le personnage est triste et mélancolique, pleurant et exprimant un manque pour sa << maison>> (la machine de recyclage).", 
+    "vert_bouteille_affamee_verre_vide.webp": "Le personnage est triste et mélancolique, pleurant et exprimant un manque pour sa << maison >> (la machine de recyclage).",  
+    "vert_bouteille_affamee_verre_pleine.webp": "Le personnage est souriant et semble complètement satisfait.",
+    "vert_bouteille_affamee_verre_deux_tiers_plein.webp": "Le personnage est serein mais exprime un léger besoin en disant <<J'ai ben besoin d'un p'tit quelque chose.>>",
+    "vert_bouteille_affamee_verre_un_tiers_plein.webp": "Le personnage est très affamé ou a un grand besoin, exprimé par << Ma mé... j'ai la dalle ! >>",
+    "jaune_bouteille_affamee_plastique_vide.webp": "Le personnage est triste et mélancolique, pleurant et exprimant un manque pour sa << maison>> (la machine de recyclage).",  
+    "jaune_bouteille_affamee_plastique_pleine.webp": "Le personnage est souriant et semble complètement satisfait.",
+    "jaune_bouteille_affamee_plastique_un_tiers_plein.webp": "Le personnage est très affamé ou a un grand besoin, exprimé par <<Ma mé... j'ai la dalle ! >>",
+    "jaune_bouteille_affamee_plastique_deux_tiers_plein.webp": "Le personnage est serein mais exprime un léger besoin en disant << J'ai ben besoin d'un p'tit quelque chose.>>"
+}
+
+,

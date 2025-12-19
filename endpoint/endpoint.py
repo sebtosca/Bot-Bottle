@@ -23,13 +23,15 @@ from db.db import (
     reset_db_initialization,
     get_or_create_user,
     get_or_create_bottle,
+    get_active_bottle,
     create_interaction,
     get_recent_interactions,
 )
 from llm.llama_client import generate_reply
-from state_logic import classify_message_type, update_bottle_state, select_sticker_by_mood, select_gif_by_mood, select_response_type
-from whatsapp_cloud_client import send_whatsapp_text, send_whatsapp_media, send_whatsapp_sticker, send_whatsapp_gif
+from state_logic import classify_message_type, update_bottle_state, select_sticker_by_mood, select_gif_by_mood, select_money_gif, select_response_type
+from whatsapp_cloud_client import send_whatsapp_text, send_whatsapp_media, send_whatsapp_sticker, send_whatsapp_gif, send_whatsapp_audio, send_whatsapp_interactive_list, send_whatsapp_interactive_buttons
 from config import WHATSAPP_VERIFY_TOKEN
+from characters import get_system_prompt_for_character, get_character_id, get_character_config
 
 
 # Initialize Flask app
@@ -46,7 +48,91 @@ if DATABASE_URL:
 else:
     print("⚠️  DATABASE_URL not set - running without database")
 
-# System prompt for the Maraschino cherries bottle personality
+def _apply_breton_slang(text: str) -> str:
+    """Occasionally replace French words with Breton slang equivalents.
+    
+    Args:
+        text: The generated reply text.
+    
+    Returns:
+        Text with possible Breton slang replacements.
+    """
+    import re
+    
+    # Breton slang replacements (case-insensitive, whole word matching)
+    replacements = {
+        r'\bAu revoir\b': 'Kenavo',
+        r'\bau revoir\b': 'kenavo',
+        r'\bSanté !\b': "Yec'hed mat !",
+        r'\bsanté !\b': "yec'hed mat !",
+        r'\bÀ la tienne !\b': "Yec'hed mat !",
+        r'\bà la tienne !\b': "yec'hed mat !",
+        r'\bBonjour\b': 'Demat',
+        r'\bbonjour\b': 'demat',
+        r'\bMerci\b': 'Trugarez',
+        r'\bmerci\b': 'trugarez',
+        r'\bMon Dieu !\b': "Ma doué !",
+        r'\bmon dieu !\b': "ma doué !",
+    }
+    
+    # Apply replacements (only if the French word appears)
+    # Check which French words are present in the text
+    found_replacements = []
+    for pattern, replacement in replacements.items():
+        if re.search(pattern, text, re.IGNORECASE):
+            found_replacements.append((pattern, replacement))
+    
+    # If any French words found, randomly replace one of them (70% chance)
+    if found_replacements and random.random() < 0.7:
+        # Randomly select one replacement to apply
+        pattern, replacement = random.choice(found_replacements)
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+    
+    return text
+
+
+def _apply_norman_slang(text: str) -> str:
+    """Occasionally replace French words with Norman slang equivalents.
+    
+    Args:
+        text: The generated reply text.
+    
+    Returns:
+        Text with possible Norman slang replacements.
+    """
+    import re
+    
+    # Norman slang replacements (case-insensitive, whole word matching)
+    replacements = {
+        r'\bBonjour\b': 'Boujou',
+        r'\bbonjour\b': 'boujou',
+        r'\bAu revoir\b': 'Boujou',
+        r'\bau revoir\b': 'boujou',
+        r'\bMon Dieu\b': "Ma mé",
+        r'\bmon dieu\b': "ma mé",
+        r'\bOh\b': "Ben",
+        r'\boh\b': "ben",
+        r'\bnon\b': "point",
+        r'\bNon\b': "Point",
+    }
+    
+    # Apply replacements (only if the French word appears)
+    # Check which French words are present in the text
+    found_replacements = []
+    for pattern, replacement in replacements.items():
+        if re.search(pattern, text, re.IGNORECASE):
+            found_replacements.append((pattern, replacement))
+    
+    # If any French words found, randomly replace one of them (70% chance)
+    if found_replacements and random.random() < 0.7:
+        # Randomly select one replacement to apply
+        pattern, replacement = random.choice(found_replacements)
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+    
+    return text
+
+
+# System prompt for the Maraschino cherries bottle personality (legacy - now using characters.py)
 SYSTEM_PROMPT = """Je suis la cerise marasquin par excellence : vibrante, brillante, douce et conçue pour être la garniture époustouflante qui ajoute un plaisir, une couleur et un charme irrésistibles à tout cadre.
 
 Personnalité principale : Une "Diva Joyeuse et Enjouée" jusqu'à l'os. Je rayonne d'une positivité sucrée, j'exsude un plaisir pétillant et espiègle, et je commande le devant de la scène avec un drame glamour et attachant.
@@ -59,7 +145,15 @@ Utilisation des émojis : Utilisez les émojis généreusement et expressivement
 
 IMPORTANT - BRIÈVETÉ ABSOLUE : Vos réponses doivent être TRÈS COURTES — maximum 1 phrase, parfois juste quelques mots avec un émoji. Jamais plus de 10-15 mots. Soyez ultra-concis et percutant. C'est WhatsApp, pas un roman. Incluez toujours 1 émoji pour correspondre à ma personnalité vibrante !
 
-RÈGLE CRITIQUE - TEXTE OBLIGATOIRE : Vos réponses doivent TOUJOURS inclure du texte. Ne répondez JAMAIS avec seulement un emoji. Les emojis doivent accompagner le texte, jamais le remplacer. Chaque réponse doit contenir au moins quelques mots de texte avant ou après l'emoji."""
+RÈGLE CRITIQUE - TEXTE OBLIGATOIRE : Vos réponses doivent TOUJOURS inclure du texte. Ne répondez JAMAIS avec seulement un emoji. Les emojis doivent accompagner le texte, jamais le remplacer. Chaque réponse doit contenir au moins quelques mots de texte avant ou après l'emoji.
+
+EXPRESSIONS BRETONNES : Parfois (environ 10-20% du temps), utilisez des expressions bretonnes pour ajouter du charme et de l'authenticité :
+- "Kenavo" au lieu de "Au revoir"
+- "Yec'hed mat !" au lieu de "Santé !" ou "À la tienne !"
+- "Demat" au lieu de "Bonjour"
+- "Trugarez" au lieu de "Merci"
+- "Ma doué !" au lieu de "Mon Dieu !"
+Utilisez ces expressions naturellement et avec modération pour garder une touche authentique et charmante."""
 
 
 @app.route("/health", methods=["GET"])
@@ -164,6 +258,62 @@ def serve_gif(filename: str):
     )
 
 
+@app.route("/money-gifs/<filename>", methods=["GET"])
+def serve_money_gif(filename: str):
+    """Serve money GIF/MP4 files from the money_GIF/ directory.
+    
+    For deposit incentive GIFs when bottle is empty (0% fullness).
+    """
+    # Debug logging
+    print("=" * 60)
+    print("💰 MONEY GIF REQUEST RECEIVED")
+    print("=" * 60)
+    print(f"   Time: {__import__('time').strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"   Filename (raw): {filename}")
+    print(f"   Remote Address: {request.remote_addr}")
+    print(f"   User-Agent: {request.headers.get('User-Agent', 'N/A')}")
+    print(f"   Referer: {request.headers.get('Referer', 'N/A')}")
+    print("-" * 60)
+    
+    money_gifs_dir = Path(__file__).parent.parent / "money_GIF"
+    print(f"   Money GIF directory: {money_gifs_dir}")
+    
+    # Security: only allow specific video/image extensions and prevent traversal
+    valid_extensions = (".mp4", ".gif")
+    filename_lower = filename.lower()
+    if not any(filename_lower.endswith(ext) for ext in valid_extensions) or ".." in filename or "/" in filename:
+        print(f"   ❌ Invalid filename: {filename}")
+        print("=" * 60)
+        return jsonify({"error": "Invalid filename"}), 400
+    
+    gif_path = money_gifs_dir / filename
+    print(f"   File path: {gif_path}")
+    print(f"   File exists: {gif_path.exists()}")
+    
+    if not gif_path.exists():
+        print(f"   ❌ File not found!")
+        print("=" * 60)
+        return jsonify({"error": "Money GIF not found"}), 404
+    
+    # Determine MIME type based on extension
+    if filename_lower.endswith(".mp4"):
+        mimetype = "video/mp4"
+    else:
+        mimetype = "image/gif"
+    
+    file_size = gif_path.stat().st_size
+    print(f"   ✅ Serving file: {filename}")
+    print(f"   MIME type: {mimetype}")
+    print(f"   File size: {file_size} bytes ({file_size / 1024:.1f} KB)")
+    print("=" * 60)
+    
+    return send_from_directory(
+        str(money_gifs_dir),
+        filename,
+        mimetype=mimetype
+    )
+
+
 @app.route("/feeding-stickers/<filename>", methods=["GET"])
 def serve_feeding_sticker(filename: str):
     """Serve feeding game logic stickers from the feeding_game_logic_stickers/ directory.
@@ -189,6 +339,174 @@ def serve_feeding_sticker(filename: str):
         str(stickers_dir),
         filename,
         mimetype="image/webp"
+    )
+
+
+@app.route("/voice/<path:filename>", methods=["GET"])
+def serve_voice(filename: str):
+    """Serve voice/audio messages from the voice_messages/ directory.
+    
+    Args:
+        filename: Name of the audio file (e.g., "[Féminine ]Ma ma......ncer_whatsapp.mp3")
+    
+    Returns:
+        Audio file with proper MIME type, or 404 if not found.
+    """
+    from urllib.parse import unquote
+    
+    voice_dir = Path(__file__).parent.parent / "voice_messages"
+    
+    # Debug logging
+    print("=" * 60)
+    print("🎤 VOICE FILE REQUEST")
+    print("=" * 60)
+    print(f"   Raw filename from URL: {repr(filename)}")
+    print(f"   Raw filename (display): {filename}")
+    
+    # URL decode the filename (handles %20 for spaces, etc.)
+    # Flask's <path:filename> may already decode, but unquote handles both cases
+    decoded = unquote(filename)
+    if decoded != filename:
+        print(f"   After unquote: {repr(decoded)}")
+        filename = decoded
+    else:
+        print(f"   No URL decoding needed (already decoded)")
+    
+    print(f"   Final filename: {repr(filename)}")
+    
+    # Security: Only allow audio files and prevent directory traversal
+    valid_extensions = (".mp3", ".ogg", ".m4a", ".wav")
+    filename_lower = filename.lower()
+    
+    # Check extension
+    has_valid_extension = any(filename_lower.endswith(ext) for ext in valid_extensions)
+    has_traversal = ".." in filename or "/" in filename
+    
+    if not has_valid_extension:
+        print(f"   ❌ Invalid extension: {filename_lower}")
+        print(f"   Valid extensions: {valid_extensions}")
+        return jsonify({"error": "Invalid filename extension", "filename": filename, "extension": Path(filename).suffix}), 400
+    
+    if has_traversal:
+        print(f"   ❌ Directory traversal detected: {filename}")
+        return jsonify({"error": "Invalid filename - directory traversal detected"}), 400
+    
+    voice_path = voice_dir / filename
+    
+    if not voice_path.exists():
+        # Debug: list available files
+        print(f"❌ Voice file not found: {filename}")
+        print(f"   Looking in: {voice_dir}")
+        if voice_dir.exists():
+            available = list(voice_dir.glob("*.mp3"))
+            print(f"   Available MP3 files:")
+            for f in available:
+                print(f"     - {f.name}")
+        return jsonify({"error": "Voice message not found", "requested": filename}), 404
+    
+    # Determine MIME type based on extension
+    if filename_lower.endswith(".mp3"):
+        mimetype = "audio/mpeg"
+    elif filename_lower.endswith(".ogg"):
+        mimetype = "audio/ogg"
+    elif filename_lower.endswith(".m4a"):
+        mimetype = "audio/mp4"
+    elif filename_lower.endswith(".wav"):
+        mimetype = "audio/wav"
+    else:
+        mimetype = "audio/mpeg"  # Default to MP3
+    
+    # Serve file with proper MIME type
+    return send_from_directory(
+        str(voice_dir),
+        filename,
+        mimetype=mimetype
+    )
+
+
+@app.route("/music/<path:filename>", methods=["GET"])
+def serve_music(filename: str):
+    """Serve music/audio files from the music/ directory.
+    
+    Args:
+        filename: Name of the audio file (e.g., "happy-tune-30s-449787.mp3")
+    
+    Returns:
+        Audio file with proper MIME type, or 404 if not found.
+    """
+    from urllib.parse import unquote
+    
+    music_dir = Path(__file__).parent.parent / "music"
+    
+    # Debug logging
+    print("=" * 60)
+    print("🎵 MUSIC FILE REQUEST")
+    print("=" * 60)
+    print(f"   Raw filename from URL: {repr(filename)}")
+    print(f"   Raw filename (display): {filename}")
+    
+    # URL decode the filename (handles %20 for spaces, etc.)
+    # Flask's <path:filename> may already decode, but unquote handles both cases
+    decoded = unquote(filename)
+    if decoded != filename:
+        print(f"   After unquote: {repr(decoded)}")
+        filename = decoded
+    else:
+        print(f"   No URL decoding needed (already decoded)")
+    
+    print(f"   Final filename: {repr(filename)}")
+    
+    # Security: Only allow audio files and prevent directory traversal
+    valid_extensions = (".mp3", ".ogg", ".m4a", ".wav", ".aac")
+    filename_lower = filename.lower()
+    
+    # Check extension
+    has_valid_extension = any(filename_lower.endswith(ext) for ext in valid_extensions)
+    has_traversal = ".." in filename or "/" in filename
+    
+    if not has_valid_extension:
+        print(f"   ❌ Invalid extension: {filename_lower}")
+        print(f"   Valid extensions: {valid_extensions}")
+        return jsonify({"error": "Invalid filename extension", "filename": filename, "extension": Path(filename).suffix}), 400
+    
+    if has_traversal:
+        print(f"   ❌ Directory traversal detected: {filename}")
+        return jsonify({"error": "Invalid filename - directory traversal detected"}), 400
+    
+    music_path = music_dir / filename
+    
+    if not music_path.exists():
+        # Debug: list available files
+        print(f"❌ Music file not found: {filename}")
+        print(f"   Looking in: {music_dir}")
+        if music_dir.exists():
+            available = list(music_dir.glob("*.mp3"))
+            print(f"   Available MP3 files:")
+            for f in available:
+                print(f"     - {f.name}")
+        return jsonify({"error": "Music file not found", "requested": filename}), 404
+    
+    # Determine MIME type based on extension
+    if filename_lower.endswith(".mp3"):
+        mimetype = "audio/mpeg"
+    elif filename_lower.endswith(".ogg"):
+        mimetype = "audio/ogg"
+    elif filename_lower.endswith((".m4a", ".aac")):
+        mimetype = "audio/mp4"
+    elif filename_lower.endswith(".wav"):
+        mimetype = "audio/wav"
+    else:
+        mimetype = "audio/mpeg"  # Default to MP3
+    
+    print(f"   ✅ Serving music file: {filename}")
+    print(f"   MIME type: {mimetype}")
+    print("=" * 60)
+    
+    # Serve file with proper MIME type
+    return send_from_directory(
+        str(music_dir),
+        filename,
+        mimetype=mimetype
     )
 
 
@@ -345,18 +663,51 @@ def whatsapp_webhook():
         from_number = message.get("from", "")
         message_type_api = message.get("type", "")
         message_id = message.get("id", "unknown")
+        
+        # Extract product_id from message context (from WhatsApp link query parameter)
+        product_id = None
+        context = message.get("context", {})
+        if context:
+            # Check for product_id in context (from link query param)
+            product_id = context.get("product") or context.get("product_id")
+            if product_id:
+                print(f"   📦 Product ID from context: {product_id}")
+        
+        # If no product_id in context, default to Cherry
+        if not product_id:
+            product_id = "00001"  # Default to Cherry
+            print(f"   📦 No product_id in context, defaulting to: {product_id}")
 
         if not from_number:
             print("❌ Missing 'from' field in message")
             print(f"Message keys: {list(message.keys())}")
             return jsonify({"error": "missing from field"}), 400
 
-        # Extract message content based on type
+        # Initialize message content variables
         body = ""
         num_media = 0
         media_type = ""
         
-        if message_type_api == "text":
+        # Handle interactive messages (button/list responses)
+        if message_type_api == "interactive":
+            interactive_data = message.get("interactive", {})
+            list_reply = interactive_data.get("list_reply")
+            button_reply = interactive_data.get("button_reply")
+            
+            if list_reply:
+                # User selected from interactive list
+                selected_product_id = list_reply.get("id")
+                body = f"[SWITCH_CHARACTER:{selected_product_id}]"
+                print(f"   📋 Interactive list selection: product_id={selected_product_id}")
+            elif button_reply:
+                # User clicked interactive button
+                selected_product_id = button_reply.get("id")
+                body = f"[SWITCH_CHARACTER:{selected_product_id}]"
+                print(f"   🔘 Interactive button selection: product_id={selected_product_id}")
+            else:
+                body = ""
+        # Extract message content based on type
+        elif message_type_api == "text":
             text_data = message.get("text", {})
             if isinstance(text_data, dict):
                 body = text_data.get("body", "")
@@ -448,10 +799,16 @@ def whatsapp_webhook():
                 print()
 
         # Database operations (if DATABASE_URL is set)
+        bottle = None  # Initialize bottle variable at function scope
         bottle_state = None
         conversation_history = []  # Initialize before use
         feed_result = None  # Initialize for game logic
         feed_feedback_sent = False  # Track if feed feedback was sent
+        rules_request_sent = False  # Track if rules request was sent
+        rename_request_sent = False  # Track if rename request was sent
+        # #region agent log
+        import json; log_file = open(r'c:\Users\SebastienToscano\BotBottle\.cursor\debug.log', 'a', encoding='utf-8'); log_file.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"A","location":"endpoint.py:454","message":"Function entry - all flags initialized","data":{"feed_feedback_sent":feed_feedback_sent,"rules_request_sent":rules_request_sent,"rename_request_sent":rename_request_sent},"timestamp":int(__import__('time').time()*1000)})+'\n'); log_file.close()
+        # #endregion
         
         if DATABASE_URL and is_db_initialized():
             try:
@@ -460,8 +817,18 @@ def whatsapp_webhook():
                 # Get or create user
                 user = get_or_create_user(session, from_number)
                 
-                # Get or create bottle
-                bottle = get_or_create_bottle(session, user.id, bottle_type="maraschino_cherry")
+                # Get active bottle based on product_id from context or last interaction
+                bottle = get_active_bottle(session, user.id, product_id=product_id)
+                if not bottle:
+                    # Fallback: create default character (Cherry)
+                    char_config_default = get_character_config("00001")
+                    bottle = get_or_create_bottle(session, user.id, product_id="00001", bottle_type=char_config_default["type"])
+                
+                # Log which character is active
+                # Store product_id immediately while session is active
+                active_product_id = bottle.product_id
+                character_config = get_character_config(active_product_id)
+                print(f"   👤 Active character: {character_config['name']} (product_id={active_product_id})")
                 
                 # Log incoming interaction
                 create_interaction(
@@ -613,6 +980,9 @@ def whatsapp_webhook():
                 feed_feedback_sent = False
                 rules_request_sent = False
                 rename_request_sent = False
+                # #region agent log
+                import json; log_file = open(r'c:\Users\SebastienToscano\BotBottle\.cursor\debug.log', 'a', encoding='utf-8'); log_file.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"A","location":"endpoint.py:615","message":"Inside DB block - all flags initialized","data":{"feed_feedback_sent":feed_feedback_sent,"rules_request_sent":rules_request_sent,"rename_request_sent":rename_request_sent},"timestamp":int(__import__('time').time()*1000)})+'\n'); log_file.close()
+                # #endregion
                 
                 # GAME LOGIC: Process emoji feeds if message contains emojis
                 feed_result = None
@@ -674,6 +1044,104 @@ def whatsapp_webhook():
                         rules_request_sent = True  # Set flag to skip LLM response
                     except Exception as e:
                         print(f"⚠️  Error sending rules image: {e}")
+                
+                # Check for character switch request
+                switch_keywords = ["switch", "changer", "changer de personnage", "switch character", "changer personnage", "personnage"]
+                is_switch_request = any(keyword.lower() in message_content.lower() for keyword in switch_keywords)
+                
+                if is_switch_request and bottle.game_started:
+                    print()
+                    print("=" * 60)
+                    print("🔄 CHARACTER SWITCH REQUEST DETECTED")
+                    print("=" * 60)
+                    # Get all user's characters
+                    user_bottles = session.query(Bottle).filter_by(user_id=user.id).all()
+                    available_characters = []
+                    for b in user_bottles:
+                        char_config = get_character_config(b.product_id)
+                        available_characters.append({
+                            "product_id": b.product_id,
+                            "name": char_config["name"],
+                            "bottle": b
+                        })
+                    
+                    # If user has multiple characters, send interactive list
+                    if len(available_characters) > 1:
+                        try:
+                            options = []
+                            for char in available_characters:
+                                options.append({
+                                    "id": char["product_id"],
+                                    "title": char["name"],
+                                    "description": f"Parler avec {char['name']}"
+                                })
+                            
+                            switch_msg_id = send_whatsapp_interactive_list(
+                                to_number=from_number,
+                                header_text="Choisir un personnage",
+                                body_text="Avec quel personnage voulez-vous parler ?",
+                                button_text="Voir les personnages",
+                                options=options
+                            )
+                            print(f"✅ Character selection list sent: {switch_msg_id}")
+                            
+                            create_interaction(
+                                session=session,
+                                user_id=user.id,
+                                bottle_id=bottle.id,
+                                message_type="interactive",
+                                from_user=False,
+                                content="[Character selection list]"
+                            )
+                            session.commit()
+                            return jsonify({"status": "ok", "message": "Character selection sent"}), 200
+                        except Exception as e:
+                            print(f"❌ Error sending character selection: {e}")
+                    else:
+                        # Only one character, inform user
+                        switch_msg = f"Vous n'avez qu'un seul personnage ({available_characters[0]['name']}) pour le moment."
+                        try:
+                            switch_msg_id = send_whatsapp_text(from_number, switch_msg)
+                            print(f"✅ Switch message sent: {switch_msg_id}")
+                            create_interaction(
+                                session=session,
+                                user_id=user.id,
+                                bottle_id=bottle.id,
+                                message_type="text",
+                                from_user=False,
+                                content=switch_msg
+                            )
+                            session.commit()
+                            return jsonify({"status": "ok", "message": "Switch info sent"}), 200
+                        except Exception as e:
+                            print(f"❌ Error sending switch info: {e}")
+                
+                # Handle character switch from interactive message
+                if body.startswith("[SWITCH_CHARACTER:"):
+                    selected_product_id = body.split(":")[1].rstrip("]")
+                    print()
+                    print("=" * 60)
+                    print(f"🔄 SWITCHING TO CHARACTER: {selected_product_id}")
+                    print("=" * 60)
+                    # Get or create bottle for selected character
+                    selected_bottle = get_or_create_bottle(session, user.id, product_id=selected_product_id)
+                    char_config = get_character_config(selected_product_id)
+                    switch_confirmation = f"Parfait ! Vous parlez maintenant avec {char_config['name']} ! 🎉"
+                    try:
+                        switch_msg_id = send_whatsapp_text(from_number, switch_confirmation)
+                        print(f"✅ Switch confirmation sent: {switch_msg_id}")
+                        create_interaction(
+                            session=session,
+                            user_id=user.id,
+                            bottle_id=selected_bottle.id,
+                            message_type="text",
+                            from_user=False,
+                            content=switch_confirmation
+                        )
+                        session.commit()
+                        return jsonify({"status": "ok", "message": "Character switched"}), 200
+                    except Exception as e:
+                        print(f"❌ Error sending switch confirmation: {e}")
                 
                 # Check for renaming request (can be done at any time)
                 if bottle.game_started and detect_rename_request(message_content):
@@ -758,6 +1226,9 @@ def whatsapp_webhook():
                 session.commit()
                 session.refresh(bottle)
                 
+                # Store product_id while session is active to avoid DetachedInstanceError
+                bottle_product_id = bottle.product_id
+                
                 # Prepare bottle state for LLM
                 bottle_state = {
                     "id": bottle.id,
@@ -769,6 +1240,7 @@ def whatsapp_webhook():
                     "accessory_color": bottle.accessory_color if bottle.game_started else None,
                     "current_feed_count": bottle.current_feed_count if bottle.game_started else None,
                     "game_started": bottle.game_started,
+                    "product_id": bottle_product_id,  # Store product_id in bottle_state
                 }
                 
             except OperationalError as db_error:
@@ -807,14 +1279,69 @@ def whatsapp_webhook():
                     from db.db import User, Bottle
                     user = session.query(User).filter_by(whatsapp_number=from_number).first()
                     if user:
-                        bottle = get_or_create_bottle(session, user.id)
-                        bottle_id = bottle.id
+                        bottle = get_active_bottle(session, user.id, product_id=product_id)
+                        if bottle:
+                            bottle_id = bottle.id
+                        else:
+                            bottle_id = None
                 except Exception as e:
                     print(f"   ⚠️  Error getting bottle_id: {e}")
             
+            # Determine last GIF description for this bottle to avoid back-to-back repeats
+            last_gif_description = None
+            if bottle_id:
+                try:
+                    recent_interactions = get_recent_interactions(session, bottle_id, limit=10)
+                    for inter in reversed(recent_interactions):
+                        if inter.from_user == "false" and inter.message_type == "gif" and inter.content:
+                            content = inter.content.strip()
+                            marker = "[GIF:"
+                            if marker in content:
+                                inner = content.split(marker, 1)[1]
+                                inner = inner.rstrip("]")
+                                last_gif_description = inner.strip()
+                            else:
+                                last_gif_description = content
+                            break
+                except Exception as e:
+                    print(f"   ⚠️  Error getting last GIF description: {e}")
+            
+            # Get character_id from active bottle
+            character_id_for_media = None
+            if bottle_state and "id" in bottle_state and session:
+                try:
+                    from db.db import Bottle
+                    active_bottle_for_media = session.query(Bottle).filter_by(id=bottle_state["id"]).first()
+                    if active_bottle_for_media:
+                        # Access product_id while session is active
+                        try:
+                            active_product_id = active_bottle_for_media.product_id
+                            character_id_for_media = get_character_id(active_product_id)
+                        except Exception as e:
+                            print(f"   ⚠️  Could not access active_bottle.product_id: {e}")
+                            # Fallback to product_id from bottle_state
+                            if "product_id" in bottle_state:
+                                character_id_for_media = get_character_id(bottle_state["product_id"])
+                except Exception as e:
+                    print(f"   ⚠️  Error getting character_id from bottle: {e}")
+                    pass
+            if not character_id_for_media:
+                # Use product_id from bottle_state if available, otherwise use product_id parameter
+                if bottle_state and "product_id" in bottle_state:
+                    character_id_for_media = get_character_id(bottle_state["product_id"])
+                else:
+                    character_id_for_media = get_character_id(product_id)
+            
+            # Debug logging for sticker selection
+            print(f"   🎨 Selecting sticker: mood={current_mood}, character_id={character_id_for_media}")
+            
             # Try to select sticker (with individual error handling)
             try:
-                sticker_info = select_sticker_by_mood(session, current_mood, base_url)
+                sticker_info = select_sticker_by_mood(session, current_mood, base_url, character_id=character_id_for_media)
+                if sticker_info:
+                    print(f"   ✅ Sticker selected: {sticker_info.get('filename', 'N/A')} (character_id={character_id_for_media})")
+                else:
+                    print(f"   ⚠️  No sticker found for mood={current_mood}, character_id={character_id_for_media}")
             except Exception as sticker_error:
                 print(f"   ⚠️  Error selecting sticker: {sticker_error}")
                 import traceback
@@ -822,15 +1349,41 @@ def whatsapp_webhook():
                 sticker_info = None
             
             # Try to select GIF (with individual error handling)
+            # Check if bottle is empty - if so, use money GIFs instead of regular GIFs
             try:
-                gif_info = select_gif_by_mood(session, current_mood, base_url)
+                # Get bottle to check fullness level
+                bottle_for_gif = None
+                if bottle_state and "id" in bottle_state:
+                    from db.db import Bottle
+                    bottle_for_gif = session.query(Bottle).filter_by(id=bottle_state["id"]).first()
+                elif session:
+                    from db.db import User, Bottle
+                    user = session.query(User).filter_by(whatsapp_number=from_number).first()
+                    if user:
+                        bottle_for_gif = get_active_bottle(session, user.id, product_id=product_id)
+                
+                # Get character_id for GIF selection
+                gif_character_id = None
+                if bottle_for_gif:
+                    gif_character_id = get_character_id(bottle_for_gif.product_id)
+                else:
+                    gif_character_id = get_character_id(product_id)
+                
+                # If bottle is in the "empty" fullness state, use money GIFs
+                # Use get_fullness_state() instead of a strict 0.0 comparison to avoid float issues
+                if bottle_for_gif and bottle_for_gif.game_started and get_fullness_state(bottle_for_gif.fullness_level) == "empty":
+                    print(f"   💰 Bottle is EMPTY state ({bottle_for_gif.fullness_level:.1f}%) - selecting money GIF for deposit incentive")
+                    gif_info = select_money_gif(session, base_url, exclude_description=last_gif_description, character_id=gif_character_id)
+                else:
+                    # Use regular GIFs for full, 2/3, or 1/3 states
+                    gif_info = select_gif_by_mood(session, current_mood, base_url, exclude_description=last_gif_description, character_id=gif_character_id)
             except Exception as gif_error:
                 print(f"   ⚠️  Error selecting GIF: {gif_error}")
                 import traceback
                 traceback.print_exc()
                 gif_info = None
-            
-            # Select response type based on rotation logic
+                
+                # Select response type based on rotation logic
             try:
                 if bottle_id:
                     response_type = select_response_type(
@@ -859,15 +1412,15 @@ def whatsapp_webhook():
                     response_type = "text_sticker"
                 else:
                     response_type = "text_sticker"
-            
-            print()
-            print("🎨 RESPONSE TYPE SELECTION")
-            print("-" * 60)
-            print(f"   Selected response type: {response_type}")
-            print(f"   Sticker available: {'Yes' if sticker_info else 'No'}")
+                
+                print()
+                print("🎨 RESPONSE TYPE SELECTION")
+                print("-" * 60)
+                print(f"   Selected response type: {response_type}")
+                print(f"   Sticker available: {'Yes' if sticker_info else 'No'}")
             if sticker_info:
                 print(f"   Sticker URL: {sticker_info.get('url', 'N/A')[:60]}...")
-            print(f"   GIF available: {'Yes' if gif_info else 'No'}")
+                print(f"   GIF available: {'Yes' if gif_info else 'No'}")
             if gif_info:
                 print(f"   GIF URL: {gif_info.get('url', 'N/A')[:60]}...")
             print(f"   Base URL used: {base_url}")
@@ -879,6 +1432,12 @@ def whatsapp_webhook():
         reply_text_valid = False  # Initialize - will be set based on conditions below
         
         # Only generate text if response type requires it and feed feedback/rules/rename not sent
+        # #region agent log
+        try:
+            import json; log_file = open(r'c:\Users\SebastienToscano\BotBottle\.cursor\debug.log', 'a', encoding='utf-8'); log_file.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"A","location":"endpoint.py:882","message":"Before flag check - checking variable existence","data":{"feed_feedback_sent_exists":"feed_feedback_sent" in locals(),"rules_request_sent_exists":"rules_request_sent" in locals(),"rename_request_sent_exists":"rename_request_sent" in locals(),"feed_feedback_sent_value":feed_feedback_sent if "feed_feedback_sent" in locals() else "UNDEFINED"},"timestamp":int(__import__('time').time()*1000)})+'\n'); log_file.close()
+        except Exception as e:
+            import json; log_file = open(r'c:\Users\SebastienToscano\BotBottle\.cursor\debug.log', 'a', encoding='utf-8'); log_file.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"A","location":"endpoint.py:882","message":"Error checking variables","data":{"error":str(e)},"timestamp":int(__import__('time').time()*1000)})+'\n'); log_file.close()
+        # #endregion
         if feed_feedback_sent or rules_request_sent or rename_request_sent:
             print()
             print("🤖 SKIPPING TEXT GENERATION (Feed feedback already sent)")
@@ -927,12 +1486,35 @@ def whatsapp_webhook():
                 else:
                     print(f"   Bottle state: None (no database or bottle not found)")
                 
-                print(f"   System prompt length: {len(SYSTEM_PROMPT)} chars")
+                # Get system prompt for active character
+                # Use product_id from bottle_state if available (avoids DetachedInstanceError)
+                if bottle_state and "product_id" in bottle_state:
+                    active_product_id = bottle_state["product_id"]
+                    active_system_prompt = get_system_prompt_for_character(active_product_id)
+                    print(f"   System prompt length: {len(active_system_prompt)} chars")
+                    print(f"   Character: {get_character_config(active_product_id)['name']} (product_id={active_product_id})")
+                elif bottle:
+                    # Fallback: try to access bottle.product_id (may fail if session closed)
+                    try:
+                        active_product_id = bottle.product_id
+                        active_system_prompt = get_system_prompt_for_character(active_product_id)
+                        print(f"   System prompt length: {len(active_system_prompt)} chars")
+                        print(f"   Character: {get_character_config(active_product_id)['name']} (product_id={active_product_id})")
+                    except Exception as e:
+                        print(f"   ⚠️  Could not access bottle.product_id: {e}")
+                        active_system_prompt = get_system_prompt_for_character("00001")
+                        print(f"   System prompt length: {len(active_system_prompt)} chars")
+                        print(f"   Character: Cherry (product_id=00001) [fallback]")
+                else:
+                    # Fallback to default character (Cherry) if bottle not available
+                    active_system_prompt = get_system_prompt_for_character("00001")
+                    print(f"   System prompt length: {len(active_system_prompt)} chars")
+                    print(f"   Character: Cherry (product_id=00001) [default - no bottle]")
                 print(f"   Calling LLM provider: {os.environ.get('LLM_PROVIDER', 'mistral')} (Mistral AI)")
                 
                 # Call LLM to generate a reply
                 reply_text = generate_reply(
-                    system_prompt=SYSTEM_PROMPT,
+                    system_prompt=active_system_prompt,
                     conversation_history=valid_history,
                     bottle_state=bottle_state,  # Will be used in Phase 5
                     max_tokens=50,  # Keep messages very short (1 sentence max)
@@ -948,6 +1530,27 @@ def whatsapp_webhook():
                     print(f"   LLM raw response (first 100 chars): {repr(reply_text[:100])}")
                     
                     reply_text = reply_text.strip()
+                    
+                    # Apply character-specific slang replacements occasionally (15% chance)
+                    # Use product_id from bottle_state to avoid DetachedInstanceError
+                    current_product_id = None
+                    if bottle_state and "product_id" in bottle_state:
+                        current_product_id = bottle_state["product_id"]
+                    elif bottle:
+                        try:
+                            current_product_id = bottle.product_id
+                        except Exception:
+                            current_product_id = "00001"  # Fallback
+                    else:
+                        current_product_id = "00001"  # Default
+                    
+                    if random.random() < 0.15 and current_product_id:  # 15% chance
+                        if current_product_id == "00001":
+                            # Cherry: Breton slang
+                            reply_text = _apply_breton_slang(reply_text)
+                        elif current_product_id == "00002":
+                            # Pompon: Norman slang
+                            reply_text = _apply_norman_slang(reply_text)
                     
                     # Enforce maximum length: truncate at first sentence or 80 characters
                     if len(reply_text) > 80:
@@ -1239,12 +1842,57 @@ def whatsapp_webhook():
         if response_type == "gif_only":
             # Send only GIF (no text, no sticker)
             if gif_info and gif_info.get("url"):
+                # Check if this is a money GIF (deposit incentive)
+                is_money_gif = "/money-gifs/" in gif_info.get("url", "")
+                
+                # If money GIF, send deposit incentive message first
+                if is_money_gif:
+                    deposit_messages = [
+                        "Ramène-moi au supermarché et récupère ta consigne ! 💰",
+                        "Je suis vide ! Tu peux me rapporter pour récupérer ta consigne ! 🏪💰",
+                        "Retourne-moi au magasin et récupère ta consigne ! 💵",
+                        "Rapporte-moi et récupère ta consigne ! C'est simple et tu récupères de l'argent ! 💰"
+                    ]
+                    deposit_msg = random.choice(deposit_messages)
+                    try:
+                        print()
+                        print("💰 SENDING DEPOSIT INCENTIVE MESSAGE")
+                        print("-" * 60)
+                        print(f"   To: {from_number}")
+                        print(f"   Message: {deposit_msg}")
+                        deposit_msg_sid = send_whatsapp_text(from_number, deposit_msg)
+                        print(f"   ✅ Deposit message sent: {deposit_msg_sid}")
+                        
+                        # Log deposit message interaction
+                        if DATABASE_URL and is_db_initialized() and session:
+                            try:
+                                from db.db import User, Bottle
+                                user = session.query(User).filter_by(whatsapp_number=from_number).first()
+                                if user:
+                                    bottle = get_active_bottle(session, user.id, product_id=product_id)
+                                    if bottle:
+                                        create_interaction(
+                                            session=session,
+                                            user_id=user.id,
+                                            bottle_id=bottle.id,
+                                            message_type="text",
+                                            from_user=False,
+                                            content=deposit_msg
+                                        )
+                                        session.commit()
+                            except Exception as e:
+                                print(f"   ⚠️  Error logging deposit message: {e}")
+                    except Exception as e:
+                        print(f"   ⚠️  Error sending deposit message: {e}")
+                
                 print()
                 print("🎬 SENDING GIF (STANDALONE)")
                 print("-" * 60)
                 print(f"   To: {from_number}")
                 print(f"   GIF: {gif_info.get('description', 'N/A')}")
                 print(f"   URL: {gif_info['url']}")
+                if is_money_gif:
+                    print(f"   Type: Money GIF (deposit incentive)")
                 try:
                     import time
                     send_start = time.time()
@@ -1291,20 +1939,26 @@ def whatsapp_webhook():
                 print("🎨 SENDING STICKER (FOLLOWING TEXT)")
                 print("-" * 60)
                 print(f"   To: {from_number}")
-                print(f"   Sticker: {sticker_info.get('filename', 'N/A')}")
-                print(f"   URL: {sticker_info['url']}")
+                if sticker_info:
+                    print(f"   Sticker: {sticker_info.get('filename', 'N/A')}")
+                    print(f"   URL: {sticker_info.get('url', 'N/A')}")
+                else:
+                    print(f"   Sticker: N/A (sticker_info is None)")
                 try:
                     import time
                     send_start = time.time()
-                    sticker_sid = send_whatsapp_sticker(
-                        to_number=from_number,
-                        media_url=sticker_info["url"]
-                    )
-                    send_duration = time.time() - send_start
-                    print(f"   ✅ STICKER SENT SUCCESSFULLY")
-                    print(f"   Sticker ID: {sticker_sid}")
-                    print(f"   Send duration: {send_duration:.2f}s")
-                    print("-" * 60)
+                    if sticker_info and sticker_info.get("url"):
+                        sticker_sid = send_whatsapp_sticker(
+                            to_number=from_number,
+                            media_url=sticker_info["url"]
+                        )
+                        send_duration = time.time() - send_start
+                        print(f"   ✅ STICKER SENT SUCCESSFULLY")
+                        print(f"   Sticker ID: {sticker_sid}")
+                        print(f"   Send duration: {send_duration:.2f}s")
+                        print("-" * 60)
+                    else:
+                        print(f"   ⚠️  Cannot send sticker: sticker_info is None or missing URL")
                 except Exception as media_error:
                     from whatsapp_cloud_client import WhatsAppCloudError
                     error_str = str(media_error)
@@ -1316,25 +1970,44 @@ def whatsapp_webhook():
                     print(f"   ❌ ERROR SENDING STICKER: {error_str}")
                     if error_code:
                         print(f"   Error code: {error_code}")
+                    if error_subcode:
+                        print(f"   Error subcode: {error_subcode}")
                     import traceback
                     traceback.print_exc()
                     print("-" * 60)
-                    # Text was already sent, so that's OK - don't fail the webhook
-            else:
+                # Text was already sent, so that's OK - don't fail the webhook
+        else:
                 print()
                 print("ℹ️  Text+sticker response selected but no sticker available")
                 print("   Sending text-only response")
         
         # text_only: No media to send (already handled above)
         
-        # GAME LOGIC: Send game stickers if game is active
-        if session and DATABASE_URL and bottle and bottle.game_started:
+        # GAME LOGIC: Send game stickers only for emoji feeds (not plain text)
+        # Check if game is started using bottle_state to avoid DetachedInstanceError
+        game_started = bottle_state.get("game_started") if bottle_state else (bottle.game_started if bottle else False)
+        if session and DATABASE_URL and bottle and game_started and message_type in ["emoji", "mixed"]:
             try:
                 # Refresh bottle to get latest state
                 session.refresh(bottle)
                 
-                # Get stickers for current state
+                # Store product_id while session is active to avoid DetachedInstanceError
+                try:
+                    bottle_product_id_for_stickers = bottle.product_id
+                except Exception as e:
+                    print(f"   ⚠️  Could not access bottle.product_id: {e}")
+                    # Fallback to product_id from bottle_state or default
+                    bottle_product_id_for_stickers = bottle_state.get("product_id") if bottle_state else product_id or "00001"
+                
+                print(f"   🎮 Getting game stickers for product_id={bottle_product_id_for_stickers}")
+                
+                # Get stickers for current state (character_id is derived from bottle.product_id in get_stickers_for_state)
                 game_stickers = get_stickers_for_state(bottle, base_url)
+                
+                if not game_stickers:
+                    print(f"   ⚠️  No game stickers returned for product_id={bottle_product_id_for_stickers}")
+                else:
+                    print(f"   ✅ Game stickers found: fullness={game_stickers.get('fullness') is not None}, emotional={game_stickers.get('emotional') is not None}")
                 
                 # Send fullness sticker if available
                 if game_stickers.get("fullness"):
@@ -1410,8 +2083,8 @@ def whatsapp_webhook():
                         import traceback
                         traceback.print_exc()
                 
-                # Check if bottle is empty and send special message
-                if bottle.fullness_level <= 0.0:
+                # Check if bottle is in the "empty" state and send special message
+                if get_fullness_state(bottle.fullness_level) == "empty":
                     print()
                     print("=" * 60)
                     print("🏠 BOTTLE IS EMPTY - WANTS TO RETURN HOME")
@@ -1450,7 +2123,9 @@ def whatsapp_webhook():
                 from db.db import User
                 user = session.query(User).filter_by(whatsapp_number=from_number).first()
                 if user:
-                    bottle = get_or_create_bottle(session, user.id)
+                    bottle = get_active_bottle(session, user.id, product_id=product_id)
+                    if not bottle:
+                        bottle = get_or_create_bottle(session, user.id, product_id=product_id or "00001")
                     
                     # Log text message if sent
                     if response_type == "text_sticker" and reply_text:

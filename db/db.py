@@ -33,7 +33,8 @@ class Bottle(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    type = Column(String, default="maraschino_cherry", nullable=False)  # e.g., "maraschino_cherry", "tabasco", "water"
+    product_id = Column(String, default="00001", nullable=False, index=True)  # Character product_id: "00001" (Cherry), "00002" (Pompon)
+    type = Column(String, default="maraschino_cherry", nullable=False)  # e.g., "maraschino_cherry", "pompon_normand"
     name = Column(String, nullable=True)  # User-given name for the bottle (optional)
     mood = Column(String, default="neutral", nullable=False)  # e.g., "happy", "sad", "angry", "lonely", "thirsty", "neutral"
     personality_level = Column(Integer, default=0, nullable=False)  # 0-10 scale, evolves with engagement
@@ -46,6 +47,7 @@ class Bottle(Base):
     current_feed_count = Column(Integer, default=0, nullable=False)  # Correct emojis in current session (0-3)
     incorrect_feed_count = Column(Integer, default=0, nullable=False)  # Incorrect emojis in current session
     last_feed_time = Column(DateTime, nullable=True)  # When last fed
+    recovery_required = Column(Boolean, default=False, nullable=False)  # True if recovery needs 3 correct feeds
     
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -91,6 +93,7 @@ class Sticker(Base):
     # For stickers: local sticker image file name.
     # For GIFs: local MP4/GIF file name in the GIF directory.
     filename = Column(String, unique=True, nullable=True, index=True)
+    character_id = Column(String, nullable=True, index=True)  # Character ID: "00001" (Cherry), "00002" (Pompon), or None (universal)
     mood_tags = Column(String, nullable=True)  # Comma-separated moods: "happy,excited,playful"
     description = Column(String, nullable=True)  # Optional description
     media_type = Column(String, default="sticker", nullable=False)  # "sticker" or "gif"
@@ -214,23 +217,26 @@ def get_or_create_user(session: Session, whatsapp_number: str) -> User:
     return user
 
 
-def get_or_create_bottle(session: Session, user_id: int, bottle_type: str = "maraschino_cherry") -> Bottle:
-    """Get existing bottle for user or create a new one.
+def get_or_create_bottle(session: Session, user_id: int, product_id: str = "00001", bottle_type: str = "maraschino_cherry") -> Bottle:
+    """Get existing bottle for user and product_id or create a new one.
     
     Args:
         session: Database session.
         user_id: User ID.
+        product_id: Character product_id (default: "00001" for Cherry).
         bottle_type: Type of bottle (default: "maraschino_cherry").
     
     Returns:
-        Bottle object.
+        Bottle object for the specified character.
     """
-    bottle = session.query(Bottle).filter_by(user_id=user_id).first()
+    # Query by both user_id and product_id to support multiple characters per user
+    bottle = session.query(Bottle).filter_by(user_id=user_id, product_id=product_id).first()
     
     if bottle is None:
         now = datetime.utcnow()
         bottle = Bottle(
             user_id=user_id,
+            product_id=product_id,
             type=bottle_type,
             mood="neutral",
             personality_level=0,
@@ -242,6 +248,41 @@ def get_or_create_bottle(session: Session, user_id: int, bottle_type: str = "mar
         session.refresh(bottle)
     
     return bottle
+
+
+def get_active_bottle(session: Session, user_id: int, product_id: Optional[str] = None) -> Optional[Bottle]:
+    """Get the active bottle for a user.
+    
+    If product_id is provided (from message context), use that character.
+    Otherwise, determine active character from the most recent user interaction.
+    
+    Args:
+        session: Database session.
+        user_id: User ID.
+        product_id: Optional product_id from message context.
+    
+    Returns:
+        Bottle object for the active character, or None if no interactions exist.
+    """
+    # If product_id provided, use it directly
+    if product_id:
+        return get_or_create_bottle(session, user_id, product_id=product_id)
+    
+    # Otherwise, find the most recently interacted bottle
+    last_interaction = (
+        session.query(Interaction)
+        .filter_by(user_id=user_id, from_user="true")
+        .order_by(Interaction.created_at.desc())
+        .first()
+    )
+    
+    if last_interaction:
+        active_bottle = session.query(Bottle).filter_by(id=last_interaction.bottle_id).first()
+        if active_bottle:
+            return active_bottle
+    
+    # Fallback: get or create default character (Cherry)
+    return get_or_create_bottle(session, user_id, product_id="00001")
 
 
 def create_interaction(

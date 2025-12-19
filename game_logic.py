@@ -215,13 +215,13 @@ def get_fullness_state(fullness_level: float) -> str:
         fullness_level: Fullness percentage (0.0 to 100.0).
     
     Returns:
-        State string: "full" (100%), "2/3" (67-99%), "1/3" (34-66%), "empty" (0-33%)
+        State string: "full" (100%), "2/3" (66.67-99.99%), "1/3" (33.33-66.66%), "empty" (0-33.32%)
     """
     if fullness_level >= 100.0:
         return "full"
-    elif fullness_level >= 67.0:
+    elif fullness_level >= 66.66:
         return "2/3"
-    elif fullness_level >= 34.0:
+    elif fullness_level >= 33.33:
         return "1/3"
     else:
         return "empty"
@@ -263,21 +263,23 @@ def update_fullness_after_feed(bottle: Bottle, is_correct: bool) -> Tuple[bool, 
     
     Returns:
         Tuple of (fullness_increased, feed_complete) where:
-        - fullness_increased: True if fullness actually increased
+        - fullness_increased: True if fullness actually increased (only when 3 feeds complete)
         - feed_complete: True if 3 correct feeds completed
     """
     if is_correct:
         bottle.current_feed_count += 1
         bottle.last_feed_time = datetime.utcnow()
         
-        # Check if we've reached 3 correct feeds
+        # Only increase fullness when 3 correct feeds are reached
         if bottle.current_feed_count >= 3:
-            # Increase fullness by 1/3 (33.33%)
-            bottle.fullness_level = min(100.0, bottle.fullness_level + 33.33)
+            # Increase fullness by 1/3 (33.333...%) - one level up
+            # Use 100/3 to ensure exact progression: empty → 1/3 → 2/3 → full
+            bottle.fullness_level = min(100.0, bottle.fullness_level + (100.0 / 3.0))
             bottle.current_feed_count = 0  # Reset counter
-            return True, True
+            bottle.incorrect_feed_count = 0  # Reset incorrect counter too
+            return True, True  # fullness_increased, feed_complete
         else:
-            return False, False
+            return False, False  # No increase yet, not complete
     else:
         # Wrong emoji - decrease fullness slightly and reset counter
         bottle.fullness_level = max(0.0, bottle.fullness_level - 5.0)
@@ -285,13 +287,14 @@ def update_fullness_after_feed(bottle: Bottle, is_correct: bool) -> Tuple[bool, 
         return False, False
 
 
-def get_fullness_sticker(accessory_color: str, fullness_state: str, base_url: str) -> Optional[Dict[str, str]]:
+def get_fullness_sticker(accessory_color: str, fullness_state: str, base_url: str, character_id: str = "00001") -> Optional[Dict[str, str]]:
     """Get the appropriate fullness sticker based on color and state.
     
     Args:
         accessory_color: Color string ("GREEN", "YELLOW", "BLACK", "BLUE").
         fullness_state: State string ("full", "2/3", "1/3", "empty").
         base_url: Base URL for serving stickers.
+        character_id: Character ID ("00001" for Cherry, "00002" for Pompon).
     
     Returns:
         Dictionary with sticker info: {"url": str, "filename": str}
@@ -327,15 +330,18 @@ def get_fullness_sticker(accessory_color: str, fullness_state: str, base_url: st
     
     filename = f"{color_fr}_bouteille_affamee_{category_fr}_{state_fr}.webp"
     
-    # Check if file exists
+    # Check if file exists in character-specific directory
     project_root = Path(__file__).parent
-    sticker_path = project_root / "feeding_game_logic_stickers" / filename
+    from characters import get_character_config
+    char_config = get_character_config(character_id if character_id else "00001")
+    stickers_dir = project_root / char_config["feeding_sticker_dir"]
+    sticker_path = stickers_dir / filename
     
     if not sticker_path.exists():
-        print(f"⚠️  Warning: Fullness sticker not found: {filename}")
+        print(f"⚠️  Warning: Fullness sticker not found: {filename} in {stickers_dir}")
         return None
     
-    # Construct URL
+    # Construct URL (use character-specific route if needed, or generic route)
     encoded_filename = quote(filename, safe='')
     sticker_url = f"{base_url.rstrip('/')}/feeding-stickers/{encoded_filename}"
     
@@ -346,31 +352,56 @@ def get_fullness_sticker(accessory_color: str, fullness_state: str, base_url: st
     }
 
 
-def get_emotional_sticker(mood: str, base_url: str) -> Optional[Dict[str, str]]:
+def get_emotional_sticker(mood: str, base_url: str, character_id: str = "00001") -> Optional[Dict[str, str]]:
     """Get emotional sticker based on mood.
     
     Args:
         mood: Mood string (e.g., "happy", "sad", "angry").
         base_url: Base URL for serving stickers.
+        character_id: Character ID ("00001" for Cherry, "00002" for Pompon).
     
     Returns:
         Dictionary with sticker info: {"url": str, "filename": str}
         Returns None if sticker not found.
     """
-    # Map mood to sticker filename
-    mood_map = {
-        "happy": "happy_cherry.webp",
-        "sad": "scared_cherry.webp",  # Using scared as sad alternative
-        "angry": "angry_cherry.webp",
-        "shocked": "shocked_cherry.webp",
-        "neutral": "diva_cherry.webp"
-    }
+    from characters import get_character_config
     
-    filename = mood_map.get(mood, "diva_cherry.webp")
+    # Map mood to sticker filename (character-specific)
+    char_config = get_character_config(character_id)
+    if character_id == "00001":
+        # Cherry
+        mood_map = {
+            "happy": "happy_cherry.webp",
+            "sad": "scared_cherry.webp",
+            "angry": "angry_cherry.webp",
+            "shocked": "shocked_cherry.webp",
+            "neutral": "diva_cherry.webp"
+        }
+    elif character_id == "00002":
+        # Pompon
+        mood_map = {
+            "happy": "happy_cider.webp",
+            "sad": "scared_cider.webp",
+            "angry": "angry_cider.webp",
+            "shocked": "shocked_cider.webp",
+            "neutral": "happy_cider.webp"  # Default to happy for Pompon
+        }
+    else:
+        # Default to Cherry
+        mood_map = {
+            "happy": "happy_cherry.webp",
+            "sad": "scared_cherry.webp",
+            "angry": "angry_cherry.webp",
+            "shocked": "shocked_cherry.webp",
+            "neutral": "diva_cherry.webp"
+        }
     
-    # Check if file exists
+    filename = mood_map.get(mood, mood_map.get("neutral", "happy_cherry.webp"))
+    
+    # Check if file exists in character-specific directory
     project_root = Path(__file__).parent
-    sticker_path = project_root / "stickers" / filename
+    stickers_dir = project_root / char_config["sticker_dir"]
+    sticker_path = stickers_dir / filename
     
     if not sticker_path.exists():
         print(f"⚠️  Warning: Emotional sticker not found: {filename}")
@@ -399,15 +430,19 @@ def get_stickers_for_state(bottle: Bottle, base_url: str) -> Dict[str, Optional[
     """
     fullness_state = get_fullness_state(bottle.fullness_level)
     
+    # Get character_id from bottle's product_id
+    character_id = bottle.product_id if hasattr(bottle, 'product_id') else "00001"
+    
     fullness_sticker = None
     if bottle.accessory_color:
         fullness_sticker = get_fullness_sticker(
             bottle.accessory_color,
             fullness_state,
-            base_url
+            base_url,
+            character_id=character_id
         )
     
-    emotional_sticker = get_emotional_sticker(bottle.mood, base_url)
+    emotional_sticker = get_emotional_sticker(bottle.mood, base_url, character_id=character_id)
     
     return {
         "fullness": fullness_sticker,
@@ -486,12 +521,22 @@ def process_emoji_feed(session, bottle: Bottle, emojis: List[str]) -> Dict[str, 
         else:
             incorrect_count += 1
     
-    # If we have correct emojis, process the feed
-    if correct_count > 0:
-        # Process each correct emoji (but only count once per message)
-        # For simplicity, we'll treat the message as one feed attempt
-        is_correct = correct_count > 0
-        fullness_increased, feed_complete = update_fullness_after_feed(bottle, is_correct)
+    # Calculate net feed count (cancel out mixed feeds)
+    net_feed_count = correct_count - incorrect_count
+    
+    # Process feeds based on net count
+    if net_feed_count > 0:
+        # Net positive: process as correct feeds
+        fullness_increased = False
+        feed_complete = False
+        
+        # Process each correct feed
+        for _ in range(net_feed_count):
+            inc, complete = update_fullness_after_feed(bottle, True)
+            if inc:
+                fullness_increased = True
+            if complete:
+                feed_complete = True
         
         # Rotate color AFTER processing for next feed attempt
         bottle.accessory_color = assign_accessory_color()
@@ -499,33 +544,44 @@ def process_emoji_feed(session, bottle: Bottle, emojis: List[str]) -> Dict[str, 
         session.add(bottle)
         session.commit()
         
+        # Get current fullness state for feedback
+        current_state = get_fullness_state(bottle.fullness_level)
+        
         if feed_complete:
-            message = f"Miam ! C’était délicieux 😋 Encore {correct_count} bon aliment à me donner 👍"
-        elif correct_count > 0:
-            remaining = 3 - bottle.current_feed_count
-            message = f"Deliceux ! Tu m'as donné {correct_count} bon aliment! Il me faut encore {remaining} bon aliment pour me rassasier 😋"
+            message = f"Miam ! C’était délicieux 😋 Tu m'as donné 3 bons aliments, je suis maintenant {current_state}!"
         else:
-            message = "Merci pour la nourriture !"
+            remaining = 3 - bottle.current_feed_count
+            if remaining == 1:
+                message = f"Délicieux ! Tu m'as donné {net_feed_count} bon aliment! Il me faut encore {remaining} bon aliment pour me rassasier 😋"
+            else:
+                message = f"Délicieux ! Tu m'as donné {net_feed_count} bon aliment! Il me faut encore {remaining} bons aliments pour me rassasier 😋"
         
         return {
             "success": True,
-            "correct_count": correct_count,
+            "correct_count": net_feed_count,
             "fullness_increased": fullness_increased,
             "feed_complete": feed_complete,
             "message": message
         }
-    elif incorrect_count > 0:
-        # Wrong emoji fed - track incorrect feeds
-        bottle.incorrect_feed_count += 1
-        bottle.current_feed_count = 0  # Reset correct feed counter on wrong feed
-        
-        # Check if we've reached 3 incorrect feeds
+    elif net_feed_count < 0:
+        # Net negative: process as incorrect feeds
         fullness_decreased = False
-        if bottle.incorrect_feed_count >= 3:
-            # Decrease fullness by 1/3 (33.33%)
-            bottle.fullness_level = max(0.0, bottle.fullness_level - 33.33)
-            bottle.incorrect_feed_count = 0  # Reset incorrect counter
-            fullness_decreased = True
+        
+        # Process each incorrect feed
+        for _ in range(abs(net_feed_count)):
+            bottle.incorrect_feed_count += 1
+            
+            # Check if we've reached 3 incorrect feeds
+            if bottle.incorrect_feed_count >= 3:
+                # Decrease fullness by 1/3 (33.33%) - one level down
+                bottle.fullness_level = max(0.0, bottle.fullness_level - 33.33)
+                bottle.incorrect_feed_count = 0  # Reset incorrect counter
+                bottle.current_feed_count = 0  # Reset correct counter too
+                fullness_decreased = True
+        
+        # Reset correct feed counter on incorrect feed (if not already reset by level down)
+        if not fullness_decreased:
+            bottle.current_feed_count = 0
         
         # Update mood to sad/angry
         if bottle.mood == "happy" or bottle.mood == "neutral":
@@ -541,7 +597,10 @@ def process_emoji_feed(session, bottle: Bottle, emojis: List[str]) -> Dict[str, 
             message = f"Oups… ce n'est pas ce qu'il me faut 😢 Attention, après 3 mauvais aliments, ma santé baisse !"
         else:
             remaining_incorrect = 3 - bottle.incorrect_feed_count
-            message = f"Oh non… ce n'est pas le bon aliment pour moi 😢 Encore {remaining_incorrect} mauvais aliment et je vais me sentir toute faible."
+            if remaining_incorrect == 1:
+                message = f"Oh non… ce n'est pas le bon aliment pour moi 😢 Encore {remaining_incorrect} mauvais aliment et je vais me sentir toute faible."
+            else:
+                message = f"Oh non… ce n'est pas le bon aliment pour moi 😢 Encore {remaining_incorrect} mauvais aliments et je vais me sentir toute faible."
         
         return {
             "success": False,

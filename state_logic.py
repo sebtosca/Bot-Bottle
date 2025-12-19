@@ -152,7 +152,8 @@ def update_bottle_state(
 def select_sticker_by_mood(
     session,
     mood: str,
-    base_url: str = "http://localhost:5000"
+    base_url: str = "http://localhost:5000",
+    character_id: Optional[str] = None
 ) -> Optional[dict]:
     """Select an appropriate sticker based on bottle mood.
     
@@ -178,10 +179,12 @@ def select_sticker_by_mood(
         # Match stickers where mood_tags contains the current mood
         # or mood_tags is None/empty (universal stickers)
         
-        # Query only stickers (not GIFs)
-        all_stickers = session.query(Sticker).filter(
-            Sticker.media_type == "sticker"
-        ).all()
+        # Query only stickers (not GIFs), filtered by character_id if provided
+        query = session.query(Sticker).filter(Sticker.media_type == "sticker")
+        if character_id:
+            # Filter by character_id, or None (universal stickers)
+            query = query.filter((Sticker.character_id == character_id) | (Sticker.character_id == None))
+        all_stickers = query.all()
         matching_stickers = []
         
         for sticker in all_stickers:
@@ -195,10 +198,11 @@ def select_sticker_by_mood(
                     matching_stickers.append(sticker)
         
         if not matching_stickers:
-            # Fallback: try to find any sticker
-            fallback_sticker = session.query(Sticker).filter(
-                Sticker.media_type == "sticker"
-            ).first()
+            # Fallback: try to find any sticker for this character (or universal)
+            fallback_query = session.query(Sticker).filter(Sticker.media_type == "sticker")
+            if character_id:
+                fallback_query = fallback_query.filter((Sticker.character_id == character_id) | (Sticker.character_id == None))
+            fallback_sticker = fallback_query.first()
             if fallback_sticker:
                 matching_stickers = [fallback_sticker]
             else:
@@ -431,7 +435,9 @@ def select_response_type(
 def select_gif_by_mood(
     session,
     mood: str,
-    base_url: str = "http://localhost:5000"
+    base_url: str = "http://localhost:5000",
+    exclude_description: Optional[str] = None,
+    character_id: Optional[str] = None
 ) -> Optional[dict]:
     """Select an appropriate GIF based on bottle mood.
     
@@ -455,10 +461,12 @@ def select_gif_by_mood(
         return None
     
     try:
-        # Query only GIFs (not stickers)
-        all_gifs = session.query(Sticker).filter(
-            Sticker.media_type == "gif"
-        ).all()
+        # Query only GIFs (not stickers), filtered by character_id if provided
+        query = session.query(Sticker).filter(Sticker.media_type == "gif")
+        if character_id:
+            # Filter by character_id, or None (universal GIFs)
+            query = query.filter((Sticker.character_id == character_id) | (Sticker.character_id == None))
+        all_gifs = query.all()
         matching_gifs = []
         
         for gif in all_gifs:
@@ -472,13 +480,26 @@ def select_gif_by_mood(
                     matching_gifs.append(gif)
         
         if not matching_gifs:
-            # Fallback: try to find any GIF
-            fallback_gif = session.query(Sticker).filter(
-                Sticker.media_type == "gif"
-            ).first()
+            # Fallback: try to find any GIF for this character (or universal)
+            fallback_query = session.query(Sticker).filter(Sticker.media_type == "gif")
+            if character_id:
+                fallback_query = fallback_query.filter((Sticker.character_id == character_id) | (Sticker.character_id == None))
+            fallback_gif = fallback_query.first()
             if fallback_gif:
                 matching_gifs = [fallback_gif]
             else:
+                return None
+        
+        # Avoid sending the same GIF twice in a row if possible
+        if exclude_description:
+            filtered_gifs = [
+                gif for gif in matching_gifs
+                if (gif.description or "").strip() != exclude_description.strip()
+            ]
+            if filtered_gifs:
+                matching_gifs = filtered_gifs
+            else:
+                # No alternative GIF available; to strictly avoid repetition, return None
                 return None
         
         # Select random GIF from matching ones
@@ -506,5 +527,92 @@ def select_gif_by_mood(
         
     except Exception as e:
         print(f"Error selecting GIF: {e}")
+        return None
+
+
+def select_money_gif(
+    session,
+    base_url: str = "http://localhost:5000",
+    exclude_description: Optional[str] = None,
+    character_id: Optional[str] = None
+) -> Optional[dict]:
+    """Select a money GIF for empty bottle state (deposit incentive).
+    
+    Args:
+        session: Database session.
+        base_url: Base URL for serving GIF/MP4 media via Flask.
+    
+    Returns:
+        Dictionary with GIF info:
+            {
+                "url": str,         # Full HTTPS URL to /money-gifs/<filename>
+                "filename": str,    # Local filename in money_GIF directory
+                "description": str,
+                "id": int,
+                "media_type": "gif"
+            }
+        Returns None if no matching GIF found.
+    """
+    if not session:
+        return None
+    
+    try:
+        # Query only GIFs (not stickers) with money/deposit/empty tags, filtered by character_id if provided
+        query = session.query(Sticker).filter(Sticker.media_type == "gif")
+        if character_id:
+            # Filter by character_id, or None (universal money GIFs)
+            query = query.filter((Sticker.character_id == character_id) | (Sticker.character_id == None))
+        all_gifs = query.all()
+        matching_gifs = []
+        
+        for gif in all_gifs:
+            if gif.mood_tags:
+                # Check if mood_tags contains any of the money GIF identifiers
+                mood_tags_lower = gif.mood_tags.lower()
+                if any(tag in mood_tags_lower for tag in ["empty", "deposit", "money"]):
+                    matching_gifs.append(gif)
+        
+        if not matching_gifs:
+            print("⚠️  No money GIFs found in database. Run scripts/load_money_gifs.py to load them.")
+            return None
+        
+        # Avoid sending the same money GIF twice in a row if possible
+        if exclude_description:
+            filtered_gifs = [
+                gif for gif in matching_gifs
+                if (gif.description or "").strip() != exclude_description.strip()
+            ]
+            if filtered_gifs:
+                matching_gifs = filtered_gifs
+            else:
+                # No alternative money GIF available; to strictly avoid repetition, return None
+                return None
+        
+        # Select random money GIF from matching ones
+        import random
+        selected = random.choice(matching_gifs)
+        
+        # Build URL from local filename using the /money-gifs/<filename> route.
+        # For WhatsApp, the underlying file SHOULD be an MP4 that meets
+        # their GIF requirements (short, muted, < ~1.5MB).
+        if not selected.filename:
+            # Legacy safety: if filename is missing, we cannot construct URL.
+            return None
+        
+        # URL-encode the filename to handle spaces and special characters
+        encoded_filename = quote(selected.filename, safe='')
+        gif_url = f"{base_url.rstrip('/')}/money-gifs/{encoded_filename}"
+        
+        return {
+            "url": gif_url,
+            "filename": selected.filename,
+            "description": selected.description or "",
+            "id": selected.id,
+            "media_type": "gif"
+        }
+    except Exception as e:
+        print(f"⚠️  Error selecting money GIF: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 

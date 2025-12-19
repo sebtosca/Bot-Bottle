@@ -3,7 +3,7 @@
 This module provides direct calls to Meta's WhatsApp Cloud API,
 using a phone number ID and access token for sending messages.
 
-Supports text messages, media (images/GIFs), and stickers.
+Supports text messages, media (images/GIFs), stickers, and audio.
 """
 
 from __future__ import annotations
@@ -262,6 +262,15 @@ def send_whatsapp_gif(to_number: str, media_url: str, body: Optional[str] = None
         raise WhatsAppCloudError(f"Message ID missing in response: {data}", full_response=data)
     
     # Log full response for debugging
+    print(f"   📤 Audio message API response:")
+    print(f"   Full response: {json.dumps(data, indent=2)}")
+    
+    # Check for any warnings or status indicators
+    if "messages" in data and len(data["messages"]) > 0:
+        msg_data = data["messages"][0]
+        if "status" in msg_data:
+            print(f"   ⚠️  Message status in response: {msg_data['status']}")
+    
     if "contacts" in data:
         contacts = data.get("contacts", [])
         if contacts:
@@ -332,5 +341,226 @@ def send_whatsapp_media(to_number: str, media_url: str, body: Optional[str] = No
             input_phone = contact.get("input")
             if wa_id != input_phone:
                 print(f"⚠️  Phone number normalization: {input_phone} → {wa_id}")
+    
+    return message_id
+
+
+def send_whatsapp_audio(to_number: str, media_url: str) -> str:
+    """Send an audio/voice message via Cloud API.
+    
+    Args:
+        to_number: Recipient phone number in international format.
+        media_url: Public URL to the audio file (MP3, OGG, etc.).
+    
+    Returns:
+        The Cloud API message ID.
+    """
+    payload: Dict[str, Any] = {
+        "messaging_product": "whatsapp",
+        "to": to_number,
+        "type": "audio",
+        "audio": {"link": media_url},
+    }
+
+    url = _get_messages_url()
+    resp = requests.post(url, headers=_get_headers(), data=json.dumps(payload), timeout=10)
+
+    if resp.status_code >= 400:
+        raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
+
+    try:
+        data = resp.json()
+    except json.JSONDecodeError:
+        raise WhatsAppCloudError(f"Invalid JSON response from WhatsApp API: {resp.text}")
+
+    # Check for errors even when status is 200
+    _check_api_response(data, resp.text)
+
+    messages = data.get("messages", [])
+    if not messages:
+        raise WhatsAppCloudError(f"No messages field in response: {data}", full_response=data)
+    
+    message_id = messages[0].get("id", "")
+    if not message_id:
+        raise WhatsAppCloudError(f"Message ID missing in response: {data}", full_response=data)
+    
+    # Log full response for debugging
+    print(f"   📤 Audio message API response:")
+    print(f"   Full response: {json.dumps(data, indent=2)}")
+    
+    # Check for any warnings or status indicators
+    if "messages" in data and len(data["messages"]) > 0:
+        msg_data = data["messages"][0]
+        if "status" in msg_data:
+            print(f"   ⚠️  Message status in response: {msg_data['status']}")
+    
+    if "contacts" in data:
+        contacts = data.get("contacts", [])
+        if contacts:
+            contact = contacts[0]
+            wa_id = contact.get("wa_id")
+            input_phone = contact.get("input")
+            if wa_id != input_phone:
+                print(f"⚠️  Phone number normalization: {input_phone} → {wa_id}")
+    
+    return message_id
+
+
+
+def send_whatsapp_interactive_list(
+    to_number: str,
+    header_text: str,
+    body_text: str,
+    button_text: str,
+    options: list[dict]
+) -> str:
+    """Send an interactive list message via Cloud API.
+    
+    Args:
+        to_number: Recipient phone number in international format.
+        header_text: Header text for the list (max 60 chars).
+        body_text: Body text explaining the list (max 1024 chars).
+        button_text: Text for the button that opens the list (max 20 chars).
+        options: List of option dicts, each with:
+            - "id": str (unique identifier, max 200 chars)
+            - "title": str (option title, max 24 chars)
+            - "description": str (optional description, max 72 chars)
+        Maximum 10 options allowed.
+    
+    Returns:
+        The Cloud API message ID.
+    """
+    if len(options) > 10:
+        raise ValueError("Maximum 10 options allowed in interactive list")
+    
+    # Build sections with rows
+    rows = []
+    for opt in options:
+        row = {
+            "id": opt["id"],
+            "title": opt["title"]
+        }
+        if "description" in opt:
+            row["description"] = opt["description"]
+        rows.append(row)
+    
+    payload: Dict[str, Any] = {
+        "messaging_product": "whatsapp",
+        "to": to_number,
+        "type": "interactive",
+        "interactive": {
+            "type": "list",
+            "header": {
+                "type": "text",
+                "text": header_text
+            },
+            "body": {
+                "text": body_text
+            },
+            "footer": {
+                "text": button_text
+            },
+            "action": {
+                "button": button_text,
+                "sections": [
+                    {
+                        "title": "Personnages",
+                        "rows": rows
+                    }
+                ]
+            }
+        }
+    }
+    
+    url = _get_messages_url()
+    resp = requests.post(url, headers=_get_headers(), data=json.dumps(payload), timeout=10)
+    
+    if resp.status_code >= 400:
+        raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
+    
+    try:
+        data = resp.json()
+    except json.JSONDecodeError:
+        raise WhatsAppCloudError(f"Invalid JSON response from WhatsApp API: {resp.text}")
+    
+    _check_api_response(data, resp.text)
+    
+    messages = data.get("messages", [])
+    if not messages:
+        raise WhatsAppCloudError(f"No messages field in response: {data}", full_response=data)
+    
+    message_id = messages[0].get("id", "")
+    if not message_id:
+        raise WhatsAppCloudError(f"Message ID missing in response: {data}", full_response=data)
+    
+    return message_id
+
+
+def send_whatsapp_interactive_buttons(
+    to_number: str,
+    body_text: str,
+    buttons: list[dict]
+) -> str:
+    """Send an interactive button message via Cloud API.
+    
+    Args:
+        to_number: Recipient phone number in international format.
+        body_text: Body text explaining the buttons (max 1024 chars).
+        buttons: List of button dicts, each with:
+            - "id": str (unique identifier, max 256 chars)
+            - "title": str (button text, max 20 chars)
+        Maximum 3 buttons allowed.
+    
+    Returns:
+        The Cloud API message ID.
+    """
+    if len(buttons) > 3:
+        raise ValueError("Maximum 3 buttons allowed in interactive message")
+    
+    button_list = []
+    for btn in buttons:
+        button_list.append({
+            "type": "reply",
+            "reply": {
+                "id": btn["id"],
+                "title": btn["title"]
+            }
+        })
+    
+    payload: Dict[str, Any] = {
+        "messaging_product": "whatsapp",
+        "to": to_number,
+        "type": "interactive",
+        "interactive": {
+            "type": "button",
+            "body": {
+                "text": body_text
+            },
+            "action": {
+                "buttons": button_list
+            }
+        }
+    }
+    
+    url = _get_messages_url()
+    resp = requests.post(url, headers=_get_headers(), data=json.dumps(payload), timeout=10)
+    
+    if resp.status_code >= 400:
+        raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
+    
+    try:
+        data = resp.json()
+    except json.JSONDecodeError:
+        raise WhatsAppCloudError(f"Invalid JSON response from WhatsApp API: {resp.text}")
+    
+    _check_api_response(data, resp.text)
+    
+    messages = data.get("messages", [])
+    if not messages:
+        raise WhatsAppCloudError(f"No messages field in response: {data}", full_response=data)
+    
+    message_id = messages[0].get("id", "")
+    if not message_id:
+        raise WhatsAppCloudError(f"Message ID missing in response: {data}", full_response=data)
     
     return message_id
