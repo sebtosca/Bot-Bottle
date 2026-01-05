@@ -1,9 +1,21 @@
 {
-  "happy_cherry.webp": "Une princesse pot de cerises rose et joyeuse avec une couronne et une écharpe duveteuse. Elle sourit largement avec les yeux fermés de joie, les bras levés d'excitation, et une jambe relevée comme si elle dansait ou célébrait quelque chose d'heureux et de positif.",
-  "sad_cherry.webp": "Un personnage pot de cerises rose vif avec une petite couronne. Elle pleure avec de grosses larmes, fronce profondément les sourcils, et est enveloppée dans une écharpe rose duveteuse. Son langage corporel semble défait et le cœur brisé, les jambes tournées vers l'intérieur alors qu'elle se tient tristement.",
-  "scared_cherry.webp": "Une princesse pot de cerises rose avec une couronne et une écharpe rose duveteuse, l'air effrayée et anxieuse. Ses yeux sont grands ouverts, les mains jointes nerveusement sur sa poitrine, et son corps tremble visiblement. Elle se tient debout avec les jambes qui tremblent.",
-  "shocked_cherry.webp": "Un personnage pot de cerises rose portant une couronne et des lunettes de chat élégantes. Elle a l'air extrêmement surprise, avec les mains levées vers ses joues et la bouche ouverte de stupeur. Elle est enveloppée dans une écharpe rose duveteuse, se penchant en arrière de manière dramatique.",
-  "angry_cherry.webp": "Un personnage pot de cerises rose furieux avec une couronne inclinée et une écharpe duveteuse, serrant les poings et montrant les dents de colère, avec des lignes de mouvement montrant la frustration.",
-  "diva_cherry.webp": "Un personnage pot de confiture rose confiant, habillé en diva avec une coiffe blanche brodée haute et ornée et une robe tablier assortie à motifs. Elle porte des lunettes de soleil de chat foncées et a une expression impertinente et confiante, posant avec une main sur la hanche et l'autre gesticulant élégamment. Sa posture est chic et assurée."
-}
+  "angry_cherry_black.webp":"Le personnage est en colère, les bras croisés et le regard dur, exprimant une frustration ferme et autoritaire. Son chapeau noir indique qu'elle a faim d'objets non-recyclables.",
+  "angry_cherry_blue.webp":"Le personnage affiche une colère froide et contrôlée, avec un regard perçant et une posture rigide. Son chapeau bleu indique qu'elle a faim de carton et de papier.",
+  "angry_cherry_green.webp":"Le personnage est visiblement irrité, le visage fermé et l'attitude stricte, traduisant une colère déterminée. Son chapeau vert indique qu'elle a faim de verre.",
+  "angry_cherry_yellow.webp":"Le personnage montre une colère vive et expressive, avec un regard dur et une posture fermée. Son chapeau jaune indique qu'elle a faim de plastique.",
 
+  "happy_cherry_black.webp":"Le personnage est joyeux et épanoui, souriant largement avec les bras ouverts, exprimant une joie communicative. Son chapeau noir indique qu'elle a faim d'objets non-recyclables.",
+  "happy_cherry_blue.webp":"Le personnage est heureuse et enthousiaste, riant à pleins poumons avec une posture ouverte. Son chapeau bleu indique qu'elle a faim de carton et de papier.",
+  "happy_cherry_green.webp":"Le personnage affiche une joie éclatante, les bras levés et un sourire rayonnant. Son chapeau vert indique qu'elle a faim de verre.",
+  "happy_cherry_yellow.webp":"Le personnage est joyeux et exubérant, exprimant une grande satisfaction et une énergie positive. Son chapeau jaune indique qu'elle a faim de plastique.",
+
+  "scared_cherry_black.webp":"Le personnage est terrorisé, les yeux écarquillés et les mains près du visage, exprimant une peur intense et incontrôlée. Son chapeau noir indique qu'elle a faim d'objets non-recyclables.",
+  "scared_cherry_blue.webp":"Le personnage est très effrayé, le regard paniqué et le corps crispé, montrant une anxiété profonde. Son chapeau bleu indique qu'elle a faim de carton et de papier.",
+  "scared_cherry_green.webp":"Le personnage est paniqué, les yeux grands ouverts et les mains tremblantes contre son visage, traduisant une peur paralysante. Son chapeau vert indique qu'elle a faim de verre.",
+  "scared_cherry_yellow.webp":"Le personnage exprime une peur urgente, la bouche entrouverte et l'attitude figée par l'angoisse. Son chapeau jaune indique qu'elle a faim de plastique.",
+
+  "shocked_cherry_black.webp":"Le personnage est choqué, la bouche en O et les mains levées près du visage, exprimant une surprise soudaine et totale. Son chapeau noir indique qu'elle a faim d'objets non-recyclables.",
+  "shocked_cherry_blue.webp":"Le personnage montre une stupeur immédiate, figée avec les yeux grands ouverts derrière ses lunettes. Son chapeau bleu indique qu'elle a faim de carton et de papier.",
+  "shocked_cherry_green.webp":"Le personnage est abasourdi, le regard incrédule et la posture figée, traduisant un choc intense. Son chapeau vert indique qu'elle a faim de verre.",
+  "shocked_cherry_yellow.webp":"Le personnage est totalement surprise, la bouche ouverte et les mains levées, exprimant un choc brutal et soudain. Son chapeau jaune indique qu'elle a faim de plastique."
+}

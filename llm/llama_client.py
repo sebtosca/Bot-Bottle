@@ -300,6 +300,79 @@ Return ONLY the JSON, no other text."""
         }
 
 
+def detect_emotion_from_message(user_message: str) -> str:
+    """Detect emotion from user message using Mistral AI.
+    
+    Analyzes the user's message to determine the appropriate emotional response.
+    Returns one of: "happy", "sad", "angry", "shocked", "neutral"
+    
+    Args:
+        user_message: The user's message text.
+    
+    Returns:
+        Emotion string: "happy", "sad", "angry", "shocked", or "neutral"
+    """
+    if not MISTRAL_API_KEY:
+        print("⚠️  MISTRAL_API_KEY not set, defaulting to neutral emotion")
+        return "neutral"
+    
+    try:
+        from mistralai import Mistral
+    except ImportError:
+        print("⚠️  mistralai package not installed, defaulting to neutral emotion")
+        return "neutral"
+    
+    try:
+        client = Mistral(api_key=MISTRAL_API_KEY)
+    except Exception as e:
+        print(f"⚠️  Failed to create Mistral client for emotion detection: {e}")
+        return "neutral"
+    
+    # System prompt for emotion detection
+    emotion_prompt = """Analysez le message de l'utilisateur et déterminez l'émotion appropriée pour la réponse.
+
+Répondez UNIQUEMENT avec un seul mot parmi: happy, sad, angry, shocked, neutral
+
+Règles:
+- Si le message contient des insultes, des mots grossiers, ou est négatif/hostile → "angry"
+- Si le message est triste, déprimant, ou exprime de la peine → "sad"
+- Si le message est positif, joyeux, ou amical → "happy"
+- Si le message est surprenant, choquant, ou inattendu → "shocked"
+- Si le message est neutre, informatif, ou sans émotion claire → "neutral"
+
+Répondez uniquement avec le mot, sans explication."""
+
+    messages = [
+        {"role": "system", "content": emotion_prompt},
+        {"role": "user", "content": user_message}
+    ]
+    
+    try:
+        response = client.chat.complete(
+            model=MISTRAL_MODEL_NAME,
+            messages=messages,
+            temperature=0.3,  # Lower temperature for more consistent emotion detection
+            max_tokens=10,  # Just need one word
+        )
+        
+        if response.choices and len(response.choices) > 0:
+            emotion = response.choices[0].message.content.strip().lower()
+            # Validate emotion
+            valid_emotions = ["happy", "sad", "angry", "shocked", "neutral"]
+            if emotion in valid_emotions:
+                print(f"   🎭 Emotion detected: {emotion}")
+                return emotion
+            else:
+                print(f"   ⚠️  Invalid emotion detected: {emotion}, defaulting to neutral")
+                return "neutral"
+        else:
+            print("   ⚠️  No response from Mistral for emotion detection, defaulting to neutral")
+            return "neutral"
+    except Exception as e:
+        print(f"   ⚠️  Error detecting emotion: {e}")
+        return "neutral"
+
+
 def generate_reply(
     system_prompt: str,
     conversation_history: List[Dict[str, str]],

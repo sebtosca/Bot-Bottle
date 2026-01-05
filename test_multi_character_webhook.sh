@@ -4,9 +4,9 @@
 # Tests character switching between Cherry (00001) and Pompon (00002)
 # Usage:
 #   bash test_multi_character_webhook.sh
-#   WEBHOOK_URL=http://localhost:5000/whatsapp-webhook bash test_multi_character_webhook.sh
+#   WEBHOOK_URL=https://investment-jamie-merge-downtown.trycloudflare.com/whatsapp-webhook bash test_multi_character_webhook.sh
 
-WEBHOOK_URL="${WEBHOOK_URL:-http://localhost:5000/whatsapp-webhook}"
+WEBHOOK_URL="${WEBHOOK_URL:-https://investment-jamie-merge-downtown.trycloudflare.com/whatsapp-webhook}"
 FROM_NUMBER="${FROM_NUMBER:-33684950535}"
 
 echo "============================================================"

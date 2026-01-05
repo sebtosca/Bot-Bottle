@@ -153,7 +153,8 @@ def select_sticker_by_mood(
     session,
     mood: str,
     base_url: str = "http://localhost:5000",
-    character_id: Optional[str] = None
+    character_id: Optional[str] = None,
+    required_color: Optional[str] = None,
 ) -> Optional[dict]:
     """Select an appropriate sticker based on bottle mood.
     
@@ -175,28 +176,75 @@ def select_sticker_by_mood(
         return None
     
     try:
-        # Query for stickers matching mood
-        # Match stickers where mood_tags contains the current mood
-        # or mood_tags is None/empty (universal stickers)
-        
         # Query only stickers (not GIFs), filtered by character_id if provided
         query = session.query(Sticker).filter(Sticker.media_type == "sticker")
         if character_id:
             # Filter by character_id, or None (universal stickers)
             query = query.filter((Sticker.character_id == character_id) | (Sticker.character_id == None))
         all_stickers = query.all()
-        matching_stickers = []
-        
+
+        mood_lower = (mood or "").lower()
+
+        # Map accessory color (game logic) to tag token used in mood_tags
+        required_color_token: Optional[str] = None
+        if required_color:
+            color_map = {
+                "GREEN": "green",
+                "YELLOW": "yellow",
+                "BLUE": "blue",
+                "BLACK": "black",
+            }
+            required_color_token = color_map.get(required_color.upper())
+
+        # Buckets for fallback hierarchy:
+        # 1) exact emotion + hat color
+        # 2) same emotion, any color
+        # 3) any emotion, matching color
+        # 4) universal / any
+        exact_both = []
+        mood_only = []
+        color_only = []
+        universal = []
+
         for sticker in all_stickers:
-            if not sticker.mood_tags or sticker.mood_tags.strip() == "":
-                # Universal sticker (no mood restriction)
-                matching_stickers.append(sticker)
+            tags_raw = (sticker.mood_tags or "").strip()
+            if not tags_raw:
+                # Universal sticker (no mood/color restriction)
+                universal.append(sticker)
+                continue
+
+            tokens = [t.strip().lower() for t in tags_raw.split(",") if t.strip()]
+            has_mood = bool(mood_lower) and mood_lower in tokens
+            has_color = bool(required_color_token) and required_color_token in tokens
+
+            if required_color_token:
+                if has_mood and has_color:
+                    exact_both.append(sticker)
+                elif has_mood:
+                    mood_only.append(sticker)
+                elif has_color:
+                    color_only.append(sticker)
+                # If neither mood nor color matches, ignore this sticker
             else:
-                # Check if mood is in the comma-separated list
-                mood_list = [m.strip().lower() for m in sticker.mood_tags.split(",")]
-                if mood.lower() in mood_list:
-                    matching_stickers.append(sticker)
-        
+                # No required color: fall back to original behavior (mood or universal)
+                if has_mood:
+                    mood_only.append(sticker)
+
+        # Choose best matching bucket according to hierarchy
+        if required_color_token:
+            if exact_both:
+                matching_stickers = exact_both
+            elif mood_only:
+                matching_stickers = mood_only
+            elif color_only:
+                matching_stickers = color_only
+            elif universal:
+                matching_stickers = universal
+            else:
+                matching_stickers = []
+        else:
+            matching_stickers = mood_only or universal
+
         if not matching_stickers:
             # Fallback: try to find any sticker for this character (or universal)
             fallback_query = session.query(Sticker).filter(Sticker.media_type == "sticker")
@@ -515,7 +563,8 @@ def select_gif_by_mood(
         
         # URL-encode the filename to handle spaces and special characters
         encoded_filename = quote(selected.filename, safe='')
-        gif_url = f"{base_url.rstrip('/')}/gifs/{encoded_filename}"
+        # Include character_id in URL to ensure correct directory is checked
+        gif_url = f"{base_url.rstrip('/')}/gifs/{encoded_filename}?character_id={character_id}" if character_id else f"{base_url.rstrip('/')}/gifs/{encoded_filename}"
         
         return {
             "url": gif_url,
@@ -601,7 +650,8 @@ def select_money_gif(
         
         # URL-encode the filename to handle spaces and special characters
         encoded_filename = quote(selected.filename, safe='')
-        gif_url = f"{base_url.rstrip('/')}/money-gifs/{encoded_filename}"
+        # Include character_id in URL to ensure correct directory is checked
+        gif_url = f"{base_url.rstrip('/')}/money-gifs/{encoded_filename}?character_id={character_id}" if character_id else f"{base_url.rstrip('/')}/money-gifs/{encoded_filename}"
         
         return {
             "url": gif_url,

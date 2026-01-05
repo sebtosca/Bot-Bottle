@@ -22,9 +22,17 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     last_seen_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
+    # Points and rewards system
+    total_points = Column(Integer, default=0, nullable=False)  # Total accumulated points
+    current_title = Column(String, nullable=True)  # Current title level (Novice/Apprentice/Master)
+    total_money_saved = Column(Float, default=0.0, nullable=False)  # Total money saved in EUR
+    total_co2_saved = Column(Float, default=0.0, nullable=False)  # Total CO2 saved in kg
+    last_notification_sent = Column(DateTime, nullable=True)  # Prevent notification spam
+
     # Relationships
     bottles = relationship("Bottle", back_populates="user", cascade="all, delete-orphan")
     interactions = relationship("Interaction", back_populates="user", cascade="all, delete-orphan")
+    receipt_verifications = relationship("ReceiptVerification", back_populates="user", cascade="all, delete-orphan")
 
 
 class Bottle(Base):
@@ -49,12 +57,22 @@ class Bottle(Base):
     last_feed_time = Column(DateTime, nullable=True)  # When last fed
     recovery_required = Column(Boolean, default=False, nullable=False)  # True if recovery needs 3 correct feeds
     
+    # Points and rewards system
+    points_earned = Column(Integer, default=0, nullable=False)  # Points earned from this character
+    money_saved = Column(Float, default=0.0, nullable=False)  # Money saved from this bottle
+    co2_saved = Column(Float, default=0.0, nullable=False)  # CO2 saved from this bottle
+    returned = Column(Boolean, default=False, nullable=False)  # Whether bottle was returned
+    return_receipt_url = Column(String, nullable=True)  # Receipt photo URL
+    return_verified = Column(Boolean, default=False, nullable=False)  # Receipt verification status
+    returned_at = Column(DateTime, nullable=True)  # When bottle was returned
+    
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     # Relationships
     user = relationship("User", back_populates="bottles")
     interactions = relationship("Interaction", back_populates="bottle", cascade="all, delete-orphan")
+    receipt_verifications = relationship("ReceiptVerification", back_populates="bottle", cascade="all, delete-orphan")
 
 
 class Interaction(Base):
@@ -73,6 +91,25 @@ class Interaction(Base):
     # Relationships
     user = relationship("User", back_populates="interactions")
     bottle = relationship("Bottle", back_populates="interactions")
+
+
+class ReceiptVerification(Base):
+    """Receipt verification model for bottle returns."""
+    __tablename__ = "receipt_verifications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    bottle_id = Column(Integer, ForeignKey("bottles.id"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    receipt_image_url = Column(String, nullable=False)  # Receipt photo URL
+    ocr_text = Column(Text, nullable=True)  # Extracted text from OCR
+    verification_status = Column(String, default="pending", nullable=False)  # "pending", "verified", "rejected"
+    points_awarded = Column(Integer, default=0, nullable=False)  # Points awarded for this verification
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    verified_at = Column(DateTime, nullable=True)  # When verification was completed
+
+    # Relationships
+    user = relationship("User", back_populates="receipt_verifications")
+    bottle = relationship("Bottle", back_populates="receipt_verifications")
 
 
 class Sticker(Base):
@@ -266,7 +303,9 @@ def get_active_bottle(session: Session, user_id: int, product_id: Optional[str] 
     """
     # If product_id provided, use it directly
     if product_id:
-        return get_or_create_bottle(session, user_id, product_id=product_id)
+        bottle = get_or_create_bottle(session, user_id, product_id=product_id)
+        print(f"   🔍 get_active_bottle: Using product_id from context: {product_id}, bottle.product_id: {bottle.product_id if bottle else 'None'}")
+        return bottle
     
     # Otherwise, find the most recently interacted bottle
     last_interaction = (
@@ -279,9 +318,11 @@ def get_active_bottle(session: Session, user_id: int, product_id: Optional[str] 
     if last_interaction:
         active_bottle = session.query(Bottle).filter_by(id=last_interaction.bottle_id).first()
         if active_bottle:
+            print(f"   🔍 get_active_bottle: Using most recent interaction, bottle.product_id: {active_bottle.product_id}")
             return active_bottle
     
     # Fallback: get or create default character (Cherry)
+    print(f"   🔍 get_active_bottle: No interactions found, defaulting to Cherry (00001)")
     return get_or_create_bottle(session, user_id, product_id="00001")
 
 

@@ -1,6 +1,22 @@
 {
-    "angry_cider.webp":"Le personnage est en colère, avec un regard sévère et des sourcils froncés.",
-    "happy_cider.webp":"Le personnage est heureux, souriant et détendu.",
-    "scared_cider.webp":"Le personnage a peur, les yeux grands ouverts et transpirant.",
-    "shocked_cider.webp":"Le personnage est choqué, la bouche ouverte, les mains levées et la pomme tombée."
-}
+    "angry_cider_black.webp":"Le personnage est en colère, avec un regard dur et des sourcils froncés, tenant fermement une pomme rouge. Son chapeau noir indique qu'il a faim d'objets non-recyclables, ce qui renforce son expression sévère et frustrée.",
+    "angry_cider_blue.webp":"Le personnage affiche une colère contrôlée, les yeux plissés derrière ses lunettes et la bouche crispée, tout en tenant la pomme. Son chapeau bleu indique qu'il a faim de carton et de papier, donnant une impression de mécontentement strict et organisé.",
+    "angry_cider_green.webp":"Le personnage est visiblement irrité, avec une posture rigide et une expression renfrognée, tenant la pomme avec fermeté. Son chapeau vert indique qu'il a faim de verre, traduisant une colère froide et déterminée.",
+    "angry_cider_yellow.webp":"Le personnage montre une colère vive et expressive, accentuée par son béret jaune, son regard perçant et son attitude ferme. Son chapeau jaune indique qu'il a faim de plastique, suggérant une réprimande imminente.",
+  
+    "happy_cider_black.webp":"Le personnage est joyeux et satisfait, souriant doucement avec une posture détendue et tenant une pomme rouge. Son chapeau noir indique qu'il a faim d'objets non-recyclables, tout en dégageant une humeur chaleureuse et bienveillante.",
+    "happy_cider_blue.webp":"Le personnage est heureux et détendu, souriant calmement tout en tenant une pomme rouge. Son chapeau bleu indique qu'il a faim de carton et de papier, exprimant une attente sereine et confiante.",
+    "happy_cider_green.webp":"Le personnage affiche une joie tranquille, avec une posture ouverte et un sourire bienveillant. Son chapeau vert indique qu'il a faim de verre, traduisant une satisfaction douce et patiente.",
+    "happy_cider_yellow.webp":"Le personnage est joyeux et accueillant, souriant fièrement avec la pomme à la main. Son chapeau jaune indique qu'il a faim de plastique, reflétant une humeur positive et optimiste.",
+  
+    "scared_cider_black.webp":"Le personnage est effrayé, les yeux écarquillés et des gouttes de sueur sur le visage, tenant la pomme avec hésitation. Son chapeau noir indique qu'il a faim d'objets non-recyclables, accentuant son anxiété et son malaise.",
+    "scared_cider_blue.webp":"Le personnage semble inquiet et nerveux, le regard paniqué et le corps tendu, tenant la pomme avec incertitude. Son chapeau bleu indique qu'il a faim de carton et de papier, traduisant une peur mêlée d'attente.",
+    "scared_cider_green.webp":"Le personnage est clairement apeuré, avec une expression anxieuse et une posture crispée, tenant la pomme comme s'il hésitait. Son chapeau vert indique qu'il a faim de verre, renforçant une sensation de stress et de fragilité.",
+    "scared_cider_yellow.webp":"Le personnage exprime une peur visible, les yeux grands ouverts et la bouche entrouverte, serrant la pomme sans assurance. Son chapeau jaune indique qu'il a faim de plastique, donnant une impression d'urgence et de confusion.",
+  
+    "shocked_cider_black.webp":"Le personnage est choqué, les bras levés et la bouche ouverte tandis que la pomme tombe. Son chapeau noir indique qu'il a faim d'objets non-recyclables, soulignant une surprise soudaine et intense.",
+    "shocked_cider_blue.webp":"Le personnage montre une réaction de choc, figé avec les mains levées et un regard stupéfait pendant que la pomme tombe. Son chapeau bleu indique qu'il a faim de carton et de papier, traduisant une surprise totale.",
+    "shocked_cider_green.webp":"Le personnage est abasourdi, immobile avec une expression incrédule et la pomme en chute. Son chapeau vert indique qu'il a faim de verre, renforçant l'effet de stupeur.",
+    "shocked_cider_yellow.webp":"Le personnage est totalement choqué, les mains levées et les yeux grands ouverts tandis que la pomme tombe au sol. Son chapeau jaune indique qu'il a faim de plastique, exprimant une surprise brutale et immédiate."
+  }
+  

@@ -16,7 +16,7 @@ from typing import Optional, Dict, List, Tuple
 from datetime import datetime, timedelta
 from urllib.parse import quote
 
-from db.db import Bottle, Sticker
+from db.db import Bottle, Sticker, User
 
 
 # Global emoji segmentation cache
@@ -337,13 +337,17 @@ def get_fullness_sticker(accessory_color: str, fullness_state: str, base_url: st
     stickers_dir = project_root / char_config["feeding_sticker_dir"]
     sticker_path = stickers_dir / filename
     
+    # Debug logging
+    print(f"   🎮 get_fullness_sticker: character_id={character_id}, filename={filename}, dir={stickers_dir}")
+    
     if not sticker_path.exists():
         print(f"⚠️  Warning: Fullness sticker not found: {filename} in {stickers_dir}")
+        print(f"   Character config: {char_config.get('name', 'Unknown')} (product_id={char_config.get('product_id', 'N/A')})")
         return None
     
-    # Construct URL (use character-specific route if needed, or generic route)
+    # Construct URL with character_id query parameter to ensure correct directory is checked
     encoded_filename = quote(filename, safe='')
-    sticker_url = f"{base_url.rstrip('/')}/feeding-stickers/{encoded_filename}"
+    sticker_url = f"{base_url.rstrip('/')}/feeding-stickers/{encoded_filename}?character_id={character_id}"
     
     return {
         "url": sticker_url,
@@ -352,13 +356,14 @@ def get_fullness_sticker(accessory_color: str, fullness_state: str, base_url: st
     }
 
 
-def get_emotional_sticker(mood: str, base_url: str, character_id: str = "00001") -> Optional[Dict[str, str]]:
-    """Get emotional sticker based on mood.
+def get_emotional_sticker(mood: str, base_url: str, character_id: str = "00001", accessory_color: Optional[str] = None) -> Optional[Dict[str, str]]:
+    """Get emotional sticker based on mood and accessory color (bin color).
     
     Args:
         mood: Mood string (e.g., "happy", "sad", "angry").
         base_url: Base URL for serving stickers.
         character_id: Character ID ("00001" for Cherry, "00002" for Pompon).
+        accessory_color: Optional bin color ("GREEN", "YELLOW", "BLUE", "BLACK") to select matching hat color.
     
     Returns:
         Dictionary with sticker info: {"url": str, "filename": str}
@@ -366,46 +371,82 @@ def get_emotional_sticker(mood: str, base_url: str, character_id: str = "00001")
     """
     from characters import get_character_config
     
-    # Map mood to sticker filename (character-specific)
+    # Map accessory color to filename color suffix
+    color_map = {
+        "GREEN": "green",
+        "YELLOW": "yellow",
+        "BLUE": "blue",
+        "BLACK": "black"
+    }
+    color_suffix = None
+    if accessory_color:
+        color_suffix = color_map.get(accessory_color.upper())
+    
+    # Map mood to base sticker name (character-specific)
     char_config = get_character_config(character_id)
     if character_id == "00001":
         # Cherry
-        mood_map = {
-            "happy": "happy_cherry.webp",
-            "sad": "scared_cherry.webp",
-            "angry": "angry_cherry.webp",
-            "shocked": "shocked_cherry.webp",
-            "neutral": "diva_cherry.webp"
+        mood_base_map = {
+            "happy": "happy_cherry",
+            "sad": "scared_cherry",
+            "angry": "angry_cherry",
+            "shocked": "shocked_cherry",
+            "neutral": "diva_cherry"
         }
     elif character_id == "00002":
         # Pompon
-        mood_map = {
-            "happy": "happy_cider.webp",
-            "sad": "scared_cider.webp",
-            "angry": "angry_cider.webp",
-            "shocked": "shocked_cider.webp",
-            "neutral": "happy_cider.webp"  # Default to happy for Pompon
+        mood_base_map = {
+            "happy": "happy_cider",
+            "sad": "scared_cider",
+            "angry": "angry_cider",
+            "shocked": "shocked_cider",
+            "neutral": "happy_cider"  # Default to happy for Pompon
         }
     else:
         # Default to Cherry
-        mood_map = {
-            "happy": "happy_cherry.webp",
-            "sad": "scared_cherry.webp",
-            "angry": "angry_cherry.webp",
-            "shocked": "shocked_cherry.webp",
-            "neutral": "diva_cherry.webp"
+        mood_base_map = {
+            "happy": "happy_cherry",
+            "sad": "scared_cherry",
+            "angry": "angry_cherry",
+            "shocked": "shocked_cherry",
+            "neutral": "diva_cherry"
         }
     
-    filename = mood_map.get(mood, mood_map.get("neutral", "happy_cherry.webp"))
+    base_name = mood_base_map.get(mood, mood_base_map.get("neutral", "happy_cherry"))
+    
+    # Construct filename with color if available
+    if color_suffix:
+        filename = f"{base_name}_{color_suffix}.webp"
+    else:
+        # Fallback: try green first, then any available color
+        filename = f"{base_name}_green.webp"
     
     # Check if file exists in character-specific directory
     project_root = Path(__file__).parent
     stickers_dir = project_root / char_config["sticker_dir"]
     sticker_path = stickers_dir / filename
     
+    # If file doesn't exist and we have a color, try other colors as fallback
+    if not sticker_path.exists() and color_suffix:
+        for fallback_color in ["green", "yellow", "blue", "black"]:
+            if fallback_color != color_suffix:
+                fallback_filename = f"{base_name}_{fallback_color}.webp"
+                fallback_path = stickers_dir / fallback_filename
+                if fallback_path.exists():
+                    filename = fallback_filename
+                    sticker_path = fallback_path
+                    break
+    
+    # If still not found, try without color suffix (for legacy stickers if any)
     if not sticker_path.exists():
-        print(f"⚠️  Warning: Emotional sticker not found: {filename}")
-        return None
+        legacy_filename = f"{base_name}.webp"
+        legacy_path = stickers_dir / legacy_filename
+        if legacy_path.exists():
+            filename = legacy_filename
+            sticker_path = legacy_path
+        else:
+            print(f"⚠️  Warning: Emotional sticker not found: {filename} (tried with color={color_suffix})")
+            return None
     
     # Construct URL
     encoded_filename = quote(filename, safe='')
@@ -433,6 +474,9 @@ def get_stickers_for_state(bottle: Bottle, base_url: str) -> Dict[str, Optional[
     # Get character_id from bottle's product_id
     character_id = bottle.product_id if hasattr(bottle, 'product_id') else "00001"
     
+    # Debug logging
+    print(f"   🎮 get_stickers_for_state: bottle.product_id={bottle.product_id}, character_id={character_id}, fullness_state={fullness_state}")
+    
     fullness_sticker = None
     if bottle.accessory_color:
         fullness_sticker = get_fullness_sticker(
@@ -441,12 +485,65 @@ def get_stickers_for_state(bottle: Bottle, base_url: str) -> Dict[str, Optional[
             base_url,
             character_id=character_id
         )
+        if fullness_sticker:
+            print(f"   🎮 Fullness sticker selected: {fullness_sticker.get('filename', 'N/A')} for character_id={character_id}")
+        else:
+            print(f"   ⚠️  No fullness sticker found for character_id={character_id}, color={bottle.accessory_color}, state={fullness_state}")
     
-    emotional_sticker = get_emotional_sticker(bottle.mood, base_url, character_id=character_id)
+    emotional_sticker = get_emotional_sticker(
+        bottle.mood, base_url, character_id=character_id, accessory_color=bottle.accessory_color
+    )
     
     return {
         "fullness": fullness_sticker,
         "emotional": emotional_sticker
+    }
+
+
+def calculate_and_record_savings(session, bottle_id: int) -> Dict[str, float]:
+    """Calculate and record money and CO2 savings when a bottle is returned.
+    
+    Args:
+        session: Database session.
+        bottle_id: Bottle ID that was returned.
+    
+    Returns:
+        Dictionary with 'money_saved' and 'co2_saved' values.
+    """
+    from characters import get_character_config
+    
+    bottle = session.query(Bottle).filter_by(id=bottle_id).first()
+    if not bottle:
+        return {"money_saved": 0.0, "co2_saved": 0.0}
+    
+    user = session.query(User).filter_by(id=bottle.user_id).first()
+    if not user:
+        return {"money_saved": 0.0, "co2_saved": 0.0}
+    
+    # Get character-specific savings values
+    char_config = get_character_config(bottle.product_id)
+    money_per_bottle = char_config.get("money_per_bottle", 0.10)  # Default €0.10
+    co2_per_bottle = char_config.get("co2_per_bottle", 0.5)  # Default 0.5 kg
+    
+    # Calculate savings
+    money_saved = money_per_bottle
+    co2_saved = co2_per_bottle
+    
+    # Update bottle savings
+    bottle.money_saved = money_saved
+    bottle.co2_saved = co2_saved
+    session.add(bottle)
+    
+    # Update user total savings
+    user.total_money_saved += money_saved
+    user.total_co2_saved += co2_saved
+    session.add(user)
+    
+    session.commit()
+    
+    return {
+        "money_saved": money_saved,
+        "co2_saved": co2_saved
     }
 
 

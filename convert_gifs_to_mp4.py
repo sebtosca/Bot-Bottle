@@ -109,7 +109,7 @@ def main() -> int:
     Usage:
         python scripts/convert_gifs_to_mp4.py [GIF_DIR]
 
-    - If GIF_DIR is omitted, defaults to project_root / \"GIF\".
+    - If GIF_DIR is omitted, defaults to project_root / \"pompon_GIF\".
     - Converts all *.gif files in that directory to *_whatsapp.mp4.
     """
     project_root = Path(__file__).parent
@@ -118,7 +118,7 @@ def main() -> int:
         if not gif_dir.is_absolute():
             gif_dir = project_root / gif_dir
     else:
-        gif_dir = project_root / "weather_GIF"
+        gif_dir = project_root / "pompon_GIF"
 
     if not gif_dir.exists():
         print(f"❌ GIF directory not found: {gif_dir}")

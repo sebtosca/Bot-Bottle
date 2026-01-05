@@ -77,19 +77,45 @@ def load_pompon_emotional_stickers():
             # Check if sticker already exists
             existing = session.query(Sticker).filter_by(filename=filename).first()
             
-            # Parse mood from filename (simple: filename like "happy_cider.webp")
-            mood_tags = None
+            # Parse mood and hat color from filename (e.g. "happy_cider_green.webp")
+            mood = None
+            color = None
             name_lower = filename.lower()
             known_moods = ["happy", "sad", "angry", "scared", "shocked", "neutral"]
-            for mood in known_moods:
-                if mood in name_lower:
-                    mood_tags = mood
+            for m in known_moods:
+                if m in name_lower:
+                    mood = m
                     break
             
-            # Get description from JSON file or use default
+            # Detect hat/bin color from filename suffix
+            if "_green" in name_lower:
+                color = "green"
+            elif "_yellow" in name_lower:
+                color = "yellow"
+            elif "_blue" in name_lower:
+                color = "blue"
+            elif "_black" in name_lower:
+                color = "black"
+            
+            # Encode both mood and color in mood_tags (e.g. "happy,green")
+            tags = []
+            if mood:
+                tags.append(mood)
+            if color:
+                tags.append(color)
+            mood_tags = ",".join(tags) if tags else None
+            
+            # Get description from JSON file or use default.
+            # Descriptions file may use base filename without color (e.g. "happy_cider.webp").
             description = descriptions.get(filename)
             if not description:
-                description = f"Pompon emotional sticker ({mood_tags or 'general'} mood)"
+                # Try base name without color suffix, e.g. "happy_cider.webp"
+                parts = filename.split("_")
+                if len(parts) >= 3:
+                    base_name = "_".join(parts[:2]) + ".webp"
+                    description = descriptions.get(base_name)
+            if not description:
+                description = f"Pompon emotional sticker ({mood or 'general'} mood)"
             
             # Character ID for Pompon
             character_id = "00002"

@@ -1,32 +1,18 @@
-#####
+### Cloudflare tunnel
 
-# Cloudflare tunnel
+- Cloudflare tunnel: `cloudflared tunnel --url http://localhost:5000`
 
-Cloudflare tunnel: cloudflared tunnel --url http://localhost:5000
+### Flask server
 
- 
+- Start server: `python -m endpoint.endpoint`
 
-#####
+### Test script
 
-# Flask server
+- Run webhook tests: `bash test_webhooks.sh`
 
-python -m endpoint.endpoint
+---
 
- 
-
-#####
-
-# run test script
-
-bash test_webhooks.sh
-
-
-#cloudflared tunnel run --token eyJhIjoiOGQwMzkzMjdmYjBmZjU2YzkzNjM0OTM2OGI1ZGE1ODMiLCJ0IjoiNDg0OTdmYzctZDE1Ny00Mzc4LTkyODgtOWQ2ZTJmYmM5Mzc0IiwicyI6Ik1qWTBNak5tT1RZdE4ySXlaaTAwTkRFeUxXSXpPREF0TTJZME5qZ3dNR1UyTkdReiJ9
-
-
-
-##
-## Emojies
+### Emojis used for recycling colors
 
 GREEN = 
 🍷 Wine glass
@@ -58,7 +44,7 @@ BLUE =
 📋 Clipboard
 🧻 Toilet paper
 
-BLACK = 
+BLACK =
 ❤️ Heart
 💔 Broken heart
 🎉 Party/celebration
@@ -76,4 +62,26 @@ BLACK =
 🎭 Theater masks
 ❤️‍🔥 Heart on fire
 
+---
+
+### Emotional stickers, hat colors, and feeding hints
+
+- Emotional stickers for each character live in:
+  - Cherry: `stickers/` (e.g. `happy_cherry_green.webp`)
+  - Pompon: `Pompom_normand_emotional_sticker/` (e.g. `angry_cider_yellow.webp`)
+- Filenames follow the pattern: `emotion_character_color.ext`, for example:
+  - `happy_cherry_green.webp`, `angry_cherry_yellow.webp`
+  - `happy_cider_blue.webp`, `scared_cider_black.webp`
+- Loader scripts:
+  - `python scripts/load_cherry_emotional_stickers.py`
+  - `python scripts/load_pompon_emotional_stickers.py`
+- Each loader:
+  - Parses the **emotion** (happy/angry/scared/shocked/neutral).
+  - Parses the **hat/bin color** from the suffix (`green`, `yellow`, `blue`, `black`).
+  - Stores both in `Sticker.mood_tags` (e.g. `happy,green`).
+- At runtime:
+  - The bottle’s `accessory_color` (GREEN/YELLOW/BLUE/BLACK) is the required bin color.
+  - `select_sticker_by_mood` is called with both the current emotion and the required color.
+  - It prefers stickers whose `mood_tags` match **both** emotion and color, so:
+    - The hat color in the emotional sticker always matches the bin color the user should feed.
 

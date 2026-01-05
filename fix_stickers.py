@@ -151,7 +151,7 @@ def fix_sticker(input_path: Path, output_path: Path = None, remove_bg: bool = Fa
 
 def main():
     """Fix all stickers in the stickers directory."""
-    stickers_dir = Path(__file__).parent / "Cider_normand_feeding_game_logic_stickers"
+    stickers_dir = Path(__file__).parent / "Pompom_normand_emotional_sticker"
     
     if not stickers_dir.exists():
         print(f"❌ Stickers directory not found: {stickers_dir}")
