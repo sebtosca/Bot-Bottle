@@ -1,87 +1,115 @@
-### Cloudflare tunnel
+# BotBottle
 
-- Cloudflare tunnel: `cloudflared tunnel --url http://localhost:5000`
+WhatsApp bot for bottle recycling gamification with character interactions.
 
-### Flask server
+## Quick Start
 
-- Start server: `python -m endpoint.endpoint`
+### Prerequisites
 
-### Test script
+- Python 3.10+
+- PostgreSQL database
+- WhatsApp Cloud API credentials
+- Mistral AI API key (optional, for LLM features)
 
-- Run webhook tests: `bash test_webhooks.sh`
+### Installation
 
----
+1. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-### Emojis used for recycling colors
+2. Set up environment variables in `.env`:
+```bash
+DATABASE_URL=postgresql+psycopg2://user:password@localhost:5432/botbottle_db
+WHATSAPP_ACCESS_TOKEN=your_token
+WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
+WHATSAPP_VERIFY_TOKEN=your_verify_token
+MISTRAL_API_KEY=your_mistral_key
+```
 
-GREEN = 
-🍷 Wine glass
-🍸 Cocktail glass
-🍺 Beer mug
-🍻 Clinking beer mugs
-🍾 Bottle with popping cork
-🍶 Sake bottle and cup
-🥃 Tumbler glass
-🏺 Amphora
-🫙 Jar
+3. Initialize database:
+```bash
+# See DATABASE_SETUP.md for detailed instructions
+python -m endpoint.endpoint
+```
 
-YELLOW = 
-🍼 Baby bottle
-🛍️ Shopping bags
-🥤 Cup with straw
-🧃 Beverage box
-🧴 Bottle with lotion
+4. Start the server:
+```bash
+python -m endpoint.endpoint
+# or
+python run_endpoint.py
+```
 
-BLUE = 
-📦 Package/box
-📄 Document
-📝 Memo/note
-📚 Books
-📰 Newspaper
-📧 Email
-✉️ Envelope
-📁 Folder
-📋 Clipboard
-🧻 Toilet paper
+### Setup Guides
 
-BLACK =
-❤️ Heart
-💔 Broken heart
-🎉 Party/celebration
-🔥 Fire
-⭐ Star
-💎 Gem/diamond
-🎁 Gift
-😀 Smiling face
-🎈 Balloon
-🎂 Cake
-🍕 Pizza
-🍔 Hamburger
-🍰 Cake slice
-🎨 Artist palette
-🎭 Theater masks
-❤️‍🔥 Heart on fire
+- **Database**: See [DATABASE_SETUP.md](DATABASE_SETUP.md)
+- **Mistral AI**: See [MISTRAL_SETUP.md](MISTRAL_SETUP.md)
+- **Security**: See [SECURITY.md](SECURITY.md)
+- **Webhook System**: See [endpoint/webhook/README.md](endpoint/webhook/README.md)
 
----
+## Project Structure
 
-### Emotional stickers, hat colors, and feeding hints
+See [MODULARIZATION_COMPLETE.md](MODULARIZATION_COMPLETE.md) for the current modular structure.
 
-- Emotional stickers for each character live in:
-  - Cherry: `stickers/` (e.g. `happy_cherry_green.webp`)
-  - Pompon: `Pompom_normand_emotional_sticker/` (e.g. `angry_cider_yellow.webp`)
-- Filenames follow the pattern: `emotion_character_color.ext`, for example:
-  - `happy_cherry_green.webp`, `angry_cherry_yellow.webp`
-  - `happy_cider_blue.webp`, `scared_cider_black.webp`
-- Loader scripts:
-  - `python scripts/load_cherry_emotional_stickers.py`
-  - `python scripts/load_pompon_emotional_stickers.py`
-- Each loader:
-  - Parses the **emotion** (happy/angry/scared/shocked/neutral).
-  - Parses the **hat/bin color** from the suffix (`green`, `yellow`, `blue`, `black`).
-  - Stores both in `Sticker.mood_tags` (e.g. `happy,green`).
-- At runtime:
-  - The bottle’s `accessory_color` (GREEN/YELLOW/BLUE/BLACK) is the required bin color.
-  - `select_sticker_by_mood` is called with both the current emotion and the required color.
-  - It prefers stickers whose `mood_tags` match **both** emotion and color, so:
-    - The hat color in the emotional sticker always matches the bin color the user should feed.
+### Key Modules
 
+- `core/` - Core business logic (game, state, points)
+- `features/` - Feature modules (receipt, stats, promos)
+- `services/` - External service clients (WhatsApp, LLM)
+- `models/` - Data models (characters)
+- `endpoint/` - Flask application (webhook, security, routes)
+- `db/` - Database models and operations
+
+## Features
+
+- **Feeding Game**: Interactive emoji-based bottle feeding
+- **Character System**: Multiple characters with unique personalities
+- **Points & Rewards**: Gamification with milestones and titles
+- **Receipt Verification**: OCR-based bottle return verification
+- **Statistics**: User stats visualization
+- **Security**: Rate limiting, input validation, secure API key handling
+
+## Cross-Platform Support
+
+✅ **Works on Windows, Linux, and macOS**
+
+- All file paths use `pathlib.Path` (cross-platform)
+- Font loading with platform-specific fallbacks
+- UTF-8 encoding for all file operations
+- Environment variables work on all platforms
+
+## Development
+
+### Running Locally
+
+```bash
+# Start Flask server
+python -m endpoint.endpoint
+
+# Health check
+curl http://localhost:5000/health
+```
+
+### Cloudflare Tunnel (for webhooks)
+
+```bash
+cloudflared tunnel --url http://localhost:5000
+```
+
+## Emojis Used for Recycling Colors
+
+### GREEN
+🍷 🍸 🍺 🍻 🍾 🍶 🥃 🏺 🫙
+
+### YELLOW
+🍼 🛍️ 🥤 🧃 🧴
+
+### BLUE
+📦 📄 📝 📚 📰 📧 ✉️ 📁 📋 🧻
+
+### BLACK
+❤️ 💔 🎉 🎊 🎈 🎁 🎀 🎂 🍰 🧁
+
+## License
+
+[Your License Here]

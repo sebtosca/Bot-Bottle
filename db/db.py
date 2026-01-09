@@ -121,7 +121,7 @@ class Sticker(Base):
             * url is typically NULL.
         - For media_type == "gif":
             * filename is the local MP4 (or GIF) filename served by Flask,
-              e.g. "diva_reaction.mp4" in the GIF directory.
+              e.g. "diva_reaction.mp4" in the character-specific GIF directory (Cherry_GIF/ or pompon_GIF/).
             * url is not used any more (legacy field for old URL-based GIFs).
     """
     __tablename__ = "stickers"

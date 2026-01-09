@@ -86,8 +86,10 @@ send_request() {
       }"
   fi
 
-  curl -i -X POST "$WEBHOOK_URL" \
+  # Capture response with detailed output
+  HTTP_CODE=$(curl -s -o /tmp/webhook_response_$$.txt -w "%{http_code}" -X POST "$WEBHOOK_URL" \
     -H "Content-Type: application/json" \
+    -H "X-Request-ID: test-$(date +%s)-$RANDOM" \
     -d "{
       \"object\": \"whatsapp_business_account\",
       \"entry\": [
@@ -118,10 +120,29 @@ send_request() {
           ]
         }
       ]
-    }"
-
+    }")
+  
+  RESPONSE_BODY=$(cat /tmp/webhook_response_$$.txt 2>/dev/null || echo "")
+  rm -f /tmp/webhook_response_$$.txt 2>/dev/null
+  
   echo
-  echo "Message sent! Check your Flask server logs and your WhatsApp for replies."
+  echo "HTTP Status Code: $HTTP_CODE"
+  if [ -n "$RESPONSE_BODY" ]; then
+    echo "Response Body: $RESPONSE_BODY"
+  fi
+  
+  if [ "$HTTP_CODE" = "200" ]; then
+    echo "✅ Message sent successfully! Check your Flask server logs and your WhatsApp for replies."
+  elif [ "$HTTP_CODE" = "403" ]; then
+    echo "❌ ERROR: Request rejected (403 Forbidden). This usually means:"
+    echo "   - Webhook signature verification failed (if WHATSAPP_APP_SECRET is set)"
+    echo "   - Check your Flask server logs for details"
+  elif [ "$HTTP_CODE" = "400" ]; then
+    echo "❌ ERROR: Bad Request (400). Check the request format and Flask server logs."
+  else
+    echo "❌ ERROR: Unexpected HTTP status code: $HTTP_CODE"
+    echo "   Check your Flask server logs for details"
+  fi
   echo
 }
 
@@ -140,8 +161,10 @@ send_button() {
   echo "Simulating interactive button: id=\"$button_id\" title=\"$title\""
   echo "============================================================"
 
-  curl -i -X POST "$WEBHOOK_URL" \
+  # Capture response with detailed output
+  HTTP_CODE=$(curl -s -o /tmp/webhook_response_$$.txt -w "%{http_code}" -X POST "$WEBHOOK_URL" \
     -H "Content-Type: application/json" \
+    -H "X-Request-ID: test-$(date +%s)-$RANDOM" \
     -d "{
       \"object\": \"whatsapp_business_account\",
       \"entry\": [
@@ -178,10 +201,29 @@ send_button() {
           ]
         }
       ]
-    }"
-
+    }")
+  
+  RESPONSE_BODY=$(cat /tmp/webhook_response_$$.txt 2>/dev/null || echo "")
+  rm -f /tmp/webhook_response_$$.txt 2>/dev/null
+  
   echo
-  echo "Interactive button sent! Check your Flask server logs and WhatsApp behavior."
+  echo "HTTP Status Code: $HTTP_CODE"
+  if [ -n "$RESPONSE_BODY" ]; then
+    echo "Response Body: $RESPONSE_BODY"
+  fi
+  
+  if [ "$HTTP_CODE" = "200" ]; then
+    echo "✅ Interactive button sent successfully! Check your Flask server logs and WhatsApp behavior."
+  elif [ "$HTTP_CODE" = "403" ]; then
+    echo "❌ ERROR: Request rejected (403 Forbidden). This usually means:"
+    echo "   - Webhook signature verification failed (if WHATSAPP_APP_SECRET is set)"
+    echo "   - Check your Flask server logs for details"
+  elif [ "$HTTP_CODE" = "400" ]; then
+    echo "❌ ERROR: Bad Request (400). Check the request format and Flask server logs."
+  else
+    echo "❌ ERROR: Unexpected HTTP status code: $HTTP_CODE"
+    echo "   Check your Flask server logs for details"
+  fi
   echo
 }
 

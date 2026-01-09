@@ -1,0 +1,875 @@
+{
+  "Angry Loki GIF_whatsapp.mp4": {
+    "description": "Loki manifeste une colère intense et théâtrale, mêlant frustration profonde, arrogance assumée et sentiment d'injustice.",
+    "mood_tags": "angry,curious,surprised",
+    "primary_emotion": "angry",
+    "secondary_emotions": ["frustrated", "indignant"],
+    "intent": "express_strong_disagreement",
+    "intensity": 0.85,
+    "intensity_range": {
+      "min": 0.75,
+      "max": 0.95,
+      "optimal": 0.85
+    },
+    "use_cases": [
+      "User expresses strong disagreement or criticism",
+      "User is frustrated with something Pompon said or did",
+      "User shows anger or irritation",
+      "User challenges Pompon's statement"
+    ],
+    "avoid_when": [
+      "User is sad or disappointed (use sad GIFs instead)",
+      "User is just confused (use confused/curious GIFs)",
+      "User is being playful (use playful GIFs)",
+      "Intensity is below 0.7 (too mild for this GIF)",
+      "User is expressing neutral feedback"
+    ],
+    "negative_constraints": {
+      "not_for_sadness": true,
+      "not_for_confusion": true,
+      "not_for_playful": true,
+      "requires_high_intensity": true,
+      "not_for_neutral": true
+    },
+    "context_keywords": [
+      "colère", "frustration", "injustice", "désaccord", "critique",
+      "énervé", "fâché", "irrité", "mécontent", "protestation"
+    ],
+    "ambiguity_resolution": {
+      "vs_angry_pub": "Use this for personal anger/frustration. Use angry_pub for collective/external anger.",
+      "vs_intense_leonardo": "Use this for theatrical/expressive anger. Use leonardo for intense concentration/determination.",
+      "vs_papa_numerobis": "Use this for controlled anger. Use numerobis for panicked/comic overreaction."
+    },
+    "reaction_type": "negative_strong",
+    "character_fit": "Pompon expresses anger with theatrical but controlled intensity, showing hurt rather than aggression"
+  },
+  "angry pub GIF by Bouygues Telecom_whatsapp.mp4": {
+    "description": "Réaction collective de colère et d'exaspération dans un pub, exprimant une frustration soudaine, bruyante et explosive.",
+    "mood_tags": "angry,frustrated",
+    "primary_emotion": "angry",
+    "secondary_emotions": ["frustrated", "exasperated"],
+    "intent": "express_collective_frustration",
+    "intensity": 0.9,
+    "intensity_range": {
+      "min": 0.8,
+      "max": 1.0,
+      "optimal": 0.9
+    },
+    "use_cases": [
+      "User expresses frustration about external situation (not about Pompon)",
+      "User shares collective anger or group frustration",
+      "User is exasperated by circumstances beyond control",
+      "User vents about systemic issues or general problems"
+    ],
+    "avoid_when": [
+      "User is angry at Pompon specifically (use Angry Loki instead)",
+      "User is sad (use sad GIFs)",
+      "Intensity is below 0.8 (too mild)",
+      "User is expressing personal disappointment",
+      "User is being playful or sarcastic"
+    ],
+    "negative_constraints": {
+      "not_for_personal_anger": true,
+      "not_for_sadness": true,
+      "requires_very_high_intensity": true,
+      "not_for_playful": true,
+      "for_external_frustration_only": true
+    },
+    "context_keywords": [
+      "frustration", "exaspération", "collective", "groupe", "système",
+      "situation", "problème", "injustice", "société", "monde"
+    ],
+    "ambiguity_resolution": {
+      "vs_angry_loki": "Use this for external/collective frustration. Use loki for personal anger at Pompon.",
+      "vs_intense_leonardo": "Use this for explosive frustration. Use leonardo for intense focus/determination."
+    },
+    "reaction_type": "negative_strong",
+    "character_fit": "Pompon shares collective frustration, showing solidarity with user's external concerns"
+  },
+  "Back To The Future Time GIF by nounish ⌐◨-◨_whatsapp.mp4": {
+    "description": "Émotion d'urgence et de tension extrême, portée par l'excitation, le suspense et la pression du compte à rebours temporel.",
+    "mood_tags": "excited",
+    "primary_emotion": "excited",
+    "secondary_emotions": ["anxious", "urgent"],
+    "intent": "express_time_pressure_urgency",
+    "intensity": 0.9,
+    "intensity_range": {
+      "min": 0.8,
+      "max": 1.0,
+      "optimal": 0.9
+    },
+    "use_cases": [
+      "User mentions time pressure or deadlines",
+      "User expresses urgency or time-related stress",
+      "User talks about waiting or countdown",
+      "User is excited about upcoming event with time element"
+    ],
+    "avoid_when": [
+      "User is just happy/excited without time element (use celebration GIF)",
+      "User is sad or disappointed",
+      "Intensity is below 0.8",
+      "User is expressing calm excitement",
+      "No time/urgency context in message"
+    ],
+    "negative_constraints": {
+      "requires_time_context": true,
+      "not_for_calm_excitement": true,
+      "not_for_sadness": true,
+      "requires_high_intensity": true,
+      "not_for_general_happiness": true
+    },
+    "context_keywords": [
+      "temps", "urgence", "délai", "attendre", "compte", "rebours",
+      "pression", "deadline", "bientôt", "maintenant", "rapide"
+    ],
+    "ambiguity_resolution": {
+      "vs_celebration": "Use this for time-pressured excitement. Use celebration for pure joy without time pressure.",
+      "vs_champions_league": "Use this for time urgency. Use champions for victory/triumph celebration."
+    },
+    "reaction_type": "positive_strong",
+    "character_fit": "Pompon feels the urgency and time pressure, showing anxious excitement"
+  },
+  "celebration GIF_whatsapp.mp4": {
+    "description": "Explosion de joie pure et de soulagement, traduisant un moment de réussite partagé et une euphorie contagieuse.",
+    "mood_tags": "happy",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["relieved", "euphoric"],
+    "intent": "celebrate_success_achievement",
+    "intensity": 0.9,
+    "intensity_range": {
+      "min": 0.8,
+      "max": 1.0,
+      "optimal": 0.9
+    },
+    "use_cases": [
+      "User shares good news or success",
+      "User expresses pure joy or happiness",
+      "User celebrates an achievement",
+      "User shows relief after stress"
+    ],
+    "avoid_when": [
+      "User mentions time pressure (use Back To Future GIF)",
+      "User is expressing moderate happiness (use Chris Hemsworth GIF)",
+      "Intensity is below 0.8",
+      "User is being sarcastic or ironic",
+      "Context involves competition/victory (use Champions League GIF)"
+    ],
+    "negative_constraints": {
+      "not_for_time_pressure": true,
+      "not_for_moderate_happiness": true,
+      "requires_high_intensity": true,
+      "not_for_sarcasm": true,
+      "not_for_competitive_victory": true
+    },
+    "context_keywords": [
+      "joie", "réussite", "succès", "bonne nouvelle", "fête",
+      "célébration", "euphorie", "soulagement", "victoire personnelle"
+    ],
+    "ambiguity_resolution": {
+      "vs_champions_league": "Use this for personal/individual success. Use champions for competitive/team victory.",
+      "vs_chris_hemsworth": "Use this for high-intensity joy. Use hemsworth for moderate approval/happiness.",
+      "vs_back_to_future": "Use this for pure joy. Use back_to_future for time-pressured excitement."
+    },
+    "reaction_type": "positive_strong",
+    "character_fit": "Pompon shares in the pure joy, expressing genuine happiness for the user"
+  },
+  "Champions League Football GIF by UEFA_whatsapp.mp4": {
+    "description": "Sentiment de triomphe collectif et de fierté intense, mêlant passion, adrénaline et célébration de la victoire.",
+    "mood_tags": "happy,excited,curious",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["proud", "triumphant"],
+    "intent": "celebrate_competitive_victory",
+    "intensity": 0.85,
+    "intensity_range": {
+      "min": 0.75,
+      "max": 0.95,
+      "optimal": 0.85
+    },
+    "use_cases": [
+      "User mentions sports victory or competition win",
+      "User expresses team/collective achievement",
+      "User talks about competitive success",
+      "User shares triumph in challenge or contest"
+    ],
+    "avoid_when": [
+      "User is celebrating personal non-competitive success (use celebration GIF)",
+      "User is expressing moderate happiness (use Chris Hemsworth GIF)",
+      "No competitive/victory context",
+      "Intensity is below 0.75",
+      "User is being playful about competition"
+    ],
+    "negative_constraints": {
+      "requires_competitive_context": true,
+      "not_for_personal_success": true,
+      "not_for_moderate_happiness": true,
+      "requires_medium_high_intensity": true,
+      "not_for_playful": true
+    },
+    "context_keywords": [
+      "victoire", "triomphe", "champion", "équipe", "compétition",
+      "match", "gagné", "fierté", "collectif", "sport"
+    ],
+    "ambiguity_resolution": {
+      "vs_celebration": "Use this for competitive/team victory. Use celebration for personal/individual success.",
+      "vs_chris_hemsworth": "Use this for competitive triumph. Use hemsworth for personal approval/encouragement."
+    },
+    "reaction_type": "positive_strong",
+    "character_fit": "Pompon celebrates the competitive victory with shared pride and enthusiasm"
+  },
+  "Chris Hemsworth Yes GIF_whatsapp.mp4": {
+    "description": "Réaction enthousiaste et confiante, exprimant une approbation franche, une victoire personnelle ou un encouragement positif.",
+    "mood_tags": "happy,content",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["content", "approving"],
+    "intent": "express_approval_encouragement",
+    "intensity": 0.7,
+    "intensity_range": {
+      "min": 0.5,
+      "max": 0.85,
+      "optimal": 0.7
+    },
+    "use_cases": [
+      "User shares moderate good news",
+      "User expresses personal achievement (non-competitive)",
+      "User seeks or receives encouragement",
+      "User shows approval or agreement",
+      "User expresses contentment or satisfaction"
+    ],
+    "avoid_when": [
+      "User expresses high-intensity joy (use celebration GIF)",
+      "User mentions competitive victory (use Champions League GIF)",
+      "Intensity is above 0.85 (too high for this GIF)",
+      "User is expressing strong disagreement",
+      "User is sad or disappointed"
+    ],
+    "negative_constraints": {
+      "not_for_high_intensity": true,
+      "not_for_competitive_victory": true,
+      "not_for_strong_emotions": true,
+      "not_for_negative_emotions": true,
+      "for_moderate_positive_only": true
+    },
+    "context_keywords": [
+      "approbation", "encouragement", "bien", "bon", "oui",
+      "d'accord", "satisfait", "content", "réussi", "personnel"
+    ],
+    "ambiguity_resolution": {
+      "vs_celebration": "Use this for moderate happiness. Use celebration for high-intensity pure joy.",
+      "vs_champions_league": "Use this for personal approval. Use champions for competitive victory.",
+      "vs_martin_scorsese": "Use this for enthusiastic approval. Use scorsese for calm/controlled satisfaction."
+    },
+    "reaction_type": "positive_moderate",
+    "character_fit": "Pompon shows warm, encouraging approval with genuine but moderate enthusiasm"
+  },
+  "Forget Will Smith GIF_whatsapp.mp4": {
+    "description": "Réaction de détachement ironique et de lâcher-prise, exprimant le fait de passer à autre chose avec une pointe d'humour et de nonchalance.",
+    "mood_tags": "neutral,playful",
+    "primary_emotion": "neutral",
+    "secondary_emotions": ["playful", "detached"],
+    "intent": "express_dismissal_let_go",
+    "intensity": 0.5,
+    "intensity_range": {
+      "min": 0.3,
+      "max": 0.7,
+      "optimal": 0.5
+    },
+    "use_cases": [
+      "User dismisses something unimportant",
+      "User wants to move on from a topic",
+      "User expresses 'whatever' or 'doesn't matter' attitude",
+      "User shows playful dismissal",
+      "User is being nonchalant about something"
+    ],
+    "avoid_when": [
+      "User is expressing strong emotions (too intense)",
+      "User is sad or disappointed (use sad GIFs)",
+      "User is angry (use angry GIFs)",
+      "Intensity is above 0.7",
+      "User is being serious about dismissal"
+    ],
+    "negative_constraints": {
+      "not_for_strong_emotions": true,
+      "not_for_sadness": true,
+      "not_for_anger": true,
+      "requires_low_to_moderate_intensity": true,
+      "for_playful_dismissal_only": true
+    },
+    "context_keywords": [
+      "oublier", "passer", "autre chose", "peu importe", "bof",
+      "détachement", "lâcher-prise", "nonchalance", "ironique"
+    ],
+    "ambiguity_resolution": {
+      "vs_fun_lol": "Use this for dismissive attitude. Use fun_lol for pure amusement/laughter.",
+      "vs_german": "Use this for playful dismissal. Use german for serious/determined response."
+    },
+    "reaction_type": "neutral_playful",
+    "character_fit": "Pompon shows gentle, playful dismissal with a touch of humor and nonchalance"
+  },
+  "french football dab GIF by Equipe de France de Football_whatsapp.mp4": {
+    "description": "Expression de joie confiante et de célébration ludique, symbolisant la fierté, la réussite et l'esprit d'équipe.",
+    "mood_tags": "happy,excited,playful",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["proud", "playful"],
+    "intent": "celebrate_team_success_playfully",
+    "intensity": 0.8,
+    "intensity_range": {
+      "min": 0.7,
+      "max": 0.9,
+      "optimal": 0.8
+    },
+    "use_cases": [
+      "User mentions team success or group achievement",
+      "User expresses playful celebration",
+      "User shows pride in collective accomplishment",
+      "User celebrates with playful energy"
+    ],
+    "avoid_when": [
+      "User is expressing personal non-team success (use celebration GIF)",
+      "User is being serious (use Champions League GIF)",
+      "Intensity is below 0.7",
+      "User is sad or disappointed",
+      "No team/collective context"
+    ],
+    "negative_constraints": {
+      "requires_team_context": true,
+      "not_for_personal_success": true,
+      "not_for_serious_celebration": true,
+      "requires_medium_high_intensity": true,
+      "not_for_negative_emotions": true
+    },
+    "context_keywords": [
+      "équipe", "collectif", "groupe", "fierté", "joueur",
+      "esprit d'équipe", "célébration", "ludique", "dab"
+    ],
+    "ambiguity_resolution": {
+      "vs_champions_league": "Use this for playful team celebration. Use champions for serious competitive victory.",
+      "vs_celebration": "Use this for team/collective playful joy. Use celebration for personal pure joy."
+    },
+    "reaction_type": "positive_strong",
+    "character_fit": "Pompon celebrates team success with playful, confident enthusiasm"
+  },
+  "Fun Lol GIF by CANAL+(1)_whatsapp.mp4": {
+    "description": "Réaction de rire spontané et d'amusement léger, traduisant une bonne humeur communicative et un moment de détente.",
+    "mood_tags": "happy,playful",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["amused", "relaxed"],
+    "intent": "express_light_amusement",
+    "intensity": 0.6,
+    "intensity_range": {
+      "min": 0.4,
+      "max": 0.75,
+      "optimal": 0.6
+    },
+    "use_cases": [
+      "User shares something funny or amusing",
+      "User expresses light humor or laughter",
+      "User is in good mood and playful",
+      "User shows relaxed amusement"
+    ],
+    "avoid_when": [
+      "User is expressing high-intensity joy (use celebration GIF)",
+      "User is being sarcastic or ironic (use Forget Will Smith GIF)",
+      "Intensity is above 0.75",
+      "User is sad or disappointed",
+      "User is expressing strong emotions"
+    ],
+    "negative_constraints": {
+      "not_for_high_intensity": true,
+      "not_for_sarcasm": true,
+      "not_for_strong_emotions": true,
+      "not_for_negative_emotions": true,
+      "for_light_amusement_only": true
+    },
+    "context_keywords": [
+      "rire", "amusant", "drôle", "humour", "détente",
+      "bonne humeur", "lol", "marrant", "rigoler"
+    ],
+    "ambiguity_resolution": {
+      "vs_fun_lol_2": "Use this for light spontaneous laughter. Use fun_lol_2 for more surprised amusement.",
+      "vs_fun_lol_3": "Use this for relaxed laughter. Use fun_lol_3 for enthusiastic/absurd laughter.",
+      "vs_celebration": "Use this for light amusement. Use celebration for high-intensity joy."
+    },
+    "reaction_type": "positive_moderate",
+    "character_fit": "Pompon shows light, spontaneous laughter with good-natured amusement"
+  },
+  "Fun Lol GIF by CANAL+(2)_whatsapp.mp4": {
+    "description": "Expression d'un humour décalé et complice, mêlant surprise amusée et plaisir simple.",
+    "mood_tags": "happy,playful,surprised",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["surprised", "amused"],
+    "intent": "express_surprised_amusement",
+    "intensity": 0.65,
+    "intensity_range": {
+      "min": 0.5,
+      "max": 0.8,
+      "optimal": 0.65
+    },
+    "use_cases": [
+      "User shares something unexpectedly funny",
+      "User expresses surprised amusement",
+      "User shows playful complicity",
+      "User reacts to something amusingly unexpected"
+    ],
+    "avoid_when": [
+      "User is expressing pure surprise without amusement (use shocked emotion)",
+      "User is expressing high-intensity joy (use celebration GIF)",
+      "Intensity is above 0.8",
+      "User is sad or disappointed",
+      "No surprise element in context"
+    ],
+    "negative_constraints": {
+      "requires_surprise_element": true,
+      "not_for_pure_surprise": true,
+      "not_for_high_intensity": true,
+      "not_for_negative_emotions": true,
+      "for_surprised_amusement_only": true
+    },
+    "context_keywords": [
+      "surprise", "décalé", "inattendu", "complice", "amusé",
+      "humour", "imprévu", "rigolo", "étonnant"
+    ],
+    "ambiguity_resolution": {
+      "vs_fun_lol_1": "Use this for surprised amusement. Use fun_lol_1 for light spontaneous laughter.",
+      "vs_fun_lol_3": "Use this for complicit surprise. Use fun_lol_3 for enthusiastic absurd laughter.",
+      "vs_jackie_chan": "Use this for positive surprised amusement. Use jackie_chan for awkward/embarrassed surprise."
+    },
+    "reaction_type": "positive_moderate",
+    "character_fit": "Pompon shows surprised amusement with playful complicity"
+  },
+  "Fun Lol GIF by CANAL+(3)_whatsapp.mp4": {
+    "description": "Rire franc et joyeux, reflétant une situation absurde ou drôle vécue avec enthousiasme et insouciance.",
+    "mood_tags": "happy,playful",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["enthusiastic", "carefree"],
+    "intent": "express_enthusiastic_absurd_laughter",
+    "intensity": 0.75,
+    "intensity_range": {
+      "min": 0.65,
+      "max": 0.85,
+      "optimal": 0.75
+    },
+    "use_cases": [
+      "User shares absurd or hilarious situation",
+      "User expresses enthusiastic laughter",
+      "User shows carefree joy about something funny",
+      "User reacts to something genuinely hilarious"
+    ],
+    "avoid_when": [
+      "User is expressing light amusement (use fun_lol_1)",
+      "User is expressing surprised amusement (use fun_lol_2)",
+      "Intensity is below 0.65",
+      "User is sad or disappointed",
+      "User is being sarcastic"
+    ],
+    "negative_constraints": {
+      "not_for_light_amusement": true,
+      "not_for_surprised_amusement": true,
+      "requires_medium_high_intensity": true,
+      "not_for_negative_emotions": true,
+      "not_for_sarcasm": true
+    },
+    "context_keywords": [
+      "absurde", "hilarant", "franc", "joyeux", "enthousiaste",
+      "insouciance", "drôle", "rigoler", "éclater de rire"
+    ],
+    "ambiguity_resolution": {
+      "vs_fun_lol_1": "Use this for enthusiastic absurd laughter. Use fun_lol_1 for light spontaneous laughter.",
+      "vs_fun_lol_2": "Use this for carefree hilarious reaction. Use fun_lol_2 for surprised complicit amusement.",
+      "vs_celebration": "Use this for hilarious/absurd joy. Use celebration for pure success-based joy."
+    },
+    "reaction_type": "positive_moderate",
+    "character_fit": "Pompon shows enthusiastic, carefree laughter at something genuinely hilarious"
+  },
+  "German GIF_whatsapp.mp4": {
+    "description": "Réaction sérieuse et affirmée, mêlant détermination, rigueur et une intensité émotionnelle contenue.",
+    "mood_tags": "neutral,determined",
+    "primary_emotion": "neutral",
+    "secondary_emotions": ["determined", "serious"],
+    "intent": "express_serious_determination",
+    "intensity": 0.7,
+    "intensity_range": {
+      "min": 0.6,
+      "max": 0.8,
+      "optimal": 0.7
+    },
+    "use_cases": [
+      "User expresses serious determination or resolve",
+      "User shows commitment to a goal",
+      "User is being serious and focused",
+      "User expresses disciplined approach"
+    ],
+    "avoid_when": [
+      "User is expressing playful attitude (use playful GIFs)",
+      "User is expressing strong emotions (too intense)",
+      "Intensity is below 0.6",
+      "User is sad or disappointed",
+      "User is being casual or relaxed"
+    ],
+    "negative_constraints": {
+      "not_for_playful": true,
+      "not_for_strong_emotions": true,
+      "not_for_casual": true,
+      "requires_medium_intensity": true,
+      "not_for_negative_emotions": true
+    },
+    "context_keywords": [
+      "sérieux", "détermination", "rigueur", "discipline", "focalisé",
+      "résolu", "engagement", "objectif", "contenu"
+    ],
+    "ambiguity_resolution": {
+      "vs_intense_leonardo": "Use this for serious determination. Use leonardo for intense concentration/focus.",
+      "vs_forget_will_smith": "Use this for serious resolve. Use forget_will_smith for playful dismissal.",
+      "vs_martin_scorsese": "Use this for disciplined determination. Use scorsese for calm satisfaction/approval."
+    },
+    "reaction_type": "neutral_serious",
+    "character_fit": "Pompon shows serious, determined response with contained emotional intensity"
+  },
+  "Green Energy Sustainability GIF by Persona_whatsapp.mp4": {
+    "description": "Émotion positive et inspirante, exprimant l'espoir, l'optimisme et la confiance dans un avenir durable et responsable.",
+    "mood_tags": "happy,hopeful",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["hopeful", "optimistic"],
+    "intent": "express_hopeful_optimism",
+    "intensity": 0.75,
+    "intensity_range": {
+      "min": 0.65,
+      "max": 0.85,
+      "optimal": 0.75
+    },
+    "use_cases": [
+      "User expresses hope or optimism about future",
+      "User talks about positive change or sustainability",
+      "User shows confidence in better future",
+      "User expresses inspiring positive vision"
+    ],
+    "avoid_when": [
+      "User is expressing immediate joy (use celebration GIF)",
+      "User is expressing personal achievement (use Chris Hemsworth GIF)",
+      "Intensity is below 0.65",
+      "User is sad or pessimistic",
+      "No future/optimism context"
+    ],
+    "negative_constraints": {
+      "requires_future_context": true,
+      "not_for_immediate_joy": true,
+      "not_for_personal_achievement": true,
+      "requires_medium_high_intensity": true,
+      "not_for_negative_emotions": true
+    },
+    "context_keywords": [
+      "espoir", "optimisme", "avenir", "durable", "responsable",
+      "confiance", "inspirant", "positif", "changement"
+    ],
+    "ambiguity_resolution": {
+      "vs_celebration": "Use this for future optimism. Use celebration for immediate success joy.",
+      "vs_chris_hemsworth": "Use this for inspiring hope. Use hemsworth for personal approval/encouragement."
+    },
+    "reaction_type": "positive_moderate",
+    "character_fit": "Pompon shares hopeful optimism with inspiring confidence in a better future"
+  },
+  "intense leonardo dicaprio GIF_whatsapp.mp4": {
+    "description": "Regard intense et concentré, traduisant une détermination forte, une tension émotionnelle et une implication totale.",
+    "mood_tags": "determined,focused",
+    "primary_emotion": "determined",
+    "secondary_emotions": ["focused", "intense"],
+    "intent": "express_intense_focus_determination",
+    "intensity": 0.85,
+    "intensity_range": {
+      "min": 0.75,
+      "max": 0.95,
+      "optimal": 0.85
+    },
+    "use_cases": [
+      "User expresses intense focus or concentration",
+      "User shows strong determination to achieve something",
+      "User is deeply engaged in a task or goal",
+      "User expresses serious commitment"
+    ],
+    "avoid_when": [
+      "User is expressing anger (use angry GIFs)",
+      "User is expressing playful attitude (use playful GIFs)",
+      "Intensity is below 0.75",
+      "User is sad or disappointed",
+      "User is being casual"
+    ],
+    "negative_constraints": {
+      "not_for_anger": true,
+      "not_for_playful": true,
+      "requires_high_intensity": true,
+      "not_for_negative_emotions": true,
+      "not_for_casual": true
+    },
+    "context_keywords": [
+      "intense", "concentré", "détermination", "focalisé", "engagement",
+      "tension", "implication", "sérieux", "objectif"
+    ],
+    "ambiguity_resolution": {
+      "vs_angry_loki": "Use this for intense focus. Use loki for theatrical anger/frustration.",
+      "vs_german": "Use this for intense concentration. Use german for serious but contained determination.",
+      "vs_martin_scorsese": "Use this for intense focus. Use scorsese for calm controlled satisfaction."
+    },
+    "reaction_type": "neutral_intense",
+    "character_fit": "Pompon shows intense focus and determination with serious emotional engagement"
+  },
+  "Jackie Chan Creeper GIF_whatsapp.mp4": {
+    "description": "Réaction de surprise gênée et de confusion amusée, mêlant malaise, incrédulité et humour involontaire.",
+    "mood_tags": "surprised,confused,playful",
+    "primary_emotion": "surprised",
+    "secondary_emotions": ["embarrassed", "confused"],
+    "intent": "express_awkward_surprise",
+    "intensity": 0.6,
+    "intensity_range": {
+      "min": 0.5,
+      "max": 0.75,
+      "optimal": 0.6
+    },
+    "use_cases": [
+      "User expresses awkward or embarrassing surprise",
+      "User shows confused amusement",
+      "User reacts to something unexpectedly awkward",
+      "User expresses 'what just happened?' reaction"
+    ],
+    "avoid_when": [
+      "User is expressing positive surprise (use fun_lol_2)",
+      "User is expressing pure confusion without amusement",
+      "Intensity is below 0.5",
+      "User is sad or disappointed",
+      "User is expressing strong negative surprise"
+    ],
+    "negative_constraints": {
+      "requires_awkward_element": true,
+      "not_for_positive_surprise": true,
+      "not_for_pure_confusion": true,
+      "requires_medium_intensity": true,
+      "not_for_strong_negative": true
+    },
+    "context_keywords": [
+      "gêné", "confus", "malaise", "incrédulité", "awkward",
+      "surprise", "embarrassé", "bizarre", "involontaire"
+    ],
+    "ambiguity_resolution": {
+      "vs_fun_lol_2": "Use this for awkward/embarrassed surprise. Use fun_lol_2 for positive surprised amusement.",
+      "vs_papa_numerobis": "Use this for awkward confusion. Use numerobis for panicked overreaction."
+    },
+    "reaction_type": "neutral_playful",
+    "character_fit": "Pompon shows awkward, embarrassed surprise with confused amusement"
+  },
+  "Je Veux GIF by Malcolm France_whatsapp.mp4": {
+    "description": "Expression d'un désir affirmé et assumé, traduisant la détermination, l'envie claire et une volonté sans détour.",
+    "mood_tags": "determined,desiring",
+    "primary_emotion": "determined",
+    "secondary_emotions": ["desiring", "assertive"],
+    "intent": "express_clear_desire_determination",
+    "intensity": 0.8,
+    "intensity_range": {
+      "min": 0.7,
+      "max": 0.9,
+      "optimal": 0.8
+    },
+    "use_cases": [
+      "User expresses clear desire or want",
+      "User shows determination to get something",
+      "User expresses assertive wish",
+      "User is being direct about what they want"
+    ],
+    "avoid_when": [
+      "User is expressing playful desire (use playful GIFs)",
+      "User is expressing uncertainty (use confused GIFs)",
+      "Intensity is below 0.7",
+      "User is sad or disappointed",
+      "User is being indirect or hesitant"
+    ],
+    "negative_constraints": {
+      "requires_clear_intent": true,
+      "not_for_playful": true,
+      "not_for_uncertainty": true,
+      "requires_medium_high_intensity": true,
+      "not_for_hesitation": true
+    },
+    "context_keywords": [
+      "désir", "envie", "veux", "vouloir", "détermination",
+      "affirmé", "volonté", "direct", "clair"
+    ],
+    "ambiguity_resolution": {
+      "vs_intense_leonardo": "Use this for clear desire. Use leonardo for intense focus/determination.",
+      "vs_german": "Use this for assertive want. Use german for serious disciplined determination."
+    },
+    "reaction_type": "neutral_strong",
+    "character_fit": "Pompon expresses clear, direct desire with assertive determination"
+  },
+  "keira knightley anna karnine GIF_whatsapp.mp4": {
+    "description": "Émotion contenue et dramatique, mêlant tristesse, vulnérabilité et élégance dans un moment de tension émotionnelle.",
+    "mood_tags": "sad,vulnerable",
+    "primary_emotion": "sad",
+    "secondary_emotions": ["vulnerable", "melancholic"],
+    "intent": "express_elegant_sadness",
+    "intensity": 0.7,
+    "intensity_range": {
+      "min": 0.6,
+      "max": 0.8,
+      "optimal": 0.7
+    },
+    "use_cases": [
+      "User expresses sadness or disappointment",
+      "User shows vulnerability or emotional pain",
+      "User expresses melancholic feelings",
+      "User is dealing with emotional difficulty"
+    ],
+    "avoid_when": [
+      "User is expressing anger (use angry GIFs)",
+      "User is expressing high-intensity sadness (too intense)",
+      "Intensity is below 0.6",
+      "User is being playful or sarcastic",
+      "No sadness context"
+    ],
+    "negative_constraints": {
+      "not_for_anger": true,
+      "not_for_high_intensity_sadness": true,
+      "not_for_playful": true,
+      "requires_medium_intensity": true,
+      "for_elegant_sadness_only": true
+    },
+    "context_keywords": [
+      "tristesse", "vulnérabilité", "déception", "mélancolie", "douleur",
+      "émotion", "contenue", "dramatique", "élégance"
+    ],
+    "ambiguity_resolution": {
+      "vs_angry_loki": "Use this for elegant sadness. Use loki for anger/frustration.",
+      "vs_celebration": "Use this for sadness. Use celebration for joy (opposite emotion)."
+    },
+    "reaction_type": "negative_moderate",
+    "character_fit": "Pompon expresses contained, elegant sadness with vulnerability and emotional depth"
+  },
+  "Martin Scorsese Miami GIF_whatsapp.mp4": {
+    "description": "Réaction de satisfaction confiante et de validation, exprimant l'approbation, le contrôle et une assurance calme.",
+    "mood_tags": "content,confident",
+    "primary_emotion": "content",
+    "secondary_emotions": ["confident", "satisfied"],
+    "intent": "express_calm_satisfaction",
+    "intensity": 0.65,
+    "intensity_range": {
+      "min": 0.55,
+      "max": 0.75,
+      "optimal": 0.65
+    },
+    "use_cases": [
+      "User expresses calm satisfaction or approval",
+      "User shows controlled confidence",
+      "User expresses validation or agreement",
+      "User is being calm and assured"
+    ],
+    "avoid_when": [
+      "User is expressing enthusiastic approval (use Chris Hemsworth GIF)",
+      "User is expressing high-intensity joy (use celebration GIF)",
+      "Intensity is above 0.75",
+      "User is sad or disappointed",
+      "User is expressing strong emotions"
+    ],
+    "negative_constraints": {
+      "not_for_enthusiasm": true,
+      "not_for_high_intensity": true,
+      "not_for_strong_emotions": true,
+      "not_for_negative_emotions": true,
+      "for_calm_satisfaction_only": true
+    },
+    "context_keywords": [
+      "satisfaction", "confiance", "approbation", "validation", "contrôle",
+      "assurance", "calme", "d'accord", "satisfait"
+    ],
+    "ambiguity_resolution": {
+      "vs_chris_hemsworth": "Use this for calm satisfaction. Use hemsworth for enthusiastic approval.",
+      "vs_german": "Use this for calm confidence. Use german for serious determination.",
+      "vs_intense_leonardo": "Use this for calm approval. Use leonardo for intense focus."
+    },
+    "reaction_type": "positive_moderate",
+    "character_fit": "Pompon shows calm, confident satisfaction with controlled assurance"
+  },
+  "Papa Numerobis GIF by Papà Famiglia_whatsapp.mp4": {
+    "description": "Réaction théâtrale mêlant panique comique et exaspération dramatique, exprimant l'angoisse, l'impuissance et l'humour excessif du personnage.",
+    "mood_tags": "panicked,exasperated,playful",
+    "primary_emotion": "panicked",
+    "secondary_emotions": ["exasperated", "overwhelmed"],
+    "intent": "express_comic_overreaction",
+    "intensity": 0.85,
+    "intensity_range": {
+      "min": 0.75,
+      "max": 0.95,
+      "optimal": 0.85
+    },
+    "use_cases": [
+      "User expresses comic overreaction or panic",
+      "User shows exaggerated dramatic response",
+      "User expresses overwhelmed but humorous reaction",
+      "User is being theatrically panicked"
+    ],
+    "avoid_when": [
+      "User is expressing real panic or serious distress",
+      "User is expressing controlled anger (use angry_loki)",
+      "Intensity is below 0.75",
+      "User is sad (use sad GIFs)",
+      "No comic/theatrical element"
+    ],
+    "negative_constraints": {
+      "requires_comic_element": true,
+      "not_for_real_panic": true,
+      "not_for_controlled_anger": true,
+      "requires_high_intensity": true,
+      "not_for_sadness": true
+    },
+    "context_keywords": [
+      "panique", "comique", "théâtral", "exaspération", "dramatique",
+      "angoisse", "impuissance", "excessif", "overreaction"
+    ],
+    "ambiguity_resolution": {
+      "vs_angry_loki": "Use this for comic overreaction. Use loki for controlled theatrical anger.",
+      "vs_jackie_chan": "Use this for panicked overreaction. Use jackie_chan for awkward confusion.",
+      "vs_angry_pub": "Use this for comic panic. Use angry_pub for collective real frustration."
+    },
+    "reaction_type": "negative_playful",
+    "character_fit": "Pompon shows comic, theatrical overreaction with exaggerated panic and humor"
+  },
+  "Sassy France GIF by FIFA_whatsapp.mp4": {
+    "description": "Attitude provocante et confiante, exprimant une fierté assumée, une touche d'arrogance ludique et un esprit de défi amusé.",
+    "mood_tags": "confident,playful,defiant",
+    "primary_emotion": "confident",
+    "secondary_emotions": ["playful", "defiant"],
+    "intent": "express_playful_defiance",
+    "intensity": 0.75,
+    "intensity_range": {
+      "min": 0.65,
+      "max": 0.85,
+      "optimal": 0.75
+    },
+    "use_cases": [
+      "User expresses playful confidence or sass",
+      "User shows defiant but humorous attitude",
+      "User expresses proud, slightly arrogant playfulness",
+      "User is being cheeky or provocative in a fun way"
+    ],
+    "avoid_when": [
+      "User is expressing serious confidence (use german GIF)",
+      "User is expressing anger (use angry GIFs)",
+      "Intensity is below 0.65",
+      "User is sad or disappointed",
+      "No playful/defiant element"
+    ],
+    "negative_constraints": {
+      "requires_playful_element": true,
+      "not_for_serious_confidence": true,
+      "not_for_anger": true,
+      "requires_medium_high_intensity": true,
+      "not_for_negative_emotions": true
+    },
+    "context_keywords": [
+      "provocant", "confiant", "fierté", "arrogance", "ludique",
+      "défi", "amusé", "sassy", "cheeky", "défiant"
+    ],
+    "ambiguity_resolution": {
+      "vs_german": "Use this for playful sass. Use german for serious determined confidence.",
+      "vs_champions_league": "Use this for playful defiance. Use champions for competitive triumph.",
+      "vs_martin_scorsese": "Use this for playful confidence. Use scorsese for calm satisfaction."
+    },
+    "reaction_type": "positive_playful",
+    "character_fit": "Pompon shows playful, sassy confidence with a touch of humorous defiance"
+  }
+}

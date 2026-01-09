@@ -147,6 +147,6 @@ echo
 echo "Check your Flask server logs to verify:"
 echo "  - Character IDs in responses"
 echo "  - Sticker filenames (cherry vs cider)"
-echo "  - GIF directories (GIF/ vs pompon_GIF/)"
+echo "  - GIF directories (Cherry_GIF/ vs pompon_GIF/)"
 echo "  - Character-specific system prompts"
 echo "============================================================"

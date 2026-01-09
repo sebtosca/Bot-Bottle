@@ -1,0 +1,236 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-8.3.4, pluggy-1.5.0 -- /home/lobo/anaconda3/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.13.5', 'Platform': 'Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.4', 'pluggy': '1.5.0'}, 'Plugins': {'jaxtyping': '0.3.2', 'json-report': '1.5.0', 'mock': '3.15.1', 'html': '4.1.1', 'xdist': '3.8.0', 'cov': '7.0.0', 'typeguard': '4.4.4', 'anyio': '4.7.0', 'metadata': '3.1.1'}}
+rootdir: /mnt/c/Users/SebastienToscano/BotBottle
+configfile: pytest.ini
+plugins: jaxtyping-0.3.2, json-report-1.5.0, mock-3.15.1, html-4.1.1, xdist-3.8.0, cov-7.0.0, typeguard-4.4.4, anyio-4.7.0, metadata-3.1.1
+collecting ... collected 82 items
+
+llm/tests/unit/test_llama_client.py::TestGenerateReplyMistral::test_generate_reply_success PASSED [  1%]
+llm/tests/unit/test_llama_client.py::TestGenerateReplyMistral::test_generate_reply_no_api_key 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [   ERROR] llm.llama_client: MISTRAL_API_KEY is not set
+PASSED                                                                   [  2%]
+llm/tests/unit/test_llama_client.py::TestGenerateReplyMistral::test_generate_reply_with_bottle_state PASSED [  3%]
+llm/tests/unit/test_llama_client.py::TestGenerateReplyMistral::test_generate_reply_no_choices 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [   ERROR] llm.llama_client: Mistral AI returned no choices in response
+PASSED                                                                   [  4%]
+llm/tests/unit/test_llama_client.py::TestGenerateReplyMistral::test_generate_reply_none_content 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: Mistral AI returned None for message.content
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: Message has tool_calls instead of content
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: Message was refused by model
+PASSED                                                                   [  6%]
+llm/tests/unit/test_llama_client.py::TestGenerateReplyMistral::test_generate_reply_api_error 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [   ERROR] llm.llama_client: Mistral AI API call failed
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/llm/llama_client.py", line 88, in _generate_reply_mistral
+    chat_response = client.chat.complete(
+        model=MISTRAL_MODEL_NAME,
+    ...<2 lines>...
+        max_tokens=max_tokens,
+    )
+  File "/home/lobo/anaconda3/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/lobo/anaconda3/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/lobo/anaconda3/lib/python3.13/unittest/mock.py", line 1228, in _execute_mock_call
+    raise effect
+Exception: API error
+PASSED                                                                   [  7%]
+llm/tests/unit/test_llama_client.py::TestGenerateReplyMistral::test_generate_reply_mistral_not_installed 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [   ERROR] llm.llama_client: mistralai package not installed
+PASSED                                                                   [  8%]
+llm/tests/unit/test_llama_client.py::TestAnalyzeMessageSentiment::test_analyze_sentiment_success PASSED [  9%]
+llm/tests/unit/test_llama_client.py::TestAnalyzeMessageSentiment::test_analyze_sentiment_no_api_key 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: MISTRAL_API_KEY not set, returning default sentiment
+PASSED                                                                   [ 10%]
+llm/tests/unit/test_llama_client.py::TestAnalyzeMessageSentiment::test_analyze_sentiment_empty_message PASSED [ 12%]
+llm/tests/unit/test_llama_client.py::TestAnalyzeMessageSentiment::test_analyze_sentiment_invalid_json 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: Failed to parse sentiment JSON
+PASSED                                                                   [ 13%]
+llm/tests/unit/test_llama_client.py::TestAnalyzeMessageSentiment::test_analyze_sentiment_invalid_emotion PASSED [ 14%]
+llm/tests/unit/test_llama_client.py::TestAnalyzeMessageSentiment::test_analyze_sentiment_intensity_clamping PASSED [ 15%]
+llm/tests/unit/test_llama_client.py::TestAnalyzeMessageSentiment::test_analyze_sentiment_json_extraction PASSED [ 17%]
+llm/tests/unit/test_llama_client.py::TestDetectEmotionFromMessage::test_detect_emotion_success PASSED [ 18%]
+llm/tests/unit/test_llama_client.py::TestDetectEmotionFromMessage::test_detect_emotion_no_api_key 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: MISTRAL_API_KEY not set, defaulting to neutral emotion
+PASSED                                                                   [ 19%]
+llm/tests/unit/test_llama_client.py::TestDetectEmotionFromMessage::test_detect_emotion_invalid_emotion 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: Invalid emotion detected, defaulting to neutral
+PASSED                                                                   [ 20%]
+llm/tests/unit/test_llama_client.py::TestDetectEmotionFromMessage::test_detect_emotion_no_choices 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: No response from Mistral for emotion detection, defaulting to neutral
+PASSED                                                                   [ 21%]
+llm/tests/unit/test_llama_client.py::TestDetectEmotionFromMessage::test_detect_emotion_api_error 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [   ERROR] llm.llama_client: Error detecting emotion
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/llm/llama_client.py", line 375, in detect_emotion_from_message
+    response = client.chat.complete(
+        model=MISTRAL_MODEL_NAME,
+    ...<2 lines>...
+        max_tokens=10,  # Just need one word
+    )
+  File "/home/lobo/anaconda3/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/lobo/anaconda3/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/lobo/anaconda3/lib/python3.13/unittest/mock.py", line 1228, in _execute_mock_call
+    raise effect
+Exception: API error
+PASSED                                                                   [ 23%]
+llm/tests/unit/test_llama_client.py::TestGenerateReply::test_generate_reply_mistral_provider PASSED [ 24%]
+llm/tests/unit/test_llama_client.py::TestGenerateReply::test_generate_reply_invalid_provider PASSED [ 25%]
+llm/tests/unit/test_llama_client.py::TestGenerateReply::test_generate_reply_case_insensitive PASSED [ 26%]
+llm/tests/unit/test_llama_client.py::TestGenerateReplyMistralEdgeCases::test_generate_reply_empty_stripped_response 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: Mistral AI response is empty or whitespace only
+PASSED                                                                   [ 28%]
+llm/tests/unit/test_llama_client.py::TestGenerateReplyMistralEdgeCases::test_generate_reply_client_init_error 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [   ERROR] llm.llama_client: Failed to create Mistral client
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/llm/llama_client.py", line 58, in _generate_reply_mistral
+    client = Mistral(api_key=MISTRAL_API_KEY)
+  File "/home/lobo/anaconda3/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/lobo/anaconda3/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/lobo/anaconda3/lib/python3.13/unittest/mock.py", line 1228, in _execute_mock_call
+    raise effect
+Exception: Failed to initialize client
+PASSED                                                                   [ 29%]
+llm/tests/unit/test_llama_client.py::TestGenerateReplyMistralEdgeCases::test_generate_reply_none_content_with_tool_calls 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: Mistral AI returned None for message.content
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: Message has tool_calls instead of content
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: Message was refused by model
+PASSED                                                                   [ 30%]
+llm/tests/unit/test_llama_client.py::TestGenerateReplyMistralEdgeCases::test_generate_reply_none_content_with_refusal 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: Mistral AI returned None for message.content
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: Message has tool_calls instead of content
+2026-01-08 16:24:39 [ WARNING] llm.llama_client: Message was refused by model
+PASSED                                                                   [ 31%]
+llm/tests/unit/test_llama_client.py::TestGenerateReplyMistralEdgeCases::test_generate_reply_without_bottle_state PASSED [ 32%]
+models/tests/unit/test_characters.py::TestGetCharacterConfig::test_get_cherry_config PASSED [ 34%]
+models/tests/unit/test_characters.py::TestGetCharacterConfig::test_get_pompon_config PASSED [ 35%]
+models/tests/unit/test_characters.py::TestGetCharacterConfig::test_get_invalid_product_id_falls_back_to_cherry PASSED [ 36%]
+models/tests/unit/test_characters.py::TestGetCharacterConfig::test_get_empty_product_id_falls_back_to_cherry PASSED [ 37%]
+models/tests/unit/test_characters.py::TestGetCharacterConfig::test_get_none_product_id_falls_back_to_cherry PASSED [ 39%]
+models/tests/unit/test_characters.py::TestGetCharacterConfig::test_config_has_required_fields PASSED [ 40%]
+models/tests/unit/test_characters.py::TestGetSystemPromptForCharacter::test_get_cherry_system_prompt PASSED [ 41%]
+models/tests/unit/test_characters.py::TestGetSystemPromptForCharacter::test_get_pompon_system_prompt PASSED [ 42%]
+models/tests/unit/test_characters.py::TestGetSystemPromptForCharacter::test_get_invalid_product_id_returns_cherry_prompt PASSED [ 43%]
+models/tests/unit/test_characters.py::TestGetSystemPromptForCharacter::test_system_prompt_is_not_empty PASSED [ 45%]
+models/tests/unit/test_characters.py::TestGetCharacterId::test_get_cherry_character_id PASSED [ 46%]
+models/tests/unit/test_characters.py::TestGetCharacterId::test_get_pompon_character_id PASSED [ 47%]
+models/tests/unit/test_characters.py::TestGetCharacterId::test_get_invalid_product_id_returns_cherry_id PASSED [ 48%]
+models/tests/unit/test_characters.py::TestGetCharacterId::test_character_id_matches_product_id PASSED [ 50%]
+models/tests/unit/test_characters.py::TestCharactersDict::test_characters_dict_has_expected_keys PASSED [ 51%]
+models/tests/unit/test_characters.py::TestCharactersDict::test_character_config_structure PASSED [ 52%]
+models/tests/unit/test_characters.py::TestCharactersDict::test_character_money_values PASSED [ 53%]
+models/tests/unit/test_characters.py::TestCharactersDict::test_character_directories_are_strings PASSED [ 54%]
+services/whatsapp/tests/unit/test_client.py::TestWhatsAppCloudError::test_error_creation PASSED [ 56%]
+services/whatsapp/tests/unit/test_client.py::TestWhatsAppCloudError::test_error_with_full_response PASSED [ 57%]
+services/whatsapp/tests/unit/test_client.py::TestCheckApiResponse::test_check_valid_response PASSED [ 58%]
+services/whatsapp/tests/unit/test_client.py::TestCheckApiResponse::test_check_error_in_response PASSED [ 59%]
+services/whatsapp/tests/unit/test_client.py::TestCheckApiResponse::test_check_errors_array PASSED [ 60%]
+services/whatsapp/tests/unit/test_client.py::TestCheckApiResponse::test_check_error_in_messages PASSED [ 62%]
+services/whatsapp/tests/unit/test_client.py::TestGetHeaders::test_get_headers_success PASSED [ 63%]
+services/whatsapp/tests/unit/test_client.py::TestGetHeaders::test_get_headers_missing_token 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [   ERROR] services.whatsapp.client: WHATSAPP_ACCESS_TOKEN is not set
+PASSED                                                                   [ 64%]
+services/whatsapp/tests/unit/test_client.py::TestGetHeaders::test_get_headers_empty_token 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [   ERROR] services.whatsapp.client: WHATSAPP_ACCESS_TOKEN is not set
+PASSED                                                                   [ 65%]
+services/whatsapp/tests/unit/test_client.py::TestGetMessagesUrl::test_get_messages_url_success PASSED [ 67%]
+services/whatsapp/tests/unit/test_client.py::TestGetMessagesUrl::test_get_messages_url_missing_id PASSED [ 68%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppText::test_send_text_success 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [    INFO] services.whatsapp.client: Sending WhatsApp text message
+2026-01-08 16:24:39 [    INFO] services.whatsapp.client: WhatsApp text message sent successfully
+PASSED                                                                   [ 69%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppText::test_send_text_network_error 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [    INFO] services.whatsapp.client: Sending WhatsApp text message
+2026-01-08 16:24:39 [   ERROR] services.whatsapp.client: Failed to send WhatsApp message - network error
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/services/whatsapp/client.py", line 158, in send_whatsapp_text
+    resp = requests.post(url, headers=_get_headers(), data=json.dumps(payload), timeout=10)
+  File "/home/lobo/anaconda3/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/lobo/anaconda3/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/lobo/anaconda3/lib/python3.13/unittest/mock.py", line 1228, in _execute_mock_call
+    raise effect
+requests.exceptions.RequestException: Network error
+PASSED                                                                   [ 70%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppText::test_send_text_api_error 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [    INFO] services.whatsapp.client: Sending WhatsApp text message
+2026-01-08 16:24:39 [   ERROR] services.whatsapp.client: WhatsApp API returned error
+PASSED                                                                   [ 71%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppText::test_send_text_no_messages_in_response 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [    INFO] services.whatsapp.client: Sending WhatsApp text message
+2026-01-08 16:24:39 [   ERROR] services.whatsapp.client: No messages field in WhatsApp API response
+PASSED                                                                   [ 73%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppText::test_send_text_invalid_json 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [    INFO] services.whatsapp.client: Sending WhatsApp text message
+PASSED                                                                   [ 74%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppText::test_send_text_phone_normalization 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [    INFO] services.whatsapp.client: Sending WhatsApp text message
+2026-01-08 16:24:39 [    INFO] services.whatsapp.client: WhatsApp text message sent successfully
+PASSED                                                                   [ 75%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppText::test_send_text_invalid_json_with_400_status 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [    INFO] services.whatsapp.client: Sending WhatsApp text message
+PASSED                                                                   [ 76%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppSticker::test_send_sticker_success PASSED [ 78%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppSticker::test_send_sticker_phone_normalization PASSED [ 79%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppGif::test_send_gif_success PASSED [ 80%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppGif::test_send_gif_without_caption PASSED [ 81%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppGif::test_send_gif_phone_normalization PASSED [ 82%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppGif::test_send_gif_with_status_warning 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [ WARNING] services.whatsapp.client: Unexpected message status in response
+PASSED                                                                   [ 84%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppInteractiveList::test_send_interactive_list_success PASSED [ 85%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppInteractiveList::test_send_interactive_list_too_many_options PASSED [ 86%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppInteractiveButtons::test_send_interactive_buttons_success PASSED [ 87%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppInteractiveButtons::test_send_interactive_buttons_too_many PASSED [ 89%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppMedia::test_send_media_success PASSED [ 90%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppMedia::test_send_media_without_caption PASSED [ 91%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppMedia::test_send_media_phone_normalization PASSED [ 92%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppAudio::test_send_audio_success PASSED [ 93%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppAudio::test_send_audio_with_status_warning 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:24:39 [ WARNING] services.whatsapp.client: Unexpected message status in response
+PASSED                                                                   [ 95%]
+services/whatsapp/tests/unit/test_client.py::TestSendWhatsAppAudio::test_send_audio_phone_normalization PASSED [ 96%]
+services/whatsapp/tests/unit/test_client.py::TestCheckApiResponseEdgeCases::test_check_empty_errors_array PASSED [ 97%]
+services/whatsapp/tests/unit/test_client.py::TestCheckApiResponseEdgeCases::test_check_errors_array_not_list PASSED [ 98%]
+services/whatsapp/tests/unit/test_client.py::TestCheckApiResponseEdgeCases::test_check_messages_with_non_list_errors PASSED [100%]

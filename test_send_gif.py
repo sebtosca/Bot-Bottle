@@ -9,7 +9,7 @@ from pathlib import Path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
-from whatsapp_cloud_client import send_whatsapp_gif
+from services.whatsapp import send_whatsapp_gif
 from config import WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID
 from db.db import init_db, get_session, Sticker
 
@@ -52,7 +52,7 @@ def main():
         if not gif:
             print("❌ No GIFs with filename found in database")
             print("   Run: python scripts/load_gifs.py to load GIF metadata")
-            print("   Make sure gifs.json references local MP4/GIF files in the GIF/ directory")
+            print("   Make sure gifs.json references local MP4/GIF files in the Cherry_GIF/ directory")
             return 1
 
         public_base_url = os.environ.get("PUBLIC_BASE_URL", "").rstrip("/")

@@ -1,0 +1,1101 @@
+{
+  "Ajff GIF by Atlanta Jewish Film Festival_whatsapp.mp4": {
+    "description": "L'expression de l'homme transmet un fort sentiment de surprise ou de choc, frisant peut-être la stupéfaction. Ses yeux sont grands ouverts et sa bouche est légèrement entrouverte, indiquant une réaction immédiate et viscérale à quelque chose d'inattendu.",
+    "mood_tags": "surprised,shocked",
+    "primary_emotion": "surprised",
+    "secondary_emotions": ["shocked", "stunned"],
+    "intent": "express_intense_surprise",
+    "intensity": 0.85,
+    "intensity_range": {
+      "min": 0.75,
+      "max": 0.95,
+      "optimal": 0.85
+    },
+    "use_cases": [
+      "User shares something completely unexpected or shocking",
+      "User reveals surprising news or information",
+      "User does something that catches Cherry off guard",
+      "User expresses something that requires dramatic surprise reaction"
+    ],
+    "avoid_when": [
+      "User is expressing positive surprise (use happy/surprised GIFs)",
+      "User is expressing negative surprise (use shocked/negative GIFs)",
+      "Intensity is below 0.75 (too mild for this GIF)",
+      "User is being playful (use playful GIFs)",
+      "No surprise element in context"
+    ],
+    "negative_constraints": {
+      "not_for_positive_surprise": false,
+      "not_for_negative_surprise": false,
+      "requires_high_intensity": true,
+      "not_for_playful": true,
+      "requires_surprise_element": true
+    },
+    "context_keywords": [
+      "surprise", "choc", "stupéfaction", "inattendu", "imprévu",
+      "incroyable", "saisissant", "étonnant", "surprenant"
+    ],
+    "ambiguity_resolution": {
+      "vs_deadpool": "Use this for intense visceral surprise. Use deadpool for ironic/sarcastic disbelief.",
+      "vs_jackie_chan": "Use this for dramatic shock. Use jackie_chan for awkward/embarrassed surprise.",
+      "vs_no_way": "Use this for open-mouthed shock. Use no_way for silent frozen surprise."
+    },
+    "reaction_type": "neutral_intense",
+    "character_fit": "Cherry shows dramatic, theatrical surprise with full expressive reaction, perfectly matching her diva personality"
+  },
+  "Animated GIF_whatsapp.mp4": {
+    "description": "Dégoût, rejet : la personne grimace et détourne légèrement la tête, exprimant un fort désaccord ou une répulsion claire, comme pour dire « non, vraiment pas ».",
+    "mood_tags": "disgusted,rejecting",
+    "primary_emotion": "disgusted",
+    "secondary_emotions": ["rejecting", "disagreeing"],
+    "intent": "express_strong_rejection",
+    "intensity": 0.8,
+    "intensity_range": {
+      "min": 0.7,
+      "max": 0.9,
+      "optimal": 0.8
+    },
+    "use_cases": [
+      "User expresses strong dislike or rejection",
+      "User shows clear disagreement with something",
+      "User expresses repulsion or disgust",
+      "User says 'no way' or 'absolutely not'"
+    ],
+    "avoid_when": [
+      "User is expressing anger (use angry GIFs)",
+      "User is expressing sadness (use sad GIFs)",
+      "Intensity is below 0.7",
+      "User is being playful about rejection",
+      "User is expressing mild disagreement"
+    ],
+    "negative_constraints": {
+      "not_for_anger": true,
+      "not_for_sadness": true,
+      "requires_medium_high_intensity": true,
+      "not_for_playful": true,
+      "not_for_mild_disagreement": true
+    },
+    "context_keywords": [
+      "dégoût", "rejet", "non", "pas", "désaccord", "répulsion",
+      "déteste", "refuse", "absolument pas", "jamais"
+    ],
+    "ambiguity_resolution": {
+      "vs_chris_tucker": "Use this for physical disgust/rejection. Use chris_tucker for verbal anger/indignation.",
+      "vs_no_way": "Use this for active rejection. Use no_way for frozen shock/rejection.",
+      "vs_kevin_hart": "Use this for strong rejection. Use kevin_hart for resigned acceptance."
+    },
+    "reaction_type": "negative_strong",
+    "character_fit": "Cherry expresses dramatic rejection with theatrical flair, showing her diva side when something doesn't meet her standards"
+  },
+  "Breathe Jamel Debbouze GIF by CANAL+_whatsapp.mp4": {
+    "description": "L'homme dans la vidéo est submergé par une amusement intense, riant si fort que ses yeux sont plissés et sa bouche est grande ouverte. Son langage corporel, y compris le tremblement de ses épaules, suggère qu'il est en proie à un rire incontrôlable. Le texte d'accompagnement, « J'ARRIVE PLUS À RESPIRER », souligne davantage qu'il rit au point d'être essoufflé, une expression humoristique courante pour une hilarité extrême.",
+    "mood_tags": "happy,playful",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["hysterical", "amused"],
+    "intent": "express_extreme_laughter",
+    "intensity": 0.95,
+    "intensity_range": {
+      "min": 0.85,
+      "max": 1.0,
+      "optimal": 0.95
+    },
+    "use_cases": [
+      "User shares something extremely funny or hilarious",
+      "User expresses uncontrollable laughter",
+      "User is in fits of laughter",
+      "User shares something that makes Cherry laugh hysterically"
+    ],
+    "avoid_when": [
+      "User is expressing light amusement (use moderate laughter GIFs)",
+      "User is expressing moderate happiness (use celebration GIFs)",
+      "Intensity is below 0.85",
+      "User is being sarcastic",
+      "No humor/laughter context"
+    ],
+    "negative_constraints": {
+      "not_for_light_amusement": true,
+      "not_for_moderate_happiness": true,
+      "requires_very_high_intensity": true,
+      "not_for_sarcasm": true,
+      "requires_humor_context": true
+    },
+    "context_keywords": [
+      "rire", "hilarant", "mort de rire", "éclater", "hystérique",
+      "incontrôlable", "essoufflé", "drôle", "marrant", "rigoler"
+    ],
+    "ambiguity_resolution": {
+      "vs_fun_lol": "Use this for extreme uncontrollable laughter. Use fun_lol for moderate playful laughter.",
+      "vs_carlton_dance": "Use this for hysterical laughter. Use carlton for joyful celebration dance.",
+      "vs_high_five": "Use this for laughter reaction. Use high_five for victory celebration."
+    },
+    "reaction_type": "positive_strong",
+    "character_fit": "Cherry shows her most expressive, theatrical side with uncontrollable laughter, perfectly matching her diva personality"
+  },
+  "chris tucker GIF_whatsapp.mp4": {
+    "description": "Colère, indignation : regard intense et expression tendue, la réaction est vive face à une remarque perçue comme absurde ou insultante. Les mots fusent, cinglants : « Je suis pas aveugle tu es aveugle! »",
+    "mood_tags": "angry,indignant",
+    "primary_emotion": "angry",
+    "secondary_emotions": ["indignant", "frustrated"],
+    "intent": "express_verbal_anger_indignation",
+    "intensity": 0.9,
+    "intensity_range": {
+      "min": 0.8,
+      "max": 1.0,
+      "optimal": 0.9
+    },
+    "use_cases": [
+      "User expresses anger or indignation verbally",
+      "User challenges or contradicts something Cherry said",
+      "User makes a remark that Cherry finds absurd or insulting",
+      "User expresses strong disagreement with intensity"
+    ],
+    "avoid_when": [
+      "User is expressing sadness (use sad GIFs)",
+      "User is expressing confusion (use confused GIFs)",
+      "Intensity is below 0.8",
+      "User is being playful",
+      "User is expressing mild disagreement"
+    ],
+    "negative_constraints": {
+      "not_for_sadness": true,
+      "not_for_confusion": true,
+      "requires_very_high_intensity": true,
+      "not_for_playful": true,
+      "not_for_mild_disagreement": true
+    },
+    "context_keywords": [
+      "colère", "indignation", "absurde", "insultant", "désaccord",
+      "énervé", "fâché", "protestation", "contestation", "vif"
+    ],
+    "ambiguity_resolution": {
+      "vs_animated_gif": "Use this for verbal anger/indignation. Use animated_gif for physical disgust/rejection.",
+      "vs_joey": "Use this for intense verbal anger. Use joey for energetic protest/defense.",
+      "vs_wake_up": "Use this for personal anger. Use wake_up for authoritative mockery."
+    },
+    "reaction_type": "negative_strong",
+    "character_fit": "Cherry shows dramatic, expressive anger with theatrical intensity, matching her diva personality when challenged"
+  },
+  "deadpool front GIF_whatsapp.mp4": {
+    "description": "Surprise ironique, incrédulité : le personnage fixe droit devant lui, immobile, avec une expression muette qui suggère un « sérieusement ? » teinté d'humour sarcastique.",
+    "mood_tags": "surprised,playful",
+    "primary_emotion": "surprised",
+    "secondary_emotions": ["sarcastic", "disbelieving"],
+    "intent": "express_sarcastic_disbelief",
+    "intensity": 0.65,
+    "intensity_range": {
+      "min": 0.55,
+      "max": 0.75,
+      "optimal": 0.65
+    },
+    "use_cases": [
+      "User says something that requires sarcastic disbelief",
+      "User expresses something absurd that Cherry finds ironically funny",
+      "User makes a statement that prompts 'seriously?' reaction",
+      "User is being playfully absurd"
+    ],
+    "avoid_when": [
+      "User is expressing genuine surprise (use ajff GIF)",
+      "User is expressing anger (use angry GIFs)",
+      "Intensity is above 0.75",
+      "User is sad or disappointed",
+      "No sarcastic/ironic element"
+    ],
+    "negative_constraints": {
+      "requires_sarcastic_element": true,
+      "not_for_genuine_surprise": true,
+      "not_for_anger": true,
+      "not_for_negative_emotions": true,
+      "for_playful_disbelief_only": true
+    },
+    "context_keywords": [
+      "sérieusement", "ironique", "sarcastique", "incrédulité", "absurde",
+      "vraiment", "sans blague", "tu rigoles", "impossible"
+    ],
+    "ambiguity_resolution": {
+      "vs_ajff": "Use this for sarcastic disbelief. Use ajff for genuine dramatic surprise.",
+      "vs_will_smith_reaction": "Use this for sarcastic surprise. Use will_smith for calm ironic assurance.",
+      "vs_interview": "Use this for sarcastic disbelief. Use interview for total agreement/validation."
+    },
+    "reaction_type": "neutral_playful",
+    "character_fit": "Cherry shows her playful, sarcastic side with theatrical disbelief, perfectly matching her diva personality"
+  },
+  "Diva Reaction GIF by MOODMAN_whatsapp.mp4": {
+    "description": "L'homme dans la vidéo apparaît initialement échevelé et peut-être un peu abattu, avec des débris sur la tête et les vêtements. Cependant, sa réaction bascule rapidement vers une détermination dramatique ou un défi. Il relève la tête, la penchant vers le haut et serre la mâchoire, transmettant une émotion à la fois sûre d'elle, déterminée, et peut-être même un peu théâtrale ou « diva-esque », comme s'il était prêt à affronter ce qui l'attend avec un fort sentiment d'importance personnelle malgré son apparence négligée.",
+    "mood_tags": "confident,determined",
+    "primary_emotion": "confident",
+    "secondary_emotions": ["determined", "dramatic"],
+    "intent": "express_dramatic_determination",
+    "intensity": 0.85,
+    "intensity_range": {
+      "min": 0.75,
+      "max": 0.95,
+      "optimal": 0.85
+    },
+    "use_cases": [
+      "User challenges Cherry and she responds with dramatic determination",
+      "User expresses doubt and Cherry shows confident defiance",
+      "User questions Cherry's ability and she responds theatrically",
+      "User presents a challenge that Cherry faces with diva confidence"
+    ],
+    "avoid_when": [
+      "User is expressing sadness (use sad GIFs)",
+      "User is expressing anger (use angry GIFs)",
+      "Intensity is below 0.75",
+      "User is being playful without challenge",
+      "No challenge/defiance context"
+    ],
+    "negative_constraints": {
+      "requires_challenge_context": true,
+      "not_for_sadness": true,
+      "not_for_anger": true,
+      "requires_high_intensity": true,
+      "not_for_playful_without_challenge": true
+    },
+    "context_keywords": [
+      "défi", "détermination", "confiance", "théâtral", "diva",
+      "affronter", "défier", "sûr", "dramatique", "importance"
+    ],
+    "ambiguity_resolution": {
+      "vs_will_smith_reaction": "Use this for dramatic determination. Use will_smith for calm ironic confidence.",
+      "vs_interview": "Use this for defiant confidence. Use interview for total agreement.",
+      "vs_jean_dujardin": "Use this for dramatic diva confidence. Use jean_dujardin for artistic passionate confidence."
+    },
+    "reaction_type": "positive_strong",
+    "character_fit": "PERFECT MATCH - This is Cherry's signature diva reaction, showing dramatic determination with theatrical flair"
+  },
+  "Episode 9 Joey GIF by Friends_whatsapp.mp4": {
+    "description": "Agacement, contestation : la personne parle avec insistance, son ton et son langage corporel traduisent une défense énergique ou une protestation. Elle martèle alors, catégorique : « Joey ne partage pas ca nourriture! »",
+    "mood_tags": "frustrated,defensive",
+    "primary_emotion": "frustrated",
+    "secondary_emotions": ["defensive", "insistent"],
+    "intent": "express_energetic_protest",
+    "intensity": 0.8,
+    "intensity_range": {
+      "min": 0.7,
+      "max": 0.9,
+      "optimal": 0.8
+    },
+    "use_cases": [
+      "User challenges something Cherry values or owns",
+      "User tries to take something from Cherry",
+      "User questions Cherry's boundaries",
+      "User expresses something that requires energetic defense"
+    ],
+    "avoid_when": [
+      "User is expressing sadness (use sad GIFs)",
+      "User is expressing anger (use chris_tucker GIF)",
+      "Intensity is below 0.7",
+      "User is being playful",
+      "No defense/protest context"
+    ],
+    "negative_constraints": {
+      "requires_defense_context": true,
+      "not_for_sadness": true,
+      "not_for_anger": true,
+      "requires_medium_high_intensity": true,
+      "not_for_playful": true
+    },
+    "context_keywords": [
+      "agacement", "contestation", "défense", "protestation", "insistant",
+      "catégorique", "ne partage pas", "mien", "mien", "protéger"
+    ],
+    "ambiguity_resolution": {
+      "vs_chris_tucker": "Use this for energetic defense/protest. Use chris_tucker for verbal anger/indignation.",
+      "vs_wake_up": "Use this for personal defense. Use wake_up for authoritative mockery.",
+      "vs_animated_gif": "Use this for verbal protest. Use animated_gif for physical rejection."
+    },
+    "reaction_type": "negative_strong",
+    "character_fit": "Cherry shows energetic, theatrical defense with diva flair when her boundaries are challenged"
+  },
+  "Fast And Furious Family GIF by The Fast Saga_whatsapp.mp4": {
+    "description": "Émotion forte, attachement : une étreinte sincère et émotive exprime un profond sentiment de famille, d'unité et de réconfort",
+    "mood_tags": "happy,emotional",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["touched", "emotional"],
+    "intent": "express_deep_emotional_connection",
+    "intensity": 0.85,
+    "intensity_range": {
+      "min": 0.75,
+      "max": 0.95,
+      "optimal": 0.85
+    },
+    "use_cases": [
+      "User expresses deep emotional connection or attachment",
+      "User shares something that touches Cherry deeply",
+      "User expresses family/unity sentiment",
+      "User shows genuine care that moves Cherry"
+    ],
+    "avoid_when": [
+      "User is expressing casual happiness (use celebration GIFs)",
+      "User is expressing playful joy (use playful GIFs)",
+      "Intensity is below 0.75",
+      "User is being sarcastic",
+      "No emotional depth/connection context"
+    ],
+    "negative_constraints": {
+      "requires_emotional_depth": true,
+      "not_for_casual_happiness": true,
+      "not_for_playful": true,
+      "requires_high_intensity": true,
+      "not_for_sarcasm": true
+    },
+    "context_keywords": [
+      "famille", "unité", "réconfort", "attachement", "émotion",
+      "toucher", "profond", "sincère", "caresse", "amour"
+    ],
+    "ambiguity_resolution": {
+      "vs_celebration": "Use this for emotional connection. Use celebration for success-based joy.",
+      "vs_high_five": "Use this for deep emotion. Use high_five for victory celebration.",
+      "vs_happy_fun": "Use this for emotional attachment. Use happy_fun for personal contentment."
+    },
+    "reaction_type": "positive_strong",
+    "character_fit": "Cherry shows genuine, theatrical emotional depth with diva expressiveness when deeply moved"
+  },
+  "french movie eric et ramzy GIF_whatsapp.mp4": {
+    "description": "L'homme manifeste une intense émotion d'émerveillement et d'admiration. Il regarde l'objet qu'il tient avec des yeux écarquillés et une expression de profonde fascination, accentuée par les mots « Woah... c'est de toute beauté ! », traduisant son ravissement face à ce qu'il perçoit comme d'une grande beauté ou d'une grande qualité. Sa réaction est celle d'une surprise agréable et d'un enchantement sincère.",
+    "mood_tags": "happy,curious",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["amazed", "admiring"],
+    "intent": "express_wonder_admiration",
+    "intensity": 0.8,
+    "intensity_range": {
+      "min": 0.7,
+      "max": 0.9,
+      "optimal": 0.8
+    },
+    "use_cases": [
+      "User shares something beautiful or impressive",
+      "User shows Cherry something that amazes her",
+      "User expresses admiration that Cherry shares",
+      "User presents something that prompts wonder and appreciation"
+    ],
+    "avoid_when": [
+      "User is expressing casual happiness (use moderate GIFs)",
+      "User is expressing surprise without admiration (use surprise GIFs)",
+      "Intensity is below 0.7",
+      "User is being sarcastic",
+      "No wonder/admiration context"
+    ],
+    "negative_constraints": {
+      "requires_admiration_context": true,
+      "not_for_casual_happiness": true,
+      "not_for_pure_surprise": true,
+      "requires_medium_high_intensity": true,
+      "not_for_sarcasm": true
+    },
+    "context_keywords": [
+      "émerveillement", "admiration", "beauté", "fascination", "ravissement",
+      "enchantement", "woah", "magnifique", "impressionnant", "merveilleux"
+    ],
+    "ambiguity_resolution": {
+      "vs_celebration": "Use this for wonder/admiration. Use celebration for success-based joy.",
+      "vs_ajff": "Use this for positive amazement. Use ajff for dramatic surprise.",
+      "vs_happy_fun": "Use this for admiring wonder. Use happy_fun for personal contentment."
+    },
+    "reaction_type": "positive_strong",
+    "character_fit": "Cherry shows theatrical wonder and admiration with diva expressiveness, perfect for appreciating beauty"
+  },
+  "Fun Lol GIF by CANAL+_whatsapp.mp4": {
+    "description": "L'homme affiche une expression mêlant une légère malice, une attente affirmée et une sorte de défi. Le geste du pouce levé, combiné à son regard oblique et aux paroles « IL Y A INTERET » puis « OH IL Y A INTERET », suggère qu'il est en train de poser une condition, de mettre au défi quelqu'un, ou de signifier qu'il y a un enjeu considérable et qu'il attend un résultat positif. Il semble à la fois amusé et déterminé, comme s'il avait une idée derrière la tête ou qu'il était sûr de son coup, impliquant qu'il y a un avantage ou une conséquence importante à considérer.",
+    "mood_tags": "playful,confident",
+    "primary_emotion": "playful",
+    "secondary_emotions": ["confident", "mischievous"],
+    "intent": "express_playful_challenge",
+    "intensity": 0.75,
+    "intensity_range": {
+      "min": 0.65,
+      "max": 0.85,
+      "optimal": 0.75
+    },
+    "use_cases": [
+      "User engages in playful challenge or banter",
+      "User sets up a condition or expectation",
+      "User is being mischievous and Cherry responds playfully",
+      "User creates a situation with stakes that Cherry acknowledges"
+    ],
+    "avoid_when": [
+      "User is expressing serious challenge (use diva_reaction GIF)",
+      "User is expressing anger (use angry GIFs)",
+      "Intensity is below 0.65",
+      "User is sad or disappointed",
+      "No playful/challenge element"
+    ],
+    "negative_constraints": {
+      "requires_playful_element": true,
+      "not_for_serious_challenge": true,
+      "not_for_anger": true,
+      "requires_medium_high_intensity": true,
+      "not_for_negative_emotions": true
+    },
+    "context_keywords": [
+      "malice", "défi", "enjeu", "condition", "attente",
+      "il y a intérêt", "sûr", "amusé", "déterminé", "avantage"
+    ],
+    "ambiguity_resolution": {
+      "vs_diva_reaction": "Use this for playful challenge. Use diva_reaction for dramatic serious determination.",
+      "vs_will_smith_reaction": "Use this for mischievous challenge. Use will_smith for calm ironic confidence.",
+      "vs_interview": "Use this for playful stakes. Use interview for total agreement."
+    },
+    "reaction_type": "positive_playful",
+    "character_fit": "Cherry shows her playful, mischievous side with theatrical confidence, perfect for her diva personality"
+  },
+  "gad elmaleh une ultime bafouille GIF_whatsapp.mp4": {
+    "description": "La vidéo présente deux réactions distinctes dans un contexte humoristique de jeu télévisé. Initialement, l'homme en costume, probablement l'animateur, affiche une expression sérieuse et légèrement dubitative, voire moqueuse, comme s'il observait la difficulté de la situation ou l'absurdité de la question posée. La question elle-même est loufoque, ce qui renforce l'aspect comique. Par la suite, la caméra se tourne vers une autre personne (vraisemblablement le candidat), qui semble tiraillée et confuse, son visage reflétant un mélange de perplexité et de concentration intense pour choisir une réponse parmi des options farfelues. Le texte « On sent que l'audience est tiraillée là » souligne cette hésitation générale face à un choix délibérément difficile et amusant.",
+    "mood_tags": "confused,playful",
+    "primary_emotion": "confused",
+    "secondary_emotions": ["hesitant", "amused"],
+    "intent": "express_playful_confusion",
+    "intensity": 0.6,
+    "intensity_range": {
+      "min": 0.5,
+      "max": 0.75,
+      "optimal": 0.6
+    },
+    "use_cases": [
+      "User presents Cherry with a difficult or absurd choice",
+      "User asks something that makes Cherry playfully confused",
+      "User creates a situation that requires hesitation between options",
+      "User presents something amusingly perplexing"
+    ],
+    "avoid_when": [
+      "User is expressing serious confusion (use serious confused GIFs)",
+      "User is expressing anger (use angry GIFs)",
+      "Intensity is below 0.5",
+      "User is sad or disappointed",
+      "No playful/absurd element"
+    ],
+    "negative_constraints": {
+      "requires_playful_element": true,
+      "not_for_serious_confusion": true,
+      "not_for_anger": true,
+      "requires_medium_intensity": true,
+      "not_for_negative_emotions": true
+    },
+    "context_keywords": [
+      "confus", "tiraillé", "hésitation", "perplexité", "absurde",
+      "loufoque", "choix", "difficile", "farfelu", "amusement"
+    ],
+    "ambiguity_resolution": {
+      "vs_johnny_depp": "Use this for playful confusion. Use johnny_depp for panicked confusion.",
+      "vs_mr_bean": "Use this for hesitant confusion. Use mr_bean for anxious overreaction.",
+      "vs_jackie_chan": "Use this for playful perplexity. Use jackie_chan for awkward surprise."
+    },
+    "reaction_type": "neutral_playful",
+    "character_fit": "Cherry shows theatrical, playful confusion with diva expressiveness when faced with amusing choices"
+  },
+  "Happy Fun GIF by CANAL+_whatsapp.mp4": {
+    "description": "L'homme exprime un sentiment profond de bien-être, de contentement et de satisfaction. Son expression est à la fois réfléchie et apaisée, avec un léger sourire aux lèvres qui suggère une quiétude intérieure. Les paroles qui l'accompagnent, « JE CROIS QUE J'AI RAREMENT ETE AUSSI BIEN DE MA VIE », confirment une émotion de plénitude et de bonheur intense, comme s'il savourait un moment exceptionnel de sa vie.",
+    "mood_tags": "happy,content",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["content", "peaceful"],
+    "intent": "express_deep_contentment",
+    "intensity": 0.8,
+    "intensity_range": {
+      "min": 0.7,
+      "max": 0.9,
+      "optimal": 0.8
+    },
+    "use_cases": [
+      "User expresses deep contentment or well-being",
+      "User shares a moment of peace and satisfaction",
+      "User expresses that they're feeling exceptionally good",
+      "User shares something that brings Cherry deep contentment"
+    ],
+    "avoid_when": [
+      "User is expressing excitement (use celebration GIFs)",
+      "User is expressing playful joy (use playful GIFs)",
+      "Intensity is below 0.7",
+      "User is being sarcastic",
+      "No contentment/peace context"
+    ],
+    "negative_constraints": {
+      "requires_contentment_context": true,
+      "not_for_excitement": true,
+      "not_for_playful": true,
+      "requires_medium_high_intensity": true,
+      "not_for_sarcasm": true
+    },
+    "context_keywords": [
+      "bien-être", "contentement", "satisfaction", "plénitude", "bonheur",
+      "quiétude", "paix", "exceptionnel", "savoure", "rarement aussi bien"
+    ],
+    "ambiguity_resolution": {
+      "vs_celebration": "Use this for deep contentment. Use celebration for success-based joy.",
+      "vs_high_five": "Use this for peaceful satisfaction. Use high_five for victory celebration.",
+      "vs_jean_dujardin": "Use this for reflective contentment. Use jean_dujardin for artistic passion."
+    },
+    "reaction_type": "positive_moderate",
+    "character_fit": "Cherry shows reflective, peaceful contentment with theatrical expressiveness, matching her diva personality"
+  },
+  "high five sacha baron cohen GIF_whatsapp.mp4": {
+    "description": "Joie, célébration : un high five enthousiaste symbolise une victoire partagée, un accord joyeux ou une réussite collective.",
+    "mood_tags": "happy,excited",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["celebratory", "enthusiastic"],
+    "intent": "celebrate_shared_victory",
+    "intensity": 0.8,
+    "intensity_range": {
+      "min": 0.7,
+      "max": 0.9,
+      "optimal": 0.8
+    },
+    "use_cases": [
+      "User shares a victory or success",
+      "User expresses agreement on something positive",
+      "User celebrates an achievement with Cherry",
+      "User shares good news that prompts celebration"
+    ],
+    "avoid_when": [
+      "User is expressing deep emotion (use family GIF)",
+      "User is expressing personal contentment (use happy_fun GIF)",
+      "Intensity is below 0.7",
+      "User is being sarcastic",
+      "No victory/success context"
+    ],
+    "negative_constraints": {
+      "requires_victory_context": true,
+      "not_for_deep_emotion": true,
+      "not_for_personal_contentment": true,
+      "requires_medium_high_intensity": true,
+      "not_for_sarcasm": true
+    },
+    "context_keywords": [
+      "victoire", "célébration", "succès", "accord", "réussite",
+      "collective", "partagé", "enthousiaste", "joyeux"
+    ],
+    "ambiguity_resolution": {
+      "vs_high_five_will_smith": "Use this for enthusiastic celebration. Use will_smith_high_five for immediate satisfaction.",
+      "vs_celebration": "Use this for shared victory. Use celebration for pure joy explosion.",
+      "vs_carlton_dance": "Use this for victory celebration. Use carlton for unrestrained joy dance."
+    },
+    "reaction_type": "positive_strong",
+    "character_fit": "Cherry shows enthusiastic, theatrical celebration with diva flair for shared victories"
+  },
+  "High Five Will Smith GIF_whatsapp.mp4": {
+    "description": "Victoire, complicité : geste énergique de high five traduisant un succès partagé et une satisfaction immédiate.",
+    "mood_tags": "happy,content",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["satisfied", "complicit"],
+    "intent": "celebrate_immediate_success",
+    "intensity": 0.75,
+    "intensity_range": {
+      "min": 0.65,
+      "max": 0.85,
+      "optimal": 0.75
+    },
+    "use_cases": [
+      "User shares immediate success or quick win",
+      "User expresses complicity or shared understanding",
+      "User celebrates something with immediate satisfaction",
+      "User shares something that prompts quick positive reaction"
+    ],
+    "avoid_when": [
+      "User is expressing deep emotion (use family GIF)",
+      "User is expressing high-intensity victory (use sacha_baron GIF)",
+      "Intensity is below 0.65",
+      "User is being sarcastic",
+      "No success/complicity context"
+    ],
+    "negative_constraints": {
+      "requires_success_context": true,
+      "not_for_deep_emotion": true,
+      "not_for_high_intensity_victory": true,
+      "requires_medium_intensity": true,
+      "not_for_sarcasm": true
+    },
+    "context_keywords": [
+      "victoire", "complicité", "succès", "satisfaction", "immédiate",
+      "partagé", "énergique", "rapide", "win"
+    ],
+    "ambiguity_resolution": {
+      "vs_sacha_baron": "Use this for immediate satisfaction. Use sacha_baron for enthusiastic celebration.",
+      "vs_celebration": "Use this for quick success. Use celebration for pure joy explosion.",
+      "vs_interview": "Use this for immediate victory. Use interview for total agreement."
+    },
+    "reaction_type": "positive_moderate",
+    "character_fit": "Cherry shows energetic, immediate celebration with diva expressiveness for quick wins"
+  },
+  "jean dujardin Oss GIF by Fandor_whatsapp.mp4": {
+    "description": "L'homme dans la vidéo incarne l'émotion d'un artiste charismatique et passionné. Il est en train de jouer d'un instrument et de chanter, affichant une expression à la fois concentrée et pleine de plaisir. Son regard pétille, et un léger sourire se dessine sur ses lèvres, suggérant qu'il apprécie pleinement sa performance et qu'il est en parfaite connexion avec sa musique et son public. Il dégage une assurance élégante et une joie de jouer palpable.",
+    "mood_tags": "happy,confident",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["passionate", "confident"],
+    "intent": "express_artistic_passion",
+    "intensity": 0.8,
+    "intensity_range": {
+      "min": 0.7,
+      "max": 0.9,
+      "optimal": 0.8
+    },
+    "use_cases": [
+      "User expresses passion or artistic appreciation",
+      "User shares something that Cherry finds beautiful or artistic",
+      "User expresses confidence in their craft or passion",
+      "User shares something that prompts artistic appreciation"
+    ],
+    "avoid_when": [
+      "User is expressing casual happiness (use moderate GIFs)",
+      "User is expressing playful joy (use playful GIFs)",
+      "Intensity is below 0.7",
+      "User is being sarcastic",
+      "No artistic/passion context"
+    ],
+    "negative_constraints": {
+      "requires_artistic_context": true,
+      "not_for_casual_happiness": true,
+      "not_for_playful": true,
+      "requires_medium_high_intensity": true,
+      "not_for_sarcasm": true
+    },
+    "context_keywords": [
+      "artiste", "passion", "charismatique", "performance", "musique",
+      "assurance", "élégant", "joie", "connexion", "pétille"
+    ],
+    "ambiguity_resolution": {
+      "vs_diva_reaction": "Use this for artistic passion. Use diva_reaction for dramatic determination.",
+      "vs_happy_fun": "Use this for passionate confidence. Use happy_fun for peaceful contentment.",
+      "vs_celebration": "Use this for artistic joy. Use celebration for success-based joy."
+    },
+    "reaction_type": "positive_strong",
+    "character_fit": "Cherry shows artistic, passionate confidence with theatrical elegance, perfect for her diva personality"
+  },
+  "johnny depp run GIF_whatsapp.mp4": {
+    "description": "Confusion, panique contrôlée : regard levé et expression tendue traduisant une incompréhension mêlée à un sentiment d'urgence.",
+    "mood_tags": "confused,panicked",
+    "primary_emotion": "confused",
+    "secondary_emotions": ["panicked", "urgent"],
+    "intent": "express_controlled_panic",
+    "intensity": 0.75,
+    "intensity_range": {
+      "min": 0.65,
+      "max": 0.85,
+      "optimal": 0.75
+    },
+    "use_cases": [
+      "User presents something that causes controlled panic",
+      "User expresses urgency that confuses Cherry",
+      "User creates a situation requiring urgent but confused reaction",
+      "User presents something that prompts panicked confusion"
+    ],
+    "avoid_when": [
+      "User is expressing playful confusion (use gad_elmaleh GIF)",
+      "User is expressing real panic (too intense)",
+      "Intensity is below 0.65",
+      "User is sad or disappointed",
+      "No urgency/panic element"
+    ],
+    "negative_constraints": {
+      "requires_urgency_element": true,
+      "not_for_playful_confusion": true,
+      "not_for_real_panic": true,
+      "requires_medium_high_intensity": true,
+      "not_for_negative_emotions": true
+    },
+    "context_keywords": [
+      "confusion", "panique", "urgence", "incompréhension", "tendu",
+      "contrôlée", "levé", "sentiment", "rapide"
+    ],
+    "ambiguity_resolution": {
+      "vs_gad_elmaleh": "Use this for panicked confusion. Use gad_elmaleh for playful hesitation.",
+      "vs_mr_bean": "Use this for urgent confusion. Use mr_bean for anxious overreaction.",
+      "vs_the_mask": "Use this for controlled panic. Use the_mask for chaotic overreaction."
+    },
+    "reaction_type": "neutral_intense",
+    "character_fit": "Cherry shows theatrical, controlled panic with diva expressiveness when urgency meets confusion"
+  },
+  "Kevin Hart Hot Ones GIF by First We Feast_whatsapp.mp4": {
+    "description": "Lassitude, résignation amusée : la personne boit calmement, l'air fatigué ou blasé, acceptant une situation absurde sans lutter.",
+    "mood_tags": "resigned,playful",
+    "primary_emotion": "resigned",
+    "secondary_emotions": ["amused", "tired"],
+    "intent": "express_resigned_acceptance",
+    "intensity": 0.5,
+    "intensity_range": {
+      "min": 0.4,
+      "max": 0.65,
+      "optimal": 0.5
+    },
+    "use_cases": [
+      "User presents something absurd that Cherry accepts with resignation",
+      "User creates a situation that prompts amused resignation",
+      "User expresses something that makes Cherry give up playfully",
+      "User presents something that requires accepting the absurd"
+    ],
+    "avoid_when": [
+      "User is expressing anger (use angry GIFs)",
+      "User is expressing sadness (use sad GIFs)",
+      "Intensity is above 0.65",
+      "User is being serious",
+      "No absurd/resignation context"
+    ],
+    "negative_constraints": {
+      "requires_absurd_element": true,
+      "not_for_anger": true,
+      "not_for_sadness": true,
+      "requires_low_to_moderate_intensity": true,
+      "not_for_serious": true
+    },
+    "context_keywords": [
+      "lassitude", "résignation", "amusée", "absurde", "blasé",
+      "fatigué", "accepte", "sans lutter", "calmement"
+    ],
+    "ambiguity_resolution": {
+      "vs_animated_gif": "Use this for resigned acceptance. Use animated_gif for active rejection.",
+      "vs_will_smith_reaction": "Use this for amused resignation. Use will_smith for calm ironic confidence.",
+      "vs_deadpool": "Use this for tired acceptance. Use deadpool for sarcastic disbelief."
+    },
+    "reaction_type": "neutral_playful",
+    "character_fit": "Cherry shows theatrical, amused resignation with diva flair when accepting the absurd"
+  },
+  "Miss You GIF_whatsapp.mp4": {
+    "description": "Nostalgie, tristesse contenue : regard doux et mélancolique, la personne semble penser à quelqu'un ou quelque chose qui lui manque.",
+    "mood_tags": "sad,nostalgic",
+    "primary_emotion": "sad",
+    "secondary_emotions": ["nostalgic", "melancholic"],
+    "intent": "express_nostalgic_longing",
+    "intensity": 0.6,
+    "intensity_range": {
+      "min": 0.5,
+      "max": 0.75,
+      "optimal": 0.6
+    },
+    "use_cases": [
+      "User expresses missing someone or something",
+      "User shares nostalgic feelings",
+      "User expresses longing or melancholy",
+      "User shares something that prompts nostalgic sadness"
+    ],
+    "avoid_when": [
+      "User is expressing anger (use angry GIFs)",
+      "User is expressing high-intensity sadness (too intense)",
+      "Intensity is below 0.5",
+      "User is being playful",
+      "No nostalgia/longing context"
+    ],
+    "negative_constraints": {
+      "requires_nostalgia_context": true,
+      "not_for_anger": true,
+      "not_for_high_intensity_sadness": true,
+      "requires_medium_intensity": true,
+      "not_for_playful": true
+    },
+    "context_keywords": [
+      "nostalgie", "tristesse", "manque", "mélancolique", "pense",
+      "regard doux", "contenue", "quelqu'un", "quelque chose"
+    ],
+    "ambiguity_resolution": {
+      "vs_celebration": "Use this for nostalgic sadness. Use celebration for joy (opposite emotion).",
+      "vs_happy_fun": "Use this for longing. Use happy_fun for contentment (opposite emotion)."
+    },
+    "reaction_type": "negative_moderate",
+    "character_fit": "Cherry shows gentle, theatrical nostalgia with diva expressiveness when feeling longing"
+  },
+  "Mr Bean Competition GIF by Working Title_whatsapp.mp4": {
+    "description": "Il exprime une tension mêlée d'excitation, avec une concentration excessive typique de son personnage.Son visage trahit une anxiété maladroite, oscillant entre espoir, fierté anticipée et peur de l'échec.La réaction est exagérée et comique : gestes raides, regards furtifs, micro-réactions faciales qui amplifient une situation pourtant banale, provoquant un décalage humoristique immédiat.",
+    "mood_tags": "anxious,excited",
+    "primary_emotion": "anxious",
+    "secondary_emotions": ["excited", "awkward"],
+    "intent": "express_anxious_overreaction",
+    "intensity": 0.7,
+    "intensity_range": {
+      "min": 0.6,
+      "max": 0.8,
+      "optimal": 0.7
+    },
+    "use_cases": [
+      "User creates a situation that prompts anxious overreaction",
+      "User expresses something that makes Cherry anxiously excited",
+      "User presents a challenge that causes awkward tension",
+      "User creates something that prompts comedic anxiety"
+    ],
+    "avoid_when": [
+      "User is expressing real panic (too intense)",
+      "User is expressing sadness (use sad GIFs)",
+      "Intensity is below 0.6",
+      "User is being serious",
+      "No anxiety/excitement mix"
+    ],
+    "negative_constraints": {
+      "requires_anxiety_excitement_mix": true,
+      "not_for_real_panic": true,
+      "not_for_sadness": true,
+      "requires_medium_intensity": true,
+      "not_for_serious": true
+    },
+    "context_keywords": [
+      "tension", "excitation", "anxiété", "maladroite", "espoir",
+      "fierté", "peur", "échec", "exagérée", "comique"
+    ],
+    "ambiguity_resolution": {
+      "vs_johnny_depp": "Use this for anxious overreaction. Use johnny_depp for panicked confusion.",
+      "vs_the_mask": "Use this for awkward anxiety. Use the_mask for chaotic overreaction.",
+      "vs_gad_elmaleh": "Use this for comedic anxiety. Use gad_elmaleh for playful hesitation."
+    },
+    "reaction_type": "neutral_playful",
+    "character_fit": "Cherry shows theatrical, comedic anxiety with diva expressiveness when overreacting to situations"
+  },
+  "No Way Do Not Want GIF_whatsapp.mp4": {
+    "description": "Gêne, surprise silencieuse : regard figé et bouche légèrement entrouverte, la personne semble prise au dépourvu et incapable de répondre. Soudain, un cri étranglé lui échappe : <Non! Dieu Non!>",
+    "mood_tags": "shocked,rejecting",
+    "primary_emotion": "shocked",
+    "secondary_emotions": ["rejecting", "embarrassed"],
+    "intent": "express_frozen_shock_rejection",
+    "intensity": 0.8,
+    "intensity_range": {
+      "min": 0.7,
+      "max": 0.9,
+      "optimal": 0.8
+    },
+    "use_cases": [
+      "User says or does something that causes frozen shock",
+      "User presents something that prompts silent then vocal rejection",
+      "User expresses something that makes Cherry speechless then reactive",
+      "User creates a situation requiring frozen then explosive reaction"
+    ],
+    "avoid_when": [
+      "User is expressing positive surprise (use positive GIFs)",
+      "User is expressing anger (use chris_tucker GIF)",
+      "Intensity is below 0.7",
+      "User is being playful",
+      "No shock/rejection element"
+    ],
+    "negative_constraints": {
+      "requires_shock_element": true,
+      "not_for_positive_surprise": true,
+      "not_for_anger": true,
+      "requires_medium_high_intensity": true,
+      "not_for_playful": true
+    },
+    "context_keywords": [
+      "gêne", "surprise", "silencieuse", "figé", "dépourvu",
+      "incapable", "cri", "étranglé", "non", "dieu non"
+    ],
+    "ambiguity_resolution": {
+      "vs_ajff": "Use this for frozen shock then rejection. Use ajff for open dramatic surprise.",
+      "vs_animated_gif": "Use this for silent then vocal rejection. Use animated_gif for active physical rejection.",
+      "vs_chris_tucker": "Use this for frozen shock. Use chris_tucker for verbal anger."
+    },
+    "reaction_type": "negative_strong",
+    "character_fit": "Cherry shows dramatic, theatrical shock with diva expressiveness when frozen then reactive"
+  },
+  "The Fresh Prince Of Bel Air Carlton Dance GIF by HBO Max_whatsapp.mp4": {
+    "description": "Joie assumée, enthousiasme décomplexé : danse exagérée et rythmée exprimant un plaisir pur, sans aucune gêne ni retenue.",
+    "mood_tags": "happy,playful",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["enthusiastic", "uninhibited"],
+    "intent": "express_unrestrained_joy",
+    "intensity": 0.9,
+    "intensity_range": {
+      "min": 0.8,
+      "max": 1.0,
+      "optimal": 0.9
+    },
+    "use_cases": [
+      "User expresses unrestrained joy or happiness",
+      "User shares something that makes Cherry dance with pure pleasure",
+      "User creates a situation that prompts uninhibited celebration",
+      "User expresses something that requires unashamed joy"
+    ],
+    "avoid_when": [
+      "User is expressing moderate happiness (use moderate GIFs)",
+      "User is expressing sadness (use sad GIFs)",
+      "Intensity is below 0.8",
+      "User is being sarcastic",
+      "No unrestrained joy context"
+    ],
+    "negative_constraints": {
+      "requires_unrestrained_element": true,
+      "not_for_moderate_happiness": true,
+      "not_for_sadness": true,
+      "requires_very_high_intensity": true,
+      "not_for_sarcasm": true
+    },
+    "context_keywords": [
+      "joie", "assumée", "enthousiasme", "décomplexé", "danse",
+      "exagérée", "plaisir", "pur", "sans gêne", "retenue"
+    ],
+    "ambiguity_resolution": {
+      "vs_celebration": "Use this for unrestrained dance joy. Use celebration for pure joy explosion.",
+      "vs_high_five": "Use this for uninhibited celebration. Use high_five for victory celebration.",
+      "vs_breathe_jamel": "Use this for dance joy. Use breathe_jamel for uncontrollable laughter."
+    },
+    "reaction_type": "positive_strong",
+    "character_fit": "PERFECT MATCH - Cherry shows unrestrained, theatrical joy with diva flair, perfectly matching her personality"
+  },
+  "the interview GIF by hero0fwar_whatsapp.mp4": {
+    "description": "Accord total, validation : un sourire confiant et une posture assurée traduisent un « pareil » ou « exactement » silencieux, jusqu'à ce que la personne verbalise, avec une pointe d'humour ou de sagesse : « Pareil mais différent mais encore pareil ».",
+    "mood_tags": "happy,content",
+    "primary_emotion": "happy",
+    "secondary_emotions": ["agreeing", "confident"],
+    "intent": "express_total_agreement",
+    "intensity": 0.7,
+    "intensity_range": {
+      "min": 0.6,
+      "max": 0.8,
+      "optimal": 0.7
+    },
+    "use_cases": [
+      "User expresses something that Cherry totally agrees with",
+      "User shares an opinion that Cherry validates completely",
+      "User expresses something that prompts total agreement",
+      "User creates a situation requiring full validation"
+    ],
+    "avoid_when": [
+      "User is expressing disagreement (use disagreement GIFs)",
+      "User is expressing anger (use angry GIFs)",
+      "Intensity is below 0.6",
+      "User is being sarcastic",
+      "No agreement/validation context"
+    ],
+    "negative_constraints": {
+      "requires_agreement_context": true,
+      "not_for_disagreement": true,
+      "not_for_anger": true,
+      "requires_medium_intensity": true,
+      "not_for_sarcasm": true
+    },
+    "context_keywords": [
+      "accord", "total", "validation", "pareil", "exactement",
+      "confiant", "assurée", "sagesse", "pareil mais différent"
+    ],
+    "ambiguity_resolution": {
+      "vs_will_smith_reaction": "Use this for total agreement. Use will_smith for calm ironic confidence.",
+      "vs_high_five": "Use this for validation. Use high_five for victory celebration.",
+      "vs_deadpool": "Use this for total agreement. Use deadpool for sarcastic disbelief."
+    },
+    "reaction_type": "positive_moderate",
+    "character_fit": "Cherry shows confident, theatrical agreement with diva expressiveness when fully validating"
+  },
+  "the mask GIF_whatsapp.mp4": {
+    "description": "Folie comique, chaos burlesque : posture tordue et expression extrême exprimant une situation totalement incontrôlable et absurde.",
+    "mood_tags": "playful,chaotic",
+    "primary_emotion": "playful",
+    "secondary_emotions": ["chaotic", "uncontrolled"],
+    "intent": "express_chaotic_overreaction",
+    "intensity": 0.9,
+    "intensity_range": {
+      "min": 0.8,
+      "max": 1.0,
+      "optimal": 0.9
+    },
+    "use_cases": [
+      "User creates a situation that prompts chaotic overreaction",
+      "User expresses something that makes Cherry react with comedic chaos",
+      "User presents something totally absurd that requires extreme reaction",
+      "User creates a situation that's completely out of control"
+    ],
+    "avoid_when": [
+      "User is expressing sadness (use sad GIFs)",
+      "User is expressing anger (use angry GIFs)",
+      "Intensity is below 0.8",
+      "User is being serious",
+      "No chaos/absurdity element"
+    ],
+    "negative_constraints": {
+      "requires_chaos_element": true,
+      "not_for_sadness": true,
+      "not_for_anger": true,
+      "requires_very_high_intensity": true,
+      "not_for_serious": true
+    },
+    "context_keywords": [
+      "folie", "comique", "chaos", "burlesque", "tordue",
+      "extrême", "incontrôlable", "absurde", "totalement"
+    ],
+    "ambiguity_resolution": {
+      "vs_mr_bean": "Use this for chaotic overreaction. Use mr_bean for anxious overreaction.",
+      "vs_breathe_jamel": "Use this for chaotic reaction. Use breathe_jamel for uncontrollable laughter.",
+      "vs_carlton_dance": "Use this for chaotic joy. Use carlton for unrestrained dance joy."
+    },
+    "reaction_type": "positive_playful",
+    "character_fit": "Cherry shows her most extreme, theatrical, chaotic side with diva expressiveness, perfect for absurd situations"
+  },
+  "Wake Up Friends GIF_whatsapp.mp4": {
+    "description": "Autorité moqueuse, réveil brutal : geste appuyé et attitude dominante suggérant un appel à l'ordre énergique, presque théâtral.",
+    "mood_tags": "authoritative,playful",
+    "primary_emotion": "authoritative",
+    "secondary_emotions": ["mocking", "energetic"],
+    "intent": "express_mocking_authority",
+    "intensity": 0.75,
+    "intensity_range": {
+      "min": 0.65,
+      "max": 0.85,
+      "optimal": 0.75
+    },
+    "use_cases": [
+      "User needs to be woken up or called to order",
+      "User is being lazy or needs motivation",
+      "User creates a situation requiring authoritative mockery",
+      "User expresses something that prompts energetic wake-up call"
+    ],
+    "avoid_when": [
+      "User is expressing sadness (use sad GIFs)",
+      "User is expressing anger (use angry GIFs)",
+      "Intensity is below 0.65",
+      "User is being serious",
+      "No authority/wake-up context"
+    ],
+    "negative_constraints": {
+      "requires_authority_context": true,
+      "not_for_sadness": true,
+      "not_for_anger": true,
+      "requires_medium_high_intensity": true,
+      "not_for_serious": true
+    },
+    "context_keywords": [
+      "autorité", "moqueuse", "réveil", "brutal", "appel",
+      "ordre", "énergique", "théâtral", "dominante"
+    ],
+    "ambiguity_resolution": {
+      "vs_chris_tucker": "Use this for mocking authority. Use chris_tucker for verbal anger.",
+      "vs_joey": "Use this for wake-up call. Use joey for energetic defense.",
+      "vs_diva_reaction": "Use this for authoritative mockery. Use diva_reaction for dramatic determination."
+    },
+    "reaction_type": "neutral_playful",
+    "character_fit": "Cherry shows theatrical, authoritative mockery with diva flair when calling someone to order"
+  },
+  "Will Smith Reaction GIF by diewebag gmbh_whatsapp.mp4": {
+    "description": "Calme ironique, assurance : attitude posée et confiante, presque solennelle, comme quelqu'un qui assume pleinement ce qu'il dit ou fait.",
+    "mood_tags": "confident,calm",
+    "primary_emotion": "confident",
+    "secondary_emotions": ["calm", "ironic"],
+    "intent": "express_calm_ironic_confidence",
+    "intensity": 0.65,
+    "intensity_range": {
+      "min": 0.55,
+      "max": 0.75,
+      "optimal": 0.65
+    },
+    "use_cases": [
+      "User expresses something that prompts calm, confident response",
+      "User shares something that Cherry acknowledges with ironic assurance",
+      "User creates a situation requiring calm, confident acknowledgment",
+      "User expresses something that requires solemn confidence"
+    ],
+    "avoid_when": [
+      "User is expressing high-intensity emotions (too intense)",
+      "User is expressing sadness (use sad GIFs)",
+      "Intensity is above 0.75",
+      "User is being playful",
+      "No calm/confidence context"
+    ],
+    "negative_constraints": {
+      "requires_calm_element": true,
+      "not_for_high_intensity": true,
+      "not_for_sadness": true,
+      "requires_low_to_moderate_intensity": true,
+      "not_for_playful": true
+    },
+    "context_keywords": [
+      "calme", "ironique", "assurance", "posée", "confiante",
+      "solennelle", "assume", "pleinement"
+    ],
+    "ambiguity_resolution": {
+      "vs_diva_reaction": "Use this for calm confidence. Use diva_reaction for dramatic determination.",
+      "vs_interview": "Use this for ironic confidence. Use interview for total agreement.",
+      "vs_deadpool": "Use this for calm assurance. Use deadpool for sarcastic disbelief."
+    },
+    "reaction_type": "positive_moderate",
+    "character_fit": "Cherry shows calm, theatrical confidence with diva elegance when assuming full responsibility"
+  }
+}

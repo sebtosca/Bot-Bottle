@@ -1,0 +1,77 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-8.3.4, pluggy-1.5.0
+rootdir: /mnt/c/Users/SebastienToscano/BotBottle
+configfile: pytest.ini
+plugins: jaxtyping-0.3.2, json-report-1.5.0, mock-3.15.1, html-4.1.1, xdist-3.8.0, cov-7.0.0, typeguard-4.4.4, anyio-4.7.0, metadata-3.1.1
+collected 62 items
+
+endpoint/tests/unit/webhook/test_idempotency.py::TestInMemoryIdempotencyStore::test_is_duplicate_new_message PASSED [  1%]
+endpoint/tests/unit/webhook/test_idempotency.py::TestInMemoryIdempotencyStore::test_is_duplicate_after_marking PASSED [  3%]
+endpoint/tests/unit/webhook/test_idempotency.py::TestInMemoryIdempotencyStore::test_is_duplicate_expired PASSED [  4%]
+endpoint/tests/unit/webhook/test_idempotency.py::TestInMemoryIdempotencyStore::test_mark_processed_with_ttl PASSED [  6%]
+endpoint/tests/unit/webhook/test_idempotency.py::TestInMemoryIdempotencyStore::test_clear_store PASSED [  8%]
+endpoint/tests/unit/webhook/test_idempotency.py::TestInMemoryIdempotencyStore::test_multiple_messages PASSED [  9%]
+endpoint/tests/unit/webhook/test_idempotency.py::TestInMemoryIdempotencyStore::test_thread_safety PASSED [ 11%]
+endpoint/tests/unit/webhook/test_models.py::TestWebhookEvent::test_message_event_properties PASSED [ 12%]
+endpoint/tests/unit/webhook/test_models.py::TestWebhookEvent::test_status_event_properties PASSED [ 14%]
+endpoint/tests/unit/webhook/test_models.py::TestWebhookEvent::test_duplicate_event_properties PASSED [ 16%]
+endpoint/tests/unit/webhook/test_models.py::TestWebhookEvent::test_message_event_without_message PASSED [ 17%]
+endpoint/tests/unit/webhook/test_models.py::TestParsedMessage::test_from_webhook_message_text PASSED [ 19%]
+endpoint/tests/unit/webhook/test_models.py::TestParsedMessage::test_from_webhook_message_image PASSED [ 20%]
+endpoint/tests/unit/webhook/test_models.py::TestParsedMessage::test_from_webhook_message_default_product_id PASSED [ 22%]
+endpoint/tests/unit/webhook/test_models.py::TestParsedMessage::test_from_webhook_message_product_id_from_context PASSED [ 24%]
+endpoint/tests/unit/webhook/test_models.py::TestParsedMessage::test_from_webhook_message_interactive_list PASSED [ 25%]
+endpoint/tests/unit/webhook/test_models.py::TestParsedMessage::test_from_webhook_message_interactive_button PASSED [ 27%]
+endpoint/tests/unit/webhook/test_models.py::TestParsedMessage::test_from_webhook_message_sticker PASSED [ 29%]
+endpoint/tests/unit/webhook/test_models.py::TestJobPayload::test_job_payload_creation PASSED [ 30%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseWebhookPayload::test_parse_production_webhook_format PASSED [ 32%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseWebhookPayload::test_parse_test_webhook_format PASSED [ 33%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseWebhookPayload::test_parse_status_update PASSED [ 35%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseWebhookPayload::test_parse_empty_payload PASSED [ 37%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseWebhookPayload::test_parse_invalid_payload_type PASSED [ 38%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseWebhookPayload::test_parse_webhook_with_no_messages PASSED [ 40%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseWebhookPayload::test_parse_webhook_with_invalid_message_format PASSED [ 41%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseMessage::test_parse_text_message PASSED [ 43%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseMessage::test_parse_image_message PASSED [ 45%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseMessage::test_parse_sticker_message PASSED [ 46%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseMessage::test_parse_interactive_list_message PASSED [ 48%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseMessage::test_parse_interactive_button_message PASSED [ 50%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseMessage::test_parse_interactive_stats_button PASSED [ 51%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseMessage::test_parse_interactive_feed_button PASSED [ 53%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseMessage::test_parse_message_missing_id PASSED [ 54%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseMessage::test_parse_message_missing_from PASSED [ 56%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseMessage::test_parse_message_invalid_type PASSED [ 58%]
+endpoint/tests/unit/webhook/test_parser.py::TestParseMessage::test_parse_message_default_product_id PASSED [ 59%]
+endpoint/tests/unit/webhook/test_parser.py::TestExtractStableId::test_extract_stable_id_from_message_event PASSED [ 61%]
+endpoint/tests/unit/webhook/test_parser.py::TestExtractStableId::test_extract_stable_id_from_status_event PASSED [ 62%]
+endpoint/tests/unit/webhook/test_parser.py::TestExtractStableId::test_extract_stable_id_no_message_id PASSED [ 64%]
+endpoint/tests/unit/webhook/test_parser.py::TestExtractStableId::test_extract_stable_id_unknown_event PASSED [ 66%]
+endpoint/tests/unit/webhook/test_queue.py::TestInMemoryQueue::test_enqueue_success 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:45:05 [    INFO] endpoint.webhook.queue: Job enqueued to in-memory queue
+PASSED                                                                   [ 67%]
+endpoint/tests/unit/webhook/test_queue.py::TestInMemoryQueue::test_enqueue_multiple 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:45:05 [    INFO] endpoint.webhook.queue: Job enqueued to in-memory queue
+2026-01-08 15:45:05 [    INFO] endpoint.webhook.queue: Job enqueued to in-memory queue
+PASSED                                                                   [ 69%]
+endpoint/tests/unit/webhook/test_queue.py::TestInMemoryQueue::test_enqueue_queue_full 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:45:05 [    INFO] endpoint.webhook.queue: Job enqueued to in-memory queue
+PASSED                                                                   [ 70%]
+endpoint/tests/unit/webhook/test_queue.py::TestInMemoryQueue::test_set_worker PASSED [ 72%]
+endpoint/tests/unit/webhook/test_queue.py::TestInMemoryQueue::test_start_worker_without_callback 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:45:05 [   ERROR] endpoint.webhook.queue: Cannot start worker: no callback set
+PASSED                                                                   [ 74%]
+endpoint/tests/unit/webhook/test_queue.py::TestInMemoryQueue::test_start_worker_with_callback 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:45:05 [    INFO] endpoint.webhook.queue: Starting worker thread
+2026-01-08 15:45:05 [    INFO] endpoint.webhook.queue: Worker thread started and running
+2026-01-08 15:45:05 [    INFO] endpoint.webhook.queue: Worker attempting to get from queue
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! KeyboardInterrupt !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/queue.py:188: KeyboardInterrupt
+(to show a full traceback on KeyboardInterrupt use --full-trace)
+============================== 46 passed in 2.12s ==============================

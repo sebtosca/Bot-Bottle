@@ -1,0 +1,158 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-8.3.4, pluggy-1.5.0 -- /home/lobo/anaconda3/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.13.5', 'Platform': 'Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.4', 'pluggy': '1.5.0'}, 'Plugins': {'jaxtyping': '0.3.2', 'json-report': '1.5.0', 'mock': '3.15.1', 'html': '4.1.1', 'xdist': '3.8.0', 'cov': '7.0.0', 'typeguard': '4.4.4', 'anyio': '4.7.0', 'metadata': '3.1.1'}}
+rootdir: /mnt/c/Users/SebastienToscano/BotBottle
+configfile: pytest.ini
+plugins: jaxtyping-0.3.2, json-report-1.5.0, mock-3.15.1, html-4.1.1, xdist-3.8.0, cov-7.0.0, typeguard-4.4.4, anyio-4.7.0, metadata-3.1.1
+collecting ... 
+----------------------------- live log collection ------------------------------
+2026-01-08 15:58:34,695 - endpoint.endpoint - INFO - [None] - Database initialized successfully
+2026-01-08 15:58:34,699 - endpoint.endpoint - INFO - [None] - Webhook handler initialized
+2026-01-08 15:58:34,699 - webhook.queue - INFO - [None] - Starting worker thread
+2026-01-08 15:58:34,699 - webhook.queue - INFO - [None] - Worker thread started and running
+2026-01-08 15:58:34,699 - webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 15:58:34,800 - webhook.queue - INFO - [None] - Worker thread created and started
+2026-01-08 15:58:34,801 - webhook.worker - INFO - [None] - In-memory queue worker started
+2026-01-08 15:58:34,801 - endpoint.endpoint - INFO - [None] - In-memory queue worker started for local development
+2026-01-08 15:58:35,700 - webhook.queue - INFO - [None] - Worker attempting to get from queue
+collected 166 items
+
+endpoint/tests/e2e/test_static_serving.py::TestStaticServing::test_health_check_e2e 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:36,418 - middleware.request_correlation - INFO - [d890637a-0c05-4122-9111-0841b7821cb7] - Request started
+2026-01-08 15:58:36,418 - middleware.request_correlation - INFO - [d890637a-0c05-4122-9111-0841b7821cb7] - Request completed
+PASSED                                                                   [  0%]
+endpoint/tests/e2e/test_static_serving.py::TestStaticServing::test_sticker_serving_e2e 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:36,427 - middleware.request_correlation - INFO - [76335c9b-32e8-45ad-9185-a75dfa975953] - Request started
+2026-01-08 15:58:36,430 - routes.static_files - INFO - [76335c9b-32e8-45ad-9185-a75dfa975953] - Serving sticker
+2026-01-08 15:58:36,434 - middleware.request_correlation - INFO - [76335c9b-32e8-45ad-9185-a75dfa975953] - Request completed
+PASSED                                                                   [  1%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_complete_webhook_flow 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:36,442 - middleware.request_correlation - INFO - [e2e-test-123] - Request started
+2026-01-08 15:58:36,442 - webhook.handler - INFO - [e2e-test-123] - Webhook request received
+2026-01-08 15:58:36,442 - webhook.handler - INFO - [e2e-test-123] - Webhook payload parsed
+2026-01-08 15:58:36,442 - webhook.handler - INFO - [e2e-test-123] - Attempting to enqueue message
+2026-01-08 15:58:36,443 - webhook.queue - INFO - [e2e-test-123] - Job enqueued to in-memory queue
+2026-01-08 15:58:36,443 - webhook.handler - INFO - [e2e-test-123] - Message enqueued successfully
+2026-01-08 15:58:36,443 - middleware.request_correlation - INFO - [e2e-test-123] - Request completed
+2026-01-08 15:58:36,443 - webhook.queue - INFO - [None] - Worker picked up job from queue
+2026-01-08 15:58:36,443 - webhook.worker - INFO - [None] - Processing message job
+2026-01-08 15:58:36,443 - webhook.processor - INFO - [None] - Starting message processing
+2026-01-08 15:58:36,443 - webhook.message_processor - INFO - [None] - Processing WhatsApp message
+PASSED                                                                   [  1%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_webhook_verification_flow 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:36,467 - middleware.request_correlation - INFO - [acee7858-3800-4ba2-a5ae-fdc5f4dc9fc1] - Request started
+2026-01-08 15:58:36,467 - webhook.handler - INFO - [acee7858-3800-4ba2-a5ae-fdc5f4dc9fc1] - Webhook verification successful
+2026-01-08 15:58:36,467 - middleware.request_correlation - INFO - [acee7858-3800-4ba2-a5ae-fdc5f4dc9fc1] - Request completed
+PASSED                                                                   [  2%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_webhook_verification_failure 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:36,473 - middleware.request_correlation - INFO - [dd4c32ab-b806-44a7-9875-819001faa6ad] - Request started
+2026-01-08 15:58:36,473 - webhook.handler - WARNING - [dd4c32ab-b806-44a7-9875-819001faa6ad] - Webhook verification failed
+2026-01-08 15:58:36,473 - middleware.request_correlation - INFO - [dd4c32ab-b806-44a7-9875-819001faa6ad] - Request completed
+PASSED                                                                   [  3%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_webhook_duplicate_detection 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:36,484 - middleware.request_correlation - INFO - [a2d2f750-d372-4acc-a9fa-ee2302e1d535] - Request started
+2026-01-08 15:58:36,484 - webhook.handler - INFO - [a2d2f750-d372-4acc-a9fa-ee2302e1d535] - Webhook request received
+2026-01-08 15:58:36,485 - webhook.handler - INFO - [a2d2f750-d372-4acc-a9fa-ee2302e1d535] - Webhook payload parsed
+2026-01-08 15:58:36,485 - webhook.handler - INFO - [a2d2f750-d372-4acc-a9fa-ee2302e1d535] - Duplicate message detected, skipping
+2026-01-08 15:58:36,485 - middleware.request_correlation - INFO - [a2d2f750-d372-4acc-a9fa-ee2302e1d535] - Request completed
+2026-01-08 15:58:36,791 - middleware.request_correlation - INFO - [d892b37b-4693-4fde-87d6-0e0d7558d3c8] - Request started
+2026-01-08 15:58:36,792 - webhook.handler - INFO - [d892b37b-4693-4fde-87d6-0e0d7558d3c8] - Webhook request received
+2026-01-08 15:58:36,792 - webhook.handler - INFO - [d892b37b-4693-4fde-87d6-0e0d7558d3c8] - Webhook payload parsed
+2026-01-08 15:58:36,793 - webhook.handler - INFO - [d892b37b-4693-4fde-87d6-0e0d7558d3c8] - Duplicate message detected, skipping
+2026-01-08 15:58:36,798 - middleware.request_correlation - INFO - [d892b37b-4693-4fde-87d6-0e0d7558d3c8] - Request completed
+PASSED                                                                   [  3%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_health_check_endpoint 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:36,820 - middleware.request_correlation - INFO - [22c3c305-150b-4ce8-a8b1-7d429f7d6d80] - Request started
+2026-01-08 15:58:36,829 - middleware.request_correlation - INFO - [22c3c305-150b-4ce8-a8b1-7d429f7d6d80] - Request completed
+PASSED                                                                   [  4%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_health_endpoint PASSED [  4%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_success 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:37,120 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+PASSED                                                                   [  5%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_not_found 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:37,194 - endpoint.routes.static_files - WARNING - [None] - Sticker not found
+PASSED                                                                   [  6%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_invalid_filename 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:37,657 - httpx - INFO - [None] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-01-08 15:58:38,065 - httpx - INFO - [None] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-01-08 15:58:38,079 - webhook.message_processor - INFO - [None] - Sending response to user
+2026-01-08 15:58:38,083 - webhook.message_processor - INFO - [None] - Sending sticker
+FAILED                                                                   [  6%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_invalid_extension 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:38,244 - endpoint.routes.static_files - WARNING - [None] - Invalid sticker file extension
+PASSED                                                                   [  7%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_rate_limited 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:38,262 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:58:38,269 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:58:38,273 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:58:38,277 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:58:38,281 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:58:38,285 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:58:38,290 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:58:38,294 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:58:38,297 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:58:38,301 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+PASSED                                                                   [  7%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestSecurityHeaders::test_security_headers_added PASSED [  8%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestSecurityHeaders::test_hsts_header_on_https PASSED [  9%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestRateLimitIntegration::test_rate_limit_allows_within_limit PASSED [  9%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestRateLimitIntegration::test_rate_limit_blocks_over_limit 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:38,354 - endpoint.security.middleware - WARNING - [None] - Rate limit exceeded
+PASSED                                                                   [ 10%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestRateLimitIntegration::test_rate_limit_per_ip 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:58:38,360 - endpoint.security.middleware - WARNING - [None] - Rate limit exceeded
+FAILED                                                                   [ 10%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_from_remote_addr FAILED [ 11%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_from_x_forwarded_for FAILED [ 12%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_from_x_real_ip FAILED [ 12%]
+
+=================================== FAILURES ===================================
+___________ TestStaticFileRoutes.test_serve_sticker_invalid_filename ___________
+endpoint/tests/integration/routes/test_static_files.py:80: in test_serve_sticker_invalid_filename
+    assert response.status_code == 400
+E   assert 404 == 400
+E    +  where 404 = <WrapperTestResponse streamed [404 NOT FOUND]>.status_code
+_______________ TestRateLimitIntegration.test_rate_limit_per_ip ________________
+endpoint/tests/integration/security/test_middleware_integration.py:101: in test_rate_limit_per_ip
+    assert response.status_code == 200
+E   assert 429 == 200
+E    +  where 429 = <WrapperTestResponse streamed [429 TOO MANY REQUESTS]>.status_code
+------------------------------ Captured log call -------------------------------
+WARNING  endpoint.security.middleware:middleware.py:117 Rate limit exceeded
+_____________ TestGetClientIP.test_get_client_ip_from_remote_addr ______________
+endpoint/tests/integration/security/test_middleware_integration.py:110: in test_get_client_ip_from_remote_addr
+    ip = get_client_ip(app.request)
+E   AttributeError: 'Flask' object has no attribute 'request'
+___________ TestGetClientIP.test_get_client_ip_from_x_forwarded_for ____________
+endpoint/tests/integration/security/test_middleware_integration.py:120: in test_get_client_ip_from_x_forwarded_for
+    ip = get_client_ip(app.request)
+E   AttributeError: 'Flask' object has no attribute 'request'
+______________ TestGetClientIP.test_get_client_ip_from_x_real_ip _______________
+endpoint/tests/integration/security/test_middleware_integration.py:130: in test_get_client_ip_from_x_real_ip
+    ip = get_client_ip(app.request)
+E   AttributeError: 'Flask' object has no attribute 'request'
+=========================== short test summary info ============================
+FAILED endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_invalid_filename - assert 404 == 400
+ +  where 404 = <WrapperTestResponse streamed [404 NOT FOUND]>.status_code
+FAILED endpoint/tests/integration/security/test_middleware_integration.py::TestRateLimitIntegration::test_rate_limit_per_ip - assert 429 == 200
+ +  where 429 = <WrapperTestResponse streamed [429 TOO MANY REQUESTS]>.status_code
+FAILED endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_from_remote_addr - AttributeError: 'Flask' object has no attribute 'request'
+FAILED endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_from_x_forwarded_for - AttributeError: 'Flask' object has no attribute 'request'
+FAILED endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_from_x_real_ip - AttributeError: 'Flask' object has no attribute 'request'
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 5 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+========================= 5 failed, 16 passed in 5.37s =========================

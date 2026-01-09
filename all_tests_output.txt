@@ -1,0 +1,239 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-8.3.4, pluggy-1.5.0 -- /home/lobo/anaconda3/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.13.5', 'Platform': 'Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.4', 'pluggy': '1.5.0'}, 'Plugins': {'jaxtyping': '0.3.2', 'json-report': '1.5.0', 'mock': '3.15.1', 'html': '4.1.1', 'xdist': '3.8.0', 'cov': '7.0.0', 'typeguard': '4.4.4', 'anyio': '4.7.0', 'metadata': '3.1.1'}}
+rootdir: /mnt/c/Users/SebastienToscano/BotBottle
+configfile: pytest.ini
+plugins: jaxtyping-0.3.2, json-report-1.5.0, mock-3.15.1, html-4.1.1, xdist-3.8.0, cov-7.0.0, typeguard-4.4.4, anyio-4.7.0, metadata-3.1.1
+collecting ... 
+----------------------------- live log collection ------------------------------
+2026-01-08 15:51:47,982 - endpoint.endpoint - INFO - [None] - Database initialized successfully
+2026-01-08 15:51:47,989 - endpoint.endpoint - INFO - [None] - Webhook handler initialized
+2026-01-08 15:51:47,989 - webhook.queue - INFO - [None] - Starting worker thread
+2026-01-08 15:51:47,989 - webhook.queue - INFO - [None] - Worker thread started and running
+2026-01-08 15:51:47,990 - webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 15:51:48,090 - webhook.queue - INFO - [None] - Worker thread created and started
+2026-01-08 15:51:48,090 - webhook.worker - INFO - [None] - In-memory queue worker started
+2026-01-08 15:51:48,091 - endpoint.endpoint - INFO - [None] - In-memory queue worker started for local development
+2026-01-08 15:51:48,990 - webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 15:51:49,991 - webhook.queue - INFO - [None] - Worker attempting to get from queue
+collected 166 items
+
+endpoint/tests/e2e/test_static_serving.py::TestStaticServing::test_health_check_e2e 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:50,126 - middleware.request_correlation - INFO - [1c044c83-cbb3-4db7-80c7-f6e87feee559] - Request started
+2026-01-08 15:51:50,127 - middleware.request_correlation - INFO - [1c044c83-cbb3-4db7-80c7-f6e87feee559] - Request completed
+PASSED                                                                   [  0%]
+endpoint/tests/e2e/test_static_serving.py::TestStaticServing::test_sticker_serving_e2e 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:50,139 - middleware.request_correlation - INFO - [91a71a7c-2822-4167-93d1-99afb89ba63b] - Request started
+2026-01-08 15:51:50,142 - routes.static_files - INFO - [91a71a7c-2822-4167-93d1-99afb89ba63b] - Serving sticker
+2026-01-08 15:51:50,147 - middleware.request_correlation - INFO - [91a71a7c-2822-4167-93d1-99afb89ba63b] - Request completed
+PASSED                                                                   [  1%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_complete_webhook_flow 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:50,177 - middleware.request_correlation - INFO - [e2e-test-123] - Request started
+2026-01-08 15:51:50,178 - webhook.handler - INFO - [e2e-test-123] - Webhook request received
+2026-01-08 15:51:50,179 - webhook.handler - INFO - [e2e-test-123] - Webhook payload parsed
+2026-01-08 15:51:50,179 - webhook.handler - INFO - [e2e-test-123] - Attempting to enqueue message
+2026-01-08 15:51:50,180 - webhook.queue - INFO - [e2e-test-123] - Job enqueued to in-memory queue
+2026-01-08 15:51:50,180 - webhook.handler - INFO - [e2e-test-123] - Message enqueued successfully
+2026-01-08 15:51:50,180 - middleware.request_correlation - INFO - [e2e-test-123] - Request completed
+2026-01-08 15:51:50,181 - webhook.queue - INFO - [None] - Worker picked up job from queue
+2026-01-08 15:51:50,181 - webhook.worker - INFO - [None] - Processing message job
+2026-01-08 15:51:50,182 - webhook.processor - INFO - [None] - Starting message processing
+2026-01-08 15:51:50,182 - webhook.message_processor - INFO - [None] - Processing WhatsApp message
+2026-01-08 15:51:51,998 - httpx - INFO - [None] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-01-08 15:51:52,244 - httpx - INFO - [None] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+FAILED                                                                   [  1%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_webhook_verification_flow 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:52,256 - middleware.request_correlation - INFO - [d6ab1f9a-3e7c-4394-a5a0-5e11930507bb] - Request started
+2026-01-08 15:51:52,257 - webhook.handler - INFO - [d6ab1f9a-3e7c-4394-a5a0-5e11930507bb] - Webhook verification successful
+2026-01-08 15:51:52,257 - middleware.request_correlation - INFO - [d6ab1f9a-3e7c-4394-a5a0-5e11930507bb] - Request completed
+2026-01-08 15:51:52,258 - webhook.message_processor - INFO - [None] - Sending response to user
+PASSED                                                                   [  2%]
+------------------------------ live log teardown -------------------------------
+2026-01-08 15:51:52,259 - webhook.message_processor - INFO - [None] - Sending GIF
+
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_webhook_verification_failure 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:52,265 - middleware.request_correlation - INFO - [0bf6f890-7e17-453d-a151-20ee9697c941] - Request started
+2026-01-08 15:51:52,265 - webhook.handler - WARNING - [0bf6f890-7e17-453d-a151-20ee9697c941] - Webhook verification failed
+2026-01-08 15:51:52,265 - middleware.request_correlation - INFO - [0bf6f890-7e17-453d-a151-20ee9697c941] - Request completed
+PASSED                                                                   [  3%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_webhook_duplicate_detection 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:52,270 - middleware.request_correlation - INFO - [3955f187-9082-493e-96fe-839ff42d1789] - Request started
+2026-01-08 15:51:52,270 - webhook.handler - INFO - [3955f187-9082-493e-96fe-839ff42d1789] - Webhook request received
+2026-01-08 15:51:52,270 - webhook.handler - INFO - [3955f187-9082-493e-96fe-839ff42d1789] - Webhook payload parsed
+2026-01-08 15:51:52,270 - webhook.handler - INFO - [3955f187-9082-493e-96fe-839ff42d1789] - Duplicate message detected, skipping
+2026-01-08 15:51:52,271 - middleware.request_correlation - INFO - [3955f187-9082-493e-96fe-839ff42d1789] - Request completed
+2026-01-08 15:51:52,472 - middleware.request_correlation - INFO - [dbf4e842-35a5-44be-a55a-4adcc018883b] - Request started
+2026-01-08 15:51:52,472 - webhook.handler - INFO - [dbf4e842-35a5-44be-a55a-4adcc018883b] - Webhook request received
+2026-01-08 15:51:52,472 - webhook.handler - INFO - [dbf4e842-35a5-44be-a55a-4adcc018883b] - Webhook payload parsed
+2026-01-08 15:51:52,473 - webhook.handler - INFO - [dbf4e842-35a5-44be-a55a-4adcc018883b] - Duplicate message detected, skipping
+2026-01-08 15:51:52,473 - middleware.request_correlation - INFO - [dbf4e842-35a5-44be-a55a-4adcc018883b] - Request completed
+FAILED                                                                   [  3%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_health_check_endpoint 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:52,818 - middleware.request_correlation - INFO - [10334a19-43ec-4136-ae72-7b61cecf0603] - Request started
+2026-01-08 15:51:52,819 - middleware.request_correlation - INFO - [10334a19-43ec-4136-ae72-7b61cecf0603] - Request completed
+PASSED                                                                   [  4%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_health_endpoint PASSED [  4%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_success 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:52,896 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+PASSED                                                                   [  5%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_not_found 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:52,915 - endpoint.routes.static_files - WARNING - [None] - Sticker not found
+PASSED                                                                   [  6%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_invalid_filename FAILED [  6%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_invalid_extension 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:52,970 - endpoint.routes.static_files - WARNING - [None] - Invalid sticker file extension
+PASSED                                                                   [  7%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_rate_limited 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:52,985 - webhook.message_processor - ERROR - [None] - Failed to send response to user
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/message_processor.py", line 483, in process_whatsapp_message
+    send_whatsapp_gif(payload.from_number, gif["url"], reply)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/services/whatsapp/client.py", line 315, in send_whatsapp_gif
+    raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
+services.whatsapp.client.WhatsAppCloudError: WhatsApp Cloud API error 400: {"error":{"message":"(#131030) Recipient phone number not in allowed list","type":"OAuthException","code":131030,"error_data":{"messaging_product":"whatsapp","details":"Le num\u00e9ro de t\u00e9l\u00e9phone du destinataire ne figure pas dans la liste de num\u00e9ros autoris\u00e9s: Ajoutez le num\u00e9ro de t\u00e9l\u00e9phone du destinataire \u00e0 la liste de destinataires, puis r\u00e9essayez."},"fbtrace_id":"AhWm3cCrGdmJUoceuN4wU6y"}}
+2026-01-08 15:51:52,990 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:51:52,996 - webhook.message_processor - ERROR - [None] - Error processing WhatsApp message
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/message_processor.py", line 483, in process_whatsapp_message
+    send_whatsapp_gif(payload.from_number, gif["url"], reply)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/services/whatsapp/client.py", line 315, in send_whatsapp_gif
+    raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
+services.whatsapp.client.WhatsAppCloudError: WhatsApp Cloud API error 400: {"error":{"message":"(#131030) Recipient phone number not in allowed list","type":"OAuthException","code":131030,"error_data":{"messaging_product":"whatsapp","details":"Le num\u00e9ro de t\u00e9l\u00e9phone du destinataire ne figure pas dans la liste de num\u00e9ros autoris\u00e9s: Ajoutez le num\u00e9ro de t\u00e9l\u00e9phone du destinataire \u00e0 la liste de destinataires, puis r\u00e9essayez."},"fbtrace_id":"AhWm3cCrGdmJUoceuN4wU6y"}}
+2026-01-08 15:51:53,002 - webhook.message_processor - INFO - [None] - Attempting to send error notification to user
+2026-01-08 15:51:53,002 - services.whatsapp.client - INFO - [None] - Sending WhatsApp text message
+2026-01-08 15:51:53,004 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:51:53,007 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:51:53,010 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:51:53,013 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:51:53,017 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:51:53,024 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:51:53,028 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:51:53,031 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 15:51:53,036 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+PASSED                                                                   [  7%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestSecurityHeaders::test_security_headers_added PASSED [  8%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestSecurityHeaders::test_hsts_header_on_https PASSED [  9%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestRateLimitIntegration::test_rate_limit_allows_within_limit PASSED [  9%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestRateLimitIntegration::test_rate_limit_blocks_over_limit 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:53,084 - endpoint.security.middleware - WARNING - [None] - Rate limit exceeded
+PASSED                                                                   [ 10%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestRateLimitIntegration::test_rate_limit_per_ip 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:53,091 - endpoint.security.middleware - WARNING - [None] - Rate limit exceeded
+FAILED                                                                   [ 10%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_from_remote_addr FAILED [ 11%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_from_x_forwarded_for FAILED [ 12%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_from_x_real_ip FAILED [ 12%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_fallback FAILED [ 13%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_verification_success FAILED [ 13%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_verification_failure FAILED [ 14%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_webhook_success FAILED [ 15%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_webhook_duplicate_message FAILED [ 15%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_webhook_status_update FAILED [ 16%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_webhook_invalid_json FAILED [ 16%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_webhook_empty_payload FAILED [ 17%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_webhook_mark_processed FAILED [ 18%]
+endpoint/tests/integration/webhook/test_handler.py::TestGetRequestId::test_get_request_id_from_header FAILED [ 18%]
+endpoint/tests/integration/webhook/test_handler.py::TestGetRequestId::test_get_request_id_generates_uuid FAILED [ 19%]
+endpoint/tests/integration/webhook/test_handler.py::TestGetRequestId::test_get_request_id_rejects_too_long FAILED [ 19%]
+endpoint/tests/integration/webhook/test_worker_integration.py::TestWorkerIntegration::test_worker_processes_enqueued_jobs 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:53,438 - endpoint.webhook.queue - INFO - [None] - Starting worker thread
+2026-01-08 15:51:53,438 - endpoint.webhook.queue - INFO - [None] - Worker thread started and running
+2026-01-08 15:51:53,438 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 15:51:53,447 - services.whatsapp.client - ERROR - [None] - WhatsApp API returned error
+2026-01-08 15:51:53,447 - webhook.message_processor - ERROR - [None] - Failed to send error notification due to API error
+2026-01-08 15:51:53,450 - webhook.processor - ERROR - [None] - Error in message processing
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/processor.py", line 48, in processor
+    process_message_func(payload)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/message_processor.py", line 483, in process_whatsapp_message
+    send_whatsapp_gif(payload.from_number, gif["url"], reply)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/services/whatsapp/client.py", line 315, in send_whatsapp_gif
+    raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
+services.whatsapp.client.WhatsAppCloudError: WhatsApp Cloud API error 400: {"error":{"message":"(#131030) Recipient phone number not in allowed list","type":"OAuthException","code":131030,"error_data":{"messaging_product":"whatsapp","details":"Le num\u00e9ro de t\u00e9l\u00e9phone du destinataire ne figure pas dans la liste de num\u00e9ros autoris\u00e9s: Ajoutez le num\u00e9ro de t\u00e9l\u00e9phone du destinataire \u00e0 la liste de destinataires, puis r\u00e9essayez."},"fbtrace_id":"AhWm3cCrGdmJUoceuN4wU6y"}}
+2026-01-08 15:51:53,457 - webhook.worker - ERROR - [None] - Error processing message job
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/worker.py", line 43, in process_job
+    self.processor(payload)
+    ~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/processor.py", line 48, in processor
+    process_message_func(payload)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/message_processor.py", line 483, in process_whatsapp_message
+    send_whatsapp_gif(payload.from_number, gif["url"], reply)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/services/whatsapp/client.py", line 315, in send_whatsapp_gif
+    raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
+services.whatsapp.client.WhatsAppCloudError: WhatsApp Cloud API error 400: {"error":{"message":"(#131030) Recipient phone number not in allowed list","type":"OAuthException","code":131030,"error_data":{"messaging_product":"whatsapp","details":"Le num\u00e9ro de t\u00e9l\u00e9phone du destinataire ne figure pas dans la liste de num\u00e9ros autoris\u00e9s: Ajoutez le num\u00e9ro de t\u00e9l\u00e9phone du destinataire \u00e0 la liste de destinataires, puis r\u00e9essayez."},"fbtrace_id":"AhWm3cCrGdmJUoceuN4wU6y"}}
+2026-01-08 15:51:53,469 - webhook.queue - ERROR - [None] - Error processing job
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/queue.py", line 151, in worker
+    self._worker_callback(payload)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/worker.py", line 43, in process_job
+    self.processor(payload)
+    ~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/processor.py", line 48, in processor
+    process_message_func(payload)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/message_processor.py", line 483, in process_whatsapp_message
+    send_whatsapp_gif(payload.from_number, gif["url"], reply)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/services/whatsapp/client.py", line 315, in send_whatsapp_gif
+    raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
+services.whatsapp.client.WhatsAppCloudError: WhatsApp Cloud API error 400: {"error":{"message":"(#131030) Recipient phone number not in allowed list","type":"OAuthException","code":131030,"error_data":{"messaging_product":"whatsapp","details":"Le num\u00e9ro de t\u00e9l\u00e9phone du destinataire ne figure pas dans la liste de num\u00e9ros autoris\u00e9s: Ajoutez le num\u00e9ro de t\u00e9l\u00e9phone du destinataire \u00e0 la liste de destinataires, puis r\u00e9essayez."},"fbtrace_id":"AhWm3cCrGdmJUoceuN4wU6y"}}
+2026-01-08 15:51:53,481 - webhook.queue - INFO - [None] - Worker is alive and polling
+2026-01-08 15:51:53,539 - endpoint.webhook.queue - INFO - [None] - Worker thread created and started
+2026-01-08 15:51:53,639 - endpoint.webhook.queue - INFO - [None] - Job enqueued to in-memory queue
+2026-01-08 15:51:53,640 - endpoint.webhook.queue - INFO - [None] - Worker picked up job from queue
+2026-01-08 15:51:53,641 - endpoint.webhook.worker - INFO - [None] - Processing message job
+2026-01-08 15:51:53,641 - endpoint.webhook.worker - INFO - [None] - Message job processed successfully
+2026-01-08 15:51:53,642 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 15:51:54,643 - endpoint.webhook.queue - INFO - [None] - Worker thread exiting
+PASSED                                                                   [ 20%]
+endpoint/tests/integration/webhook/test_worker_integration.py::TestWorkerIntegration::test_worker_processes_multiple_jobs 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:54,660 - endpoint.webhook.queue - INFO - [None] - Starting worker thread
+2026-01-08 15:51:54,662 - endpoint.webhook.queue - INFO - [None] - Worker thread started and running
+2026-01-08 15:51:54,662 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 15:51:54,764 - endpoint.webhook.queue - INFO - [None] - Worker thread created and started
+2026-01-08 15:51:54,865 - endpoint.webhook.queue - INFO - [None] - Job enqueued to in-memory queue
+2026-01-08 15:51:54,866 - endpoint.webhook.queue - INFO - [None] - Job enqueued to in-memory queue
+2026-01-08 15:51:54,867 - endpoint.webhook.queue - INFO - [None] - Job enqueued to in-memory queue
+2026-01-08 15:51:54,867 - endpoint.webhook.queue - INFO - [None] - Worker picked up job from queue
+2026-01-08 15:51:54,868 - endpoint.webhook.worker - INFO - [None] - Processing message job
+2026-01-08 15:51:54,868 - endpoint.webhook.worker - INFO - [None] - Message job processed successfully
+2026-01-08 15:51:54,869 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 15:51:54,869 - endpoint.webhook.queue - INFO - [None] - Worker picked up job from queue
+2026-01-08 15:51:54,870 - endpoint.webhook.worker - INFO - [None] - Processing message job
+2026-01-08 15:51:54,870 - endpoint.webhook.worker - INFO - [None] - Message job processed successfully
+2026-01-08 15:51:54,870 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 15:51:54,871 - endpoint.webhook.queue - INFO - [None] - Worker picked up job from queue
+2026-01-08 15:51:54,871 - endpoint.webhook.worker - INFO - [None] - Processing message job
+2026-01-08 15:51:54,871 - endpoint.webhook.worker - INFO - [None] - Message job processed successfully
+2026-01-08 15:51:55,872 - endpoint.webhook.queue - INFO - [None] - Worker thread exiting
+PASSED                                                                   [ 21%]
+endpoint/tests/integration/webhook/test_worker_integration.py::TestWorkerIntegration::test_worker_handles_processor_errors 
+-------------------------------- live log call ---------------------------------
+2026-01-08 15:51:55,888 - endpoint.webhook.queue - INFO - [None] - Starting worker thread
+2026-01-08 15:51:55,889 - endpoint.webhook.queue - INFO - [None] - Worker thread started and running
+2026-01-08 15:51:55,890 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 15:51:55,991 - endpoint.webhook.queue - INFO - [None] - Worker thread created and started

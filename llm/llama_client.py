@@ -9,6 +9,9 @@ from config import (
     MISTRAL_API_KEY,
     MISTRAL_MODEL_NAME,
 )
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def _generate_reply_mistral(
@@ -35,17 +38,26 @@ def _generate_reply_mistral(
         Exception: If the API call fails.
     """
     if not MISTRAL_API_KEY:
+        logger.error("MISTRAL_API_KEY is not set")
         raise RuntimeError("MISTRAL_API_KEY is required when using Mistral provider. Set it in .env file.")
+    
+    # Log that API key is being used (but not the value)
+    logger.debug("Using Mistral API key", extra={
+        "key_set": True,
+        "key_length": len(MISTRAL_API_KEY) if MISTRAL_API_KEY else 0,
+        "model": MISTRAL_MODEL_NAME
+    })
     
     try:
         from mistralai import Mistral
     except ImportError:
+        logger.error("mistralai package not installed")
         raise RuntimeError("mistralai package not installed. Run: pip install mistralai")
     
     try:
         client = Mistral(api_key=MISTRAL_API_KEY)
     except Exception as client_error:
-        print(f"❌ Failed to create Mistral client: {client_error}")
+        logger.exception("Failed to create Mistral client", extra={"error": str(client_error)})
         raise RuntimeError(f"Failed to initialize Mistral client: {client_error}")
     
     # Build the system prompt with bottle state context if provided
@@ -63,13 +75,14 @@ def _generate_reply_mistral(
     messages = [{"role": "system", "content": full_system_prompt}] + conversation_history
     
     # Log request details
-    print(f"🔍 Mistral AI API Request:")
-    print(f"   Model: {MISTRAL_MODEL_NAME}")
-    print(f"   Temperature: {temperature}")
-    print(f"   Max tokens: {max_tokens}")
-    print(f"   Messages count: {len(messages)}")
-    print(f"   System prompt (first 100 chars): {full_system_prompt[:100]}...")
-    print(f"   Last user message: {conversation_history[-1].get('content', 'N/A')[:100] if conversation_history else 'N/A'}")
+    logger.debug("Mistral AI API request", extra={
+        "model": MISTRAL_MODEL_NAME,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "messages_count": len(messages),
+        "system_prompt_preview": full_system_prompt[:100] + "..." if len(full_system_prompt) > 100 else full_system_prompt,
+        "last_user_message_preview": conversation_history[-1].get('content', '')[:100] + "..." if conversation_history and len(conversation_history[-1].get('content', '')) > 100 else (conversation_history[-1].get('content', '') if conversation_history else 'N/A')
+    })
     
     try:
         chat_response = client.chat.complete(
@@ -79,64 +92,66 @@ def _generate_reply_mistral(
             max_tokens=max_tokens,
         )
     except Exception as api_error:
-        print(f"❌ Mistral AI API call failed with exception:")
-        print(f"   Error type: {type(api_error).__name__}")
-        print(f"   Error message: {str(api_error)}")
+        logger.exception("Mistral AI API call failed", extra={
+            "error_type": type(api_error).__name__,
+            "error_message": str(api_error)
+        })
         import traceback
         traceback.print_exc()
         raise
     
     # Log full response object structure
-    print(f"🔍 Mistral AI API Response:")
-    print(f"   Response ID: {chat_response.id if hasattr(chat_response, 'id') else 'N/A'}")
-    print(f"   Choices count: {len(chat_response.choices) if chat_response.choices else 0}")
-    print(f"   Finish reason: {chat_response.choices[0].finish_reason if chat_response.choices and len(chat_response.choices) > 0 else 'N/A'}")
-    print(f"   Usage: {chat_response.usage if hasattr(chat_response, 'usage') else 'N/A'}")
+    logger.debug("Mistral AI API response", extra={
+        "response_id": chat_response.id if hasattr(chat_response, 'id') else None,
+        "choices_count": len(chat_response.choices) if chat_response.choices else 0,
+        "finish_reason": chat_response.choices[0].finish_reason if chat_response.choices and len(chat_response.choices) > 0 else None,
+        "usage": str(chat_response.usage) if hasattr(chat_response, 'usage') else None
+    })
     
     if not chat_response.choices or len(chat_response.choices) == 0:
-        print(f"❌ Mistral AI returned no choices in response")
-        print(f"   Full response object: {chat_response}")
+        logger.error("Mistral AI returned no choices in response", extra={
+            "response_type": type(chat_response).__name__
+        })
         return ""
     
     message = chat_response.choices[0].message
     raw_content = message.content
     
-    print(f"   Message role: {message.role if hasattr(message, 'role') else 'N/A'}")
-    print(f"   Message content type: {type(raw_content)}")
-    print(f"   Message content value: {repr(raw_content)}")
+    logger.debug("Mistral AI message details", extra={
+        "message_role": message.role if hasattr(message, 'role') else None,
+        "content_type": type(raw_content).__name__,
+        "content_length": len(str(raw_content)) if raw_content else 0
+    })
     
     if raw_content is None:
         finish_reason = chat_response.choices[0].finish_reason if chat_response.choices and len(chat_response.choices) > 0 else "unknown"
-        print(f"❌ Mistral AI returned None for message.content")
-        print(f"   Finish reason: {finish_reason}")
-        print(f"   This usually means:")
-        if finish_reason == "length":
-            print(f"      - Model hit max_tokens limit ({max_tokens}) - try increasing max_tokens")
-        elif finish_reason == "content_filter":
-            print(f"      - Model was stopped by content filters - try adjusting the prompt")
-        elif finish_reason == "stop":
-            print(f"      - Model stopped normally but returned None (unusual)")
-        else:
-            print(f"      - Unknown finish reason: {finish_reason}")
-        print(f"   Full message object: {message}")
-        print(f"   Full response object keys: {dir(chat_response)}")
+        logger.warning("Mistral AI returned None for message.content", extra={
+            "finish_reason": finish_reason,
+            "max_tokens": max_tokens
+        })
         
         # Try to get alternative content if available
         if hasattr(message, 'tool_calls') and message.tool_calls:
-            print(f"   ⚠️  Message has tool_calls instead of content: {message.tool_calls}")
+            logger.warning("Message has tool_calls instead of content", extra={
+                "tool_calls": str(message.tool_calls)[:200] if message.tool_calls else None
+            })
         if hasattr(message, 'refusal') and message.refusal:
-            print(f"   ⚠️  Message was refused: {message.refusal}")
+            logger.warning("Message was refused by model", extra={
+                "refusal": str(message.refusal)[:200]
+            })
         
         # Raise an exception instead of returning empty string to trigger proper error handling
         raise ValueError(f"Mistral AI API returned None content (finish_reason: {finish_reason})")
     
     # Log raw response for debugging
-    print(f"🔍 Mistral AI raw response (before strip): {repr(raw_content)}")
-    print(f"🔍 Mistral AI raw response length: {len(raw_content)}")
+    logger.debug("Mistral AI raw response", extra={
+        "response_length": len(raw_content) if raw_content else 0,
+        "response_preview": str(raw_content)[:100] + "..." if raw_content and len(str(raw_content)) > 100 else str(raw_content) if raw_content else None
+    })
     
     stripped = raw_content.strip()
     if not stripped:
-        print(f"⚠️  Mistral AI response is empty or whitespace only")
+        logger.warning("Mistral AI response is empty or whitespace only")
     
     return stripped
 
@@ -162,7 +177,7 @@ def analyze_message_sentiment(user_message: str) -> Dict[str, Any]:
         Returns default neutral sentiment if analysis fails.
     """
     if not MISTRAL_API_KEY:
-        print("⚠️  MISTRAL_API_KEY not set, returning default sentiment")
+        logger.warning("MISTRAL_API_KEY not set, returning default sentiment")
         return {
             "emotion": "neutral",
             "intensity": 0.3,
@@ -179,7 +194,7 @@ def analyze_message_sentiment(user_message: str) -> Dict[str, Any]:
     try:
         from mistralai import Mistral
     except ImportError:
-        print("⚠️  mistralai package not installed, returning default sentiment")
+        logger.warning("mistralai package not installed, returning default sentiment")
         return {
             "emotion": "neutral",
             "intensity": 0.3,
@@ -189,7 +204,9 @@ def analyze_message_sentiment(user_message: str) -> Dict[str, Any]:
     try:
         client = Mistral(api_key=MISTRAL_API_KEY)
     except Exception as client_error:
-        print(f"⚠️  Failed to create Mistral client for sentiment analysis: {client_error}")
+        logger.exception("Failed to create Mistral client for sentiment analysis", extra={
+            "error": str(client_error)
+        })
         return {
             "emotion": "neutral",
             "intensity": 0.3,
@@ -225,7 +242,7 @@ Return ONLY the JSON, no other text."""
         )
         
         if not chat_response.choices or len(chat_response.choices) == 0:
-            print("⚠️  Sentiment analysis returned no choices")
+            logger.warning("Sentiment analysis returned no choices")
             return {
                 "emotion": "neutral",
                 "intensity": 0.3,
@@ -234,7 +251,7 @@ Return ONLY the JSON, no other text."""
         
         raw_content = chat_response.choices[0].message.content
         if not raw_content:
-            print("⚠️  Sentiment analysis returned None content")
+            logger.warning("Sentiment analysis returned None content")
             return {
                 "emotion": "neutral",
                 "intensity": 0.3,
@@ -273,16 +290,19 @@ Return ONLY the JSON, no other text."""
                 "should_send_media": should_send_media
             }
             
-            print(f"🔍 Sentiment Analysis Result:")
-            print(f"   Emotion: {emotion}")
-            print(f"   Intensity: {intensity:.2f}")
-            print(f"   Should send media: {should_send_media}")
+            logger.debug("Sentiment analysis result", extra={
+                "emotion": emotion,
+                "intensity": intensity,
+                "should_send_media": should_send_media
+            })
             
             return result
             
         except json.JSONDecodeError as json_error:
-            print(f"⚠️  Failed to parse sentiment JSON: {json_error}")
-            print(f"   Raw response: {content[:200]}")
+            logger.warning("Failed to parse sentiment JSON", extra={
+                "error": str(json_error),
+                "raw_response_preview": content[:200] if content else None
+            })
             return {
                 "emotion": "neutral",
                 "intensity": 0.3,
@@ -290,7 +310,9 @@ Return ONLY the JSON, no other text."""
             }
             
     except Exception as api_error:
-        print(f"⚠️  Sentiment analysis API call failed: {api_error}")
+        logger.exception("Sentiment analysis API call failed", extra={
+            "error": str(api_error)
+        })
         import traceback
         traceback.print_exc()
         return {
@@ -313,19 +335,21 @@ def detect_emotion_from_message(user_message: str) -> str:
         Emotion string: "happy", "sad", "angry", "shocked", or "neutral"
     """
     if not MISTRAL_API_KEY:
-        print("⚠️  MISTRAL_API_KEY not set, defaulting to neutral emotion")
+        logger.warning("MISTRAL_API_KEY not set, defaulting to neutral emotion")
         return "neutral"
     
     try:
         from mistralai import Mistral
     except ImportError:
-        print("⚠️  mistralai package not installed, defaulting to neutral emotion")
+        logger.warning("mistralai package not installed, defaulting to neutral emotion")
         return "neutral"
     
     try:
         client = Mistral(api_key=MISTRAL_API_KEY)
     except Exception as e:
-        print(f"⚠️  Failed to create Mistral client for emotion detection: {e}")
+        logger.exception("Failed to create Mistral client for emotion detection", extra={
+            "error": str(e)
+        })
         return "neutral"
     
     # System prompt for emotion detection
@@ -360,16 +384,16 @@ Répondez uniquement avec le mot, sans explication."""
             # Validate emotion
             valid_emotions = ["happy", "sad", "angry", "shocked", "neutral"]
             if emotion in valid_emotions:
-                print(f"   🎭 Emotion detected: {emotion}")
+                logger.debug("Emotion detected", extra={"emotion": emotion})
                 return emotion
             else:
-                print(f"   ⚠️  Invalid emotion detected: {emotion}, defaulting to neutral")
+                logger.warning("Invalid emotion detected, defaulting to neutral", extra={"emotion": emotion})
                 return "neutral"
         else:
-            print("   ⚠️  No response from Mistral for emotion detection, defaulting to neutral")
+            logger.warning("No response from Mistral for emotion detection, defaulting to neutral")
             return "neutral"
     except Exception as e:
-        print(f"   ⚠️  Error detecting emotion: {e}")
+        logger.exception("Error detecting emotion", extra={"error": str(e)})
         return "neutral"
 
 

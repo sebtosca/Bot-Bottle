@@ -1,0 +1,444 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-8.3.4, pluggy-1.5.0 -- /home/lobo/anaconda3/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.13.5', 'Platform': 'Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.4', 'pluggy': '1.5.0'}, 'Plugins': {'jaxtyping': '0.3.2', 'json-report': '1.5.0', 'mock': '3.15.1', 'html': '4.1.1', 'xdist': '3.8.0', 'cov': '7.0.0', 'typeguard': '4.4.4', 'anyio': '4.7.0', 'metadata': '3.1.1'}}
+rootdir: /mnt/c/Users/SebastienToscano/BotBottle
+configfile: pytest.ini
+plugins: jaxtyping-0.3.2, json-report-1.5.0, mock-3.15.1, html-4.1.1, xdist-3.8.0, cov-7.0.0, typeguard-4.4.4, anyio-4.7.0, metadata-3.1.1
+collecting ... 
+----------------------------- live log collection ------------------------------
+2026-01-08 16:03:35,122 - endpoint.endpoint - INFO - [None] - Database initialized successfully
+2026-01-08 16:03:35,125 - endpoint.endpoint - INFO - [None] - Webhook handler initialized
+2026-01-08 16:03:35,125 - webhook.queue - INFO - [None] - Starting worker thread
+2026-01-08 16:03:35,125 - webhook.queue - INFO - [None] - Worker thread started and running
+2026-01-08 16:03:35,125 - webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 16:03:35,226 - webhook.queue - INFO - [None] - Worker thread created and started
+2026-01-08 16:03:35,227 - webhook.worker - INFO - [None] - In-memory queue worker started
+2026-01-08 16:03:35,227 - endpoint.endpoint - INFO - [None] - In-memory queue worker started for local development
+2026-01-08 16:03:36,126 - webhook.queue - INFO - [None] - Worker attempting to get from queue
+collected 166 items
+
+endpoint/tests/e2e/test_static_serving.py::TestStaticServing::test_health_check_e2e 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:37,077 - middleware.request_correlation - INFO - [263920dc-ef63-4187-93f1-8367cf9f5235] - Request started
+2026-01-08 16:03:37,078 - middleware.request_correlation - INFO - [263920dc-ef63-4187-93f1-8367cf9f5235] - Request completed
+PASSED                                                                   [  0%]
+endpoint/tests/e2e/test_static_serving.py::TestStaticServing::test_sticker_serving_e2e 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:37,088 - middleware.request_correlation - INFO - [be1e775e-7c40-4b4e-84fe-166567bf00d3] - Request started
+2026-01-08 16:03:37,091 - routes.static_files - INFO - [be1e775e-7c40-4b4e-84fe-166567bf00d3] - Serving sticker
+2026-01-08 16:03:37,095 - middleware.request_correlation - INFO - [be1e775e-7c40-4b4e-84fe-166567bf00d3] - Request completed
+PASSED                                                                   [  1%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_complete_webhook_flow 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:37,103 - middleware.request_correlation - INFO - [e2e-test-123] - Request started
+2026-01-08 16:03:37,104 - webhook.handler - INFO - [e2e-test-123] - Webhook request received
+2026-01-08 16:03:37,104 - webhook.handler - INFO - [e2e-test-123] - Webhook payload parsed
+2026-01-08 16:03:37,104 - webhook.handler - INFO - [e2e-test-123] - Attempting to enqueue message
+2026-01-08 16:03:37,104 - webhook.queue - INFO - [e2e-test-123] - Job enqueued to in-memory queue
+2026-01-08 16:03:37,104 - webhook.queue - INFO - [None] - Worker picked up job from queue
+2026-01-08 16:03:37,104 - webhook.handler - INFO - [e2e-test-123] - Message enqueued successfully
+2026-01-08 16:03:37,105 - webhook.worker - INFO - [None] - Processing message job
+2026-01-08 16:03:37,105 - middleware.request_correlation - INFO - [e2e-test-123] - Request completed
+2026-01-08 16:03:37,105 - webhook.processor - INFO - [None] - Starting message processing
+2026-01-08 16:03:37,106 - webhook.message_processor - INFO - [None] - Processing WhatsApp message
+PASSED                                                                   [  1%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_webhook_verification_flow 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:37,125 - middleware.request_correlation - INFO - [60d59905-1e09-4b7a-aae3-4a97d40f9606] - Request started
+2026-01-08 16:03:37,126 - webhook.handler - INFO - [60d59905-1e09-4b7a-aae3-4a97d40f9606] - Webhook verification successful
+2026-01-08 16:03:37,126 - middleware.request_correlation - INFO - [60d59905-1e09-4b7a-aae3-4a97d40f9606] - Request completed
+PASSED                                                                   [  2%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_webhook_verification_failure 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:37,135 - middleware.request_correlation - INFO - [98be3054-d208-4022-ba58-c6fdaf09e309] - Request started
+2026-01-08 16:03:37,136 - webhook.handler - WARNING - [98be3054-d208-4022-ba58-c6fdaf09e309] - Webhook verification failed
+2026-01-08 16:03:37,142 - middleware.request_correlation - INFO - [98be3054-d208-4022-ba58-c6fdaf09e309] - Request completed
+PASSED                                                                   [  3%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_webhook_duplicate_detection 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:37,157 - middleware.request_correlation - INFO - [8b7f098f-d37c-4e2e-8da5-eae80fc62a2a] - Request started
+2026-01-08 16:03:37,157 - webhook.handler - INFO - [8b7f098f-d37c-4e2e-8da5-eae80fc62a2a] - Webhook request received
+2026-01-08 16:03:37,160 - webhook.handler - INFO - [8b7f098f-d37c-4e2e-8da5-eae80fc62a2a] - Webhook payload parsed
+2026-01-08 16:03:37,162 - webhook.handler - INFO - [8b7f098f-d37c-4e2e-8da5-eae80fc62a2a] - Duplicate message detected, skipping
+2026-01-08 16:03:37,162 - middleware.request_correlation - INFO - [8b7f098f-d37c-4e2e-8da5-eae80fc62a2a] - Request completed
+2026-01-08 16:03:37,542 - middleware.request_correlation - INFO - [f6e17239-095a-4642-9235-812f6021bbb3] - Request started
+2026-01-08 16:03:37,543 - webhook.handler - INFO - [f6e17239-095a-4642-9235-812f6021bbb3] - Webhook request received
+2026-01-08 16:03:37,543 - webhook.handler - INFO - [f6e17239-095a-4642-9235-812f6021bbb3] - Webhook payload parsed
+2026-01-08 16:03:37,543 - webhook.handler - INFO - [f6e17239-095a-4642-9235-812f6021bbb3] - Duplicate message detected, skipping
+2026-01-08 16:03:37,543 - middleware.request_correlation - INFO - [f6e17239-095a-4642-9235-812f6021bbb3] - Request completed
+PASSED                                                                   [  3%]
+endpoint/tests/e2e/test_webhook_flow.py::TestWebhookFlow::test_health_check_endpoint 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:37,570 - middleware.request_correlation - INFO - [6d1ae875-a96b-4b7a-add3-13a0d8223d62] - Request started
+2026-01-08 16:03:37,570 - middleware.request_correlation - INFO - [6d1ae875-a96b-4b7a-add3-13a0d8223d62] - Request completed
+PASSED                                                                   [  4%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_health_endpoint PASSED [  4%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_success 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:37,759 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+PASSED                                                                   [  5%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_not_found 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:37,840 - endpoint.routes.static_files - WARNING - [None] - Sticker not found
+PASSED                                                                   [  6%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_invalid_filename PASSED [  6%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_invalid_extension 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:37,914 - endpoint.routes.static_files - WARNING - [None] - Invalid sticker file extension
+PASSED                                                                   [  7%]
+endpoint/tests/integration/routes/test_static_files.py::TestStaticFileRoutes::test_serve_sticker_rate_limited 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:37,981 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 16:03:37,998 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 16:03:38,024 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 16:03:38,047 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 16:03:38,052 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 16:03:38,059 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 16:03:38,069 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 16:03:38,077 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 16:03:38,082 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+2026-01-08 16:03:38,087 - endpoint.routes.static_files - INFO - [None] - Serving sticker
+PASSED                                                                   [  7%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestSecurityHeaders::test_security_headers_added PASSED [  8%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestSecurityHeaders::test_hsts_header_on_https PASSED [  9%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestRateLimitIntegration::test_rate_limit_allows_within_limit PASSED [  9%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestRateLimitIntegration::test_rate_limit_blocks_over_limit 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:38,166 - endpoint.security.middleware - WARNING - [None] - Rate limit exceeded
+PASSED                                                                   [ 10%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestRateLimitIntegration::test_rate_limit_per_ip PASSED [ 10%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_from_remote_addr PASSED [ 11%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_from_x_forwarded_for PASSED [ 12%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_from_x_real_ip PASSED [ 12%]
+endpoint/tests/integration/security/test_middleware_integration.py::TestGetClientIP::test_get_client_ip_fallback PASSED [ 13%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_verification_success 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:38,222 - endpoint.webhook.handler - INFO - [None] - Webhook verification successful
+PASSED                                                                   [ 13%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_verification_failure 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:38,228 - endpoint.webhook.handler - WARNING - [None] - Webhook verification failed
+PASSED                                                                   [ 14%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_webhook_success 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:38,233 - endpoint.webhook.handler - INFO - [None] - Webhook request received
+2026-01-08 16:03:38,233 - endpoint.webhook.handler - INFO - [None] - Webhook payload parsed
+2026-01-08 16:03:38,234 - endpoint.webhook.handler - INFO - [None] - Attempting to enqueue message
+2026-01-08 16:03:38,234 - endpoint.webhook.queue - INFO - [None] - Job enqueued to in-memory queue
+2026-01-08 16:03:38,234 - endpoint.webhook.handler - INFO - [None] - Message enqueued successfully
+PASSED                                                                   [ 15%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_webhook_duplicate_message 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:38,239 - endpoint.webhook.handler - INFO - [None] - Webhook request received
+2026-01-08 16:03:38,239 - endpoint.webhook.handler - INFO - [None] - Webhook payload parsed
+2026-01-08 16:03:38,239 - endpoint.webhook.handler - INFO - [None] - Duplicate message detected, skipping
+PASSED                                                                   [ 15%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_webhook_status_update 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:38,245 - endpoint.webhook.handler - INFO - [None] - Webhook request received
+2026-01-08 16:03:38,245 - endpoint.webhook.handler - INFO - [None] - Webhook payload parsed
+2026-01-08 16:03:38,245 - endpoint.webhook.handler - INFO - [None] - Status update received, acknowledging
+PASSED                                                                   [ 16%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_webhook_invalid_json 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:38,250 - endpoint.webhook.handler - INFO - [None] - Webhook request received
+2026-01-08 16:03:38,251 - endpoint.webhook.handler - ERROR - [None] - Failed to parse JSON payload
+Traceback (most recent call last):
+  File "/home/lobo/anaconda3/lib/python3.13/site-packages/werkzeug/wrappers/request.py", line 611, in get_json
+    rv = self.json_module.loads(data)
+  File "/home/lobo/anaconda3/lib/python3.13/site-packages/flask/json/provider.py", line 187, in loads
+    return json.loads(s, **kwargs)
+           ~~~~~~~~~~^^^^^^^^^^^^^
+  File "/home/lobo/anaconda3/lib/python3.13/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/home/lobo/anaconda3/lib/python3.13/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lobo/anaconda3/lib/python3.13/json/decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/lobo/anaconda3/lib/python3.13/site-packages/flask/wrappers.py", line 214, in on_json_loading_failed
+    return super().on_json_loading_failed(e)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/home/lobo/anaconda3/lib/python3.13/site-packages/werkzeug/wrappers/request.py", line 645, in on_json_loading_failed
+    raise BadRequest(f"Failed to decode JSON object: {e}")
+werkzeug.exceptions.BadRequest: 400 Bad Request: Failed to decode JSON object: Expecting value: line 1 column 1 (char 0)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/handler.py", line 144, in handle_webhook
+    data = request.get_json()
+  File "/home/lobo/anaconda3/lib/python3.13/site-packages/werkzeug/wrappers/request.py", line 620, in get_json
+    rv = self.on_json_loading_failed(e)
+  File "/home/lobo/anaconda3/lib/python3.13/site-packages/flask/wrappers.py", line 219, in on_json_loading_failed
+    raise BadRequest() from ebr
+werkzeug.exceptions.BadRequest: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+PASSED                                                                   [ 16%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_webhook_empty_payload 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:38,264 - endpoint.webhook.handler - INFO - [None] - Webhook request received
+2026-01-08 16:03:38,264 - endpoint.webhook.handler - WARNING - [None] - No JSON data received
+PASSED                                                                   [ 17%]
+endpoint/tests/integration/webhook/test_handler.py::TestWebhookHandler::test_handle_webhook_mark_processed 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:38,270 - endpoint.webhook.handler - INFO - [None] - Webhook request received
+2026-01-08 16:03:38,270 - endpoint.webhook.handler - INFO - [None] - Webhook payload parsed
+2026-01-08 16:03:38,270 - endpoint.webhook.handler - INFO - [None] - Attempting to enqueue message
+2026-01-08 16:03:38,270 - endpoint.webhook.queue - INFO - [None] - Job enqueued to in-memory queue
+2026-01-08 16:03:38,270 - endpoint.webhook.handler - INFO - [None] - Message enqueued successfully
+PASSED                                                                   [ 18%]
+endpoint/tests/integration/webhook/test_handler.py::TestGetRequestId::test_get_request_id_from_header PASSED [ 18%]
+endpoint/tests/integration/webhook/test_handler.py::TestGetRequestId::test_get_request_id_generates_uuid PASSED [ 19%]
+endpoint/tests/integration/webhook/test_handler.py::TestGetRequestId::test_get_request_id_rejects_too_long 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:38,287 - endpoint.webhook.handler - WARNING - [None] - Request ID too long, generating new one
+PASSED                                                                   [ 19%]
+endpoint/tests/integration/webhook/test_worker_integration.py::TestWorkerIntegration::test_worker_processes_enqueued_jobs 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:38,292 - endpoint.webhook.queue - INFO - [None] - Starting worker thread
+2026-01-08 16:03:38,292 - endpoint.webhook.queue - INFO - [None] - Worker thread started and running
+2026-01-08 16:03:38,293 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 16:03:38,339 - httpx - INFO - [None] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-01-08 16:03:38,393 - endpoint.webhook.queue - INFO - [None] - Worker thread created and started
+2026-01-08 16:03:38,494 - endpoint.webhook.queue - INFO - [None] - Job enqueued to in-memory queue
+2026-01-08 16:03:38,495 - endpoint.webhook.queue - INFO - [None] - Worker picked up job from queue
+2026-01-08 16:03:38,495 - endpoint.webhook.worker - INFO - [None] - Processing message job
+2026-01-08 16:03:38,496 - endpoint.webhook.worker - INFO - [None] - Message job processed successfully
+2026-01-08 16:03:38,496 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 16:03:38,586 - httpx - INFO - [None] - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-01-08 16:03:38,604 - webhook.message_processor - INFO - [None] - Sending response to user
+2026-01-08 16:03:38,608 - webhook.message_processor - INFO - [None] - Sending sticker
+2026-01-08 16:03:39,157 - webhook.message_processor - ERROR - [None] - Failed to send response to user
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/message_processor.py", line 465, in process_whatsapp_message
+    send_whatsapp_sticker(payload.from_number, sticker["url"])
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/services/whatsapp/client.py", line 251, in send_whatsapp_sticker
+    raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
+services.whatsapp.client.WhatsAppCloudError: WhatsApp Cloud API error 401: {"error":{"message":"Error validating access token: Session has expired on Thursday, 08-Jan-26 07:00:00 PST. The current time is Thursday, 08-Jan-26 07:03:39 PST.","type":"OAuthException","code":190,"error_subcode":463,"fbtrace_id":"AWK9Qk1LvKq-6gIxtB6T169"}}
+2026-01-08 16:03:39,181 - webhook.message_processor - ERROR - [None] - Error processing WhatsApp message
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/message_processor.py", line 465, in process_whatsapp_message
+    send_whatsapp_sticker(payload.from_number, sticker["url"])
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/services/whatsapp/client.py", line 251, in send_whatsapp_sticker
+    raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
+services.whatsapp.client.WhatsAppCloudError: WhatsApp Cloud API error 401: {"error":{"message":"Error validating access token: Session has expired on Thursday, 08-Jan-26 07:00:00 PST. The current time is Thursday, 08-Jan-26 07:03:39 PST.","type":"OAuthException","code":190,"error_subcode":463,"fbtrace_id":"AWK9Qk1LvKq-6gIxtB6T169"}}
+2026-01-08 16:03:39,189 - webhook.message_processor - INFO - [None] - Attempting to send error notification to user
+2026-01-08 16:03:39,189 - services.whatsapp.client - INFO - [None] - Sending WhatsApp text message
+2026-01-08 16:03:39,496 - endpoint.webhook.queue - INFO - [None] - Worker thread exiting
+PASSED                                                                   [ 20%]
+endpoint/tests/integration/webhook/test_worker_integration.py::TestWorkerIntegration::test_worker_processes_multiple_jobs 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:39,503 - endpoint.webhook.queue - INFO - [None] - Starting worker thread
+2026-01-08 16:03:39,503 - endpoint.webhook.queue - INFO - [None] - Worker thread started and running
+2026-01-08 16:03:39,504 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 16:03:39,521 - services.whatsapp.client - ERROR - [None] - WhatsApp API returned error
+2026-01-08 16:03:39,521 - webhook.message_processor - ERROR - [None] - Failed to send error notification due to API error
+2026-01-08 16:03:39,522 - webhook.processor - ERROR - [None] - Error in message processing
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/processor.py", line 48, in processor
+    process_message_func(payload)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/message_processor.py", line 465, in process_whatsapp_message
+    send_whatsapp_sticker(payload.from_number, sticker["url"])
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/services/whatsapp/client.py", line 251, in send_whatsapp_sticker
+    raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
+services.whatsapp.client.WhatsAppCloudError: WhatsApp Cloud API error 401: {"error":{"message":"Error validating access token: Session has expired on Thursday, 08-Jan-26 07:00:00 PST. The current time is Thursday, 08-Jan-26 07:03:39 PST.","type":"OAuthException","code":190,"error_subcode":463,"fbtrace_id":"AWK9Qk1LvKq-6gIxtB6T169"}}
+2026-01-08 16:03:39,531 - webhook.worker - ERROR - [None] - Error processing message job
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/worker.py", line 43, in process_job
+    self.processor(payload)
+    ~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/processor.py", line 48, in processor
+    process_message_func(payload)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/message_processor.py", line 465, in process_whatsapp_message
+    send_whatsapp_sticker(payload.from_number, sticker["url"])
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/services/whatsapp/client.py", line 251, in send_whatsapp_sticker
+    raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
+services.whatsapp.client.WhatsAppCloudError: WhatsApp Cloud API error 401: {"error":{"message":"Error validating access token: Session has expired on Thursday, 08-Jan-26 07:00:00 PST. The current time is Thursday, 08-Jan-26 07:03:39 PST.","type":"OAuthException","code":190,"error_subcode":463,"fbtrace_id":"AWK9Qk1LvKq-6gIxtB6T169"}}
+2026-01-08 16:03:39,543 - webhook.queue - ERROR - [None] - Error processing job
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/queue.py", line 151, in worker
+    self._worker_callback(payload)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/worker.py", line 43, in process_job
+    self.processor(payload)
+    ~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/processor.py", line 48, in processor
+    process_message_func(payload)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/message_processor.py", line 465, in process_whatsapp_message
+    send_whatsapp_sticker(payload.from_number, sticker["url"])
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/services/whatsapp/client.py", line 251, in send_whatsapp_sticker
+    raise WhatsAppCloudError(f"WhatsApp Cloud API error {resp.status_code}: {resp.text}")
+services.whatsapp.client.WhatsAppCloudError: WhatsApp Cloud API error 401: {"error":{"message":"Error validating access token: Session has expired on Thursday, 08-Jan-26 07:00:00 PST. The current time is Thursday, 08-Jan-26 07:03:39 PST.","type":"OAuthException","code":190,"error_subcode":463,"fbtrace_id":"AWK9Qk1LvKq-6gIxtB6T169"}}
+2026-01-08 16:03:39,556 - webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 16:03:39,604 - endpoint.webhook.queue - INFO - [None] - Worker thread created and started
+2026-01-08 16:03:39,704 - endpoint.webhook.queue - INFO - [None] - Job enqueued to in-memory queue
+2026-01-08 16:03:39,705 - endpoint.webhook.queue - INFO - [None] - Job enqueued to in-memory queue
+2026-01-08 16:03:39,705 - endpoint.webhook.queue - INFO - [None] - Job enqueued to in-memory queue
+2026-01-08 16:03:39,705 - endpoint.webhook.queue - INFO - [None] - Worker picked up job from queue
+2026-01-08 16:03:39,705 - endpoint.webhook.worker - INFO - [None] - Processing message job
+2026-01-08 16:03:39,705 - endpoint.webhook.worker - INFO - [None] - Message job processed successfully
+2026-01-08 16:03:39,706 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 16:03:39,706 - endpoint.webhook.queue - INFO - [None] - Worker picked up job from queue
+2026-01-08 16:03:39,706 - endpoint.webhook.worker - INFO - [None] - Processing message job
+2026-01-08 16:03:39,706 - endpoint.webhook.worker - INFO - [None] - Message job processed successfully
+2026-01-08 16:03:39,706 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 16:03:39,706 - endpoint.webhook.queue - INFO - [None] - Worker picked up job from queue
+2026-01-08 16:03:39,706 - endpoint.webhook.worker - INFO - [None] - Processing message job
+2026-01-08 16:03:39,706 - endpoint.webhook.worker - INFO - [None] - Message job processed successfully
+2026-01-08 16:03:40,557 - webhook.queue - INFO - [None] - Worker is alive and polling
+2026-01-08 16:03:40,706 - endpoint.webhook.queue - INFO - [None] - Worker thread exiting
+PASSED                                                                   [ 21%]
+endpoint/tests/integration/webhook/test_worker_integration.py::TestWorkerIntegration::test_worker_handles_processor_errors 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:40,714 - endpoint.webhook.queue - INFO - [None] - Starting worker thread
+2026-01-08 16:03:40,715 - endpoint.webhook.queue - INFO - [None] - Worker thread started and running
+2026-01-08 16:03:40,715 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 16:03:40,815 - endpoint.webhook.queue - INFO - [None] - Worker thread created and started
+2026-01-08 16:03:40,917 - endpoint.webhook.queue - INFO - [None] - Job enqueued to in-memory queue
+2026-01-08 16:03:40,917 - endpoint.webhook.queue - INFO - [None] - Worker picked up job from queue
+2026-01-08 16:03:40,918 - endpoint.webhook.worker - INFO - [None] - Processing message job
+2026-01-08 16:03:40,918 - endpoint.webhook.worker - ERROR - [None] - Error processing message job
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/worker.py", line 43, in process_job
+    self.processor(payload)
+    ~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/tests/integration/webhook/test_worker_integration.py", line 87, in failing_processor
+    raise ValueError("Processing error")
+ValueError: Processing error
+2026-01-08 16:03:40,930 - endpoint.webhook.queue - ERROR - [None] - Error processing job
+Traceback (most recent call last):
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/queue.py", line 151, in worker
+    self._worker_callback(payload)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/webhook/worker.py", line 43, in process_job
+    self.processor(payload)
+    ~~~~~~~~~~~~~~^^^^^^^^^
+  File "/mnt/c/Users/SebastienToscano/BotBottle/endpoint/tests/integration/webhook/test_worker_integration.py", line 87, in failing_processor
+    raise ValueError("Processing error")
+ValueError: Processing error
+2026-01-08 16:03:40,943 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 16:03:41,944 - endpoint.webhook.queue - INFO - [None] - Worker thread exiting
+PASSED                                                                   [ 21%]
+endpoint/tests/integration/webhook/test_worker_integration.py::TestWorkerIntegration::test_setup_in_memory_worker 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:41,955 - endpoint.webhook.queue - INFO - [None] - Starting worker thread
+2026-01-08 16:03:41,956 - endpoint.webhook.queue - INFO - [None] - Worker thread started and running
+2026-01-08 16:03:41,956 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 16:03:42,057 - endpoint.webhook.queue - INFO - [None] - Worker thread created and started
+2026-01-08 16:03:42,058 - endpoint.webhook.worker - INFO - [None] - In-memory queue worker started
+2026-01-08 16:03:42,159 - endpoint.webhook.queue - INFO - [None] - Job enqueued to in-memory queue
+2026-01-08 16:03:42,159 - endpoint.webhook.queue - INFO - [None] - Worker picked up job from queue
+2026-01-08 16:03:42,160 - endpoint.webhook.worker - INFO - [None] - Processing message job
+2026-01-08 16:03:42,160 - endpoint.webhook.worker - INFO - [None] - Message job processed successfully
+2026-01-08 16:03:42,160 - endpoint.webhook.queue - INFO - [None] - Worker attempting to get from queue
+2026-01-08 16:03:43,161 - endpoint.webhook.queue - INFO - [None] - Worker thread exiting
+PASSED                                                                   [ 22%]
+endpoint/tests/unit/helpers/test_slang.py::TestApplyBretonSlang::test_apply_breton_slang_replaces_au_revoir PASSED [ 22%]
+endpoint/tests/unit/helpers/test_slang.py::TestApplyBretonSlang::test_apply_breton_slang_no_replacement_when_random_high PASSED [ 23%]
+endpoint/tests/unit/helpers/test_slang.py::TestApplyBretonSlang::test_apply_breton_slang_replaces_merci PASSED [ 24%]
+endpoint/tests/unit/helpers/test_slang.py::TestApplyBretonSlang::test_apply_breton_slang_no_french_words PASSED [ 24%]
+endpoint/tests/unit/helpers/test_slang.py::TestApplyBretonSlang::test_apply_breton_slang_case_insensitive PASSED [ 25%]
+endpoint/tests/unit/helpers/test_slang.py::TestApplyNormanSlang::test_apply_norman_slang_replaces_bonjour PASSED [ 25%]
+endpoint/tests/unit/helpers/test_slang.py::TestApplyNormanSlang::test_apply_norman_slang_no_replacement_when_random_high PASSED [ 26%]
+endpoint/tests/unit/helpers/test_slang.py::TestApplyNormanSlang::test_apply_norman_slang_replaces_mon_dieu PASSED [ 27%]
+endpoint/tests/unit/helpers/test_slang.py::TestApplyNormanSlang::test_apply_norman_slang_no_french_words PASSED [ 27%]
+endpoint/tests/unit/helpers/test_slang.py::TestApplyNormanSlang::test_apply_norman_slang_case_insensitive PASSED [ 28%]
+endpoint/tests/unit/middleware/test_request_correlation.py::TestRequestIDFilter::test_filter_adds_request_id_in_context PASSED [ 28%]
+endpoint/tests/unit/middleware/test_request_correlation.py::TestRequestIDFilter::test_filter_handles_no_context PASSED [ 29%]
+endpoint/tests/unit/middleware/test_request_correlation.py::TestRequestIDFilter::test_filter_handles_missing_request_id PASSED [ 30%]
+endpoint/tests/unit/middleware/test_request_correlation.py::TestSetupRequestCorrelation::test_setup_adds_request_id_middleware 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:43,312 - endpoint.middleware.request_correlation - INFO - [d156bdb4-de5d-4b1c-b8a7-27879a94a91a] - Request started
+2026-01-08 16:03:43,312 - endpoint.middleware.request_correlation - INFO - [d156bdb4-de5d-4b1c-b8a7-27879a94a91a] - Request completed
+PASSED                                                                   [ 30%]
+endpoint/tests/unit/middleware/test_request_correlation.py::TestSetupRequestCorrelation::test_setup_uses_existing_request_id_header 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:43,317 - endpoint.middleware.request_correlation - INFO - [custom-id-123] - Request started
+2026-01-08 16:03:43,318 - endpoint.middleware.request_correlation - INFO - [custom-id-123] - Request completed
+PASSED                                                                   [ 31%]
+endpoint/tests/unit/middleware/test_request_correlation.py::TestSetupRequestCorrelation::test_setup_generates_request_id_if_missing 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:43,323 - endpoint.middleware.request_correlation - INFO - [fa88c30f-b0fa-491a-bde3-222f32481697] - Request started
+2026-01-08 16:03:43,323 - endpoint.middleware.request_correlation - INFO - [fa88c30f-b0fa-491a-bde3-222f32481697] - Request completed
+PASSED                                                                   [ 31%]
+endpoint/tests/unit/middleware/test_request_correlation.py::TestSetupRequestCorrelation::test_setup_rejects_too_long_request_id 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:43,328 - endpoint.middleware.request_correlation - INFO - [a4da9b1f-d77d-4058-8420-bf0555088762] - Request started
+2026-01-08 16:03:43,328 - endpoint.middleware.request_correlation - INFO - [a4da9b1f-d77d-4058-8420-bf0555088762] - Request completed
+PASSED                                                                   [ 32%]
+endpoint/tests/unit/middleware/test_request_correlation.py::TestSetupRequestCorrelation::test_setup_logs_request_start 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:43,333 - endpoint.middleware.request_correlation - INFO - [95f7f660-50ab-45cb-bfea-b54fb323126e] - Request started
+2026-01-08 16:03:43,334 - endpoint.middleware.request_correlation - INFO - [95f7f660-50ab-45cb-bfea-b54fb323126e] - Request completed
+PASSED                                                                   [ 33%]
+endpoint/tests/unit/middleware/test_request_correlation.py::TestSetupRequestCorrelation::test_setup_logs_request_completion 
+-------------------------------- live log call ---------------------------------
+2026-01-08 16:03:43,339 - endpoint.middleware.request_correlation - INFO - [48f0554a-e996-4432-8012-a2d409c4508a] - Request started
+2026-01-08 16:03:43,340 - endpoint.middleware.request_correlation - INFO - [48f0554a-e996-4432-8012-a2d409c4508a] - Request completed
+PASSED                                                                   [ 33%]
+endpoint/tests/unit/security/test_rate_limiter.py::TestInMemoryRateLimiter::test_check_rate_limit_allows_first_request PASSED [ 34%]
+endpoint/tests/unit/security/test_rate_limiter.py::TestInMemoryRateLimiter::test_check_rate_limit_allows_within_limit PASSED [ 34%]
+endpoint/tests/unit/security/test_rate_limiter.py::TestInMemoryRateLimiter::test_check_rate_limit_blocks_over_limit PASSED [ 35%]
+endpoint/tests/unit/security/test_rate_limiter.py::TestInMemoryRateLimiter::test_check_rate_limit_expires_old_requests PASSED [ 36%]
+endpoint/tests/unit/security/test_rate_limiter.py::TestInMemoryRateLimiter::test_check_rate_limit_different_identifiers PASSED [ 36%]
+endpoint/tests/unit/security/test_rate_limiter.py::TestInMemoryRateLimiter::test_record_request PASSED [ 37%]
+endpoint/tests/unit/security/test_rate_limiter.py::TestInMemoryRateLimiter::test_clear_rate_limiter PASSED [ 37%]
+endpoint/tests/unit/security/test_rate_limiter.py::TestInMemoryRateLimiter::test_rate_limit_sliding_window PASSED [ 38%]
+endpoint/tests/unit/security/test_rate_limiter.py::TestInMemoryRateLimiter::test_thread_safety PASSED [ 39%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeString::test_sanitize_normal_string PASSED [ 39%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeString::test_sanitize_removes_control_chars PASSED [ 40%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeString::test_sanitize_trims_whitespace PASSED [ 40%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeString::test_sanitize_truncates_long_string PASSED [ 41%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeString::test_sanitize_preserves_newlines PASSED [ 42%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeString::test_sanitize_converts_non_string PASSED [ 42%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeFilename::test_sanitize_valid_filename PASSED [ 43%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeFilename::test_sanitize_removes_path_traversal PASSED [ 43%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeFilename::test_sanitize_removes_slashes PASSED [ 44%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeFilename::test_sanitize_removes_backslashes PASSED [ 45%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeFilename::test_sanitize_removes_control_chars PASSED [ 45%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeFilename::test_sanitize_rejects_empty PASSED [ 46%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeFilename::test_sanitize_rejects_non_string PASSED [ 46%]
+endpoint/tests/unit/security/test_validation.py::TestSanitizeFilename::test_sanitize_trims_whitespace PASSED [ 47%]
+endpoint/tests/unit/security/test_validation.py::TestValidatePhoneNumber::test_validate_valid_phone PASSED [ 48%]
+endpoint/tests/unit/security/test_validation.py::TestValidatePhoneNumber::test_validate_invalid_no_plus PASSED [ 48%]
+endpoint/tests/unit/security/test_validation.py::TestValidatePhoneNumber::test_validate_invalid_too_short PASSED [ 49%]
+endpoint/tests/unit/security/test_validation.py::TestValidatePhoneNumber::test_validate_invalid_too_long PASSED [ 50%]
+endpoint/tests/unit/security/test_validation.py::TestValidatePhoneNumber::test_validate_invalid_chars PASSED [ 50%]
+endpoint/tests/unit/security/test_validation.py::TestValidatePhoneNumber::test_validate_invalid_starts_with_zero PASSED [ 51%]
+endpoint/tests/unit/security/test_validation.py::TestValidateWhatsAppMessageId::test_validate_valid_message_id PASSED [ 51%]
+endpoint/tests/unit/security/test_validation.py::TestValidateWhatsAppMessageId::test_validate_message_id_with_dots PASSED [ 52%]
+endpoint/tests/unit/security/test_validation.py::TestValidateWhatsAppMessageId::test_validate_message_id_with_underscores PASSED [ 53%]
+endpoint/tests/unit/security/test_validation.py::TestValidateWhatsAppMessageId::test_validate_invalid_too_short PASSED [ 53%]
+endpoint/tests/unit/security/test_validation.py::TestValidateWhatsAppMessageId::test_validate_invalid_too_long PASSED [ 54%]
+endpoint/tests/unit/security/test_validation.py::TestValidateWhatsAppMessageId::test_validate_invalid_chars PASSED [ 54%]
+endpoint/tests/unit/security/test_validation.py::TestValidateWhatsAppMessageId::test_validate_invalid_type PASSED [ 55%]
+endpoint/tests/unit/security/test_validation.py::TestValidateProductId::test_validate_valid_product_id PASSED [ 56%]
+endpoint/tests/unit/security/test_validation.py::TestValidateProductId::test_validate_invalid_wrong_length PASSED [ 56%]
+endpoint/tests/unit/security/test_validation.py::TestValidateProductId::test_validate_invalid_non_digits PASSED [ 57%]
+endpoint/tests/unit/security/test_validation.py::TestValidateProductId::test_validate_invalid_type PASSED [ 57%]
+endpoint/tests/unit/security/test_validation.py::TestSchemaValidator::test_validate_valid_data PASSED [ 58%]
+endpoint/tests/unit/security/test_validation.py::TestSchemaValidator::test_validate_missing_required_field PASSED [ 59%]
+endpoint/tests/unit/security/test_validation.py::TestSchemaValidator::test_validate_wrong_type PASSED [ 59%]
+endpoint/tests/unit/security/test_validation.py::TestSchemaValidator::test_validate_string_length PASSED [ 60%]
+endpoint/tests/unit/security/test_validation.py::TestSchemaValidator::test_validate_pattern PASSED [ 60%]
+endpoint/tests/unit/security/test_validation.py::TestSchemaValidator::test_validate_allowed_values PASSED [ 61%]
+endpoint/tests/unit/security/test_validation.py::TestSchemaValidator::test_validate_strict_mode PASSED [ 62%]
+endpoint/tests/unit/security/test_validation.py::TestSchemaValidator::test_validate_non_strict_mode PASSED [ 62%]
+endpoint/tests/unit/webhook/test_idempotency.py::TestInMemoryIdempotencyStore::test_is_duplicate_new_message PASSED [ 63%]
+endpoint/tests/unit/webhook/test_idempotency.py::TestInMemoryIdempotencyStore::test_is_duplicate_after_marking PASSED [ 63%]
+endpoint/tests/unit/webhook/test_idempotency.py::TestInMemoryIdempotencyStore::test_is_duplicate_expired 

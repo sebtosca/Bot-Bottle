@@ -1,0 +1,15 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-8.3.4, pluggy-1.5.0 -- /home/lobo/anaconda3/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.13.5', 'Platform': 'Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39', 'Packages': {'pytest': '8.3.4', 'pluggy': '1.5.0'}, 'Plugins': {'jaxtyping': '0.3.2', 'json-report': '1.5.0', 'mock': '3.15.1', 'html': '4.1.1', 'xdist': '3.8.0', 'cov': '7.0.0', 'typeguard': '4.4.4', 'anyio': '4.7.0', 'metadata': '3.1.1'}}
+rootdir: /mnt/c/Users/SebastienToscano/BotBottle
+configfile: pytest.ini
+plugins: jaxtyping-0.3.2, json-report-1.5.0, mock-3.15.1, html-4.1.1, xdist-3.8.0, cov-7.0.0, typeguard-4.4.4, anyio-4.7.0, metadata-3.1.1
+collecting ... collected 76 items
+
+llm/tests/e2e/test_llama_e2e.py::TestLLME2E::test_generate_reply_e2e 
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! KeyboardInterrupt !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/home/lobo/anaconda3/lib/python3.13/typing.py:1035: KeyboardInterrupt
+(to show a full traceback on KeyboardInterrupt use --full-trace)
+============================ no tests ran in 2.81s =============================
